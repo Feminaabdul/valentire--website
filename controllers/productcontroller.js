@@ -33,6 +33,7 @@ const postAddProduct = async (req, res) => {
         const saveProduct = await product.save();
 
         // console.log("yuio");
+                // console.log("yuio");
 
         if (saveProduct) {
             res.redirect("/admin/listproduct");
