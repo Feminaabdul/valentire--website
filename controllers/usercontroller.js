@@ -14,6 +14,9 @@ const isLoggedIn = (req, res,user) => {
     return false;
 }
 
+// console.log("yuio");
+// console.log("yuio");
+
 const loadHome = async (req, res) => {
     try {
         const product = await products.find({ status: true })
