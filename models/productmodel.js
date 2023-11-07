@@ -15,7 +15,7 @@ const productSchema = new mongoose.Schema({
     },
     mrp:{
         type:Number,
-        required:true
+       
       
     },
     category:{

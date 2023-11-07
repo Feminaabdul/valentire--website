@@ -11,10 +11,12 @@ const postAddProduct = async (req, res) => {
             image[i] = req.files[i].filename;
         }
 
+
+
         const { productname, stockquantity, price, description, category, material, offer } = req.body;
+       if(offer){
         const offers = await Offer.findById(offer)
         const newprice=Number(price)
-
         const calculator = newprice - (newprice * offers.discount / 100)
         
         const product = new Product({
@@ -29,17 +31,47 @@ const postAddProduct = async (req, res) => {
             material: material,
             offer: offer
         })
-      
+        const save1Product = await product.save();
+        
+        if (save1Product) {
+            res.redirect("/admin/listproduct");
+        } else {
+            const categorydata = await Category.find({});
+            res.render('addproduct', { category: categorydata, message: "Something went wrong" })
+        }
+       }else{
+        const newprice=Number(price)
+        
+        const product = new Product({
+          
+            productname: productname,
+            stockquantity: stockquantity,
+            price: newprice,
+
+            description: description,
+            category: category,
+            image: image,
+            material: material,
+          
+        })
         const saveProduct = await product.save();
-
-
-
+        
         if (saveProduct) {
             res.redirect("/admin/listproduct");
         } else {
             const categorydata = await Category.find({});
             res.render('addproduct', { category: categorydata, message: "Something went wrong" })
         }
+       }
+
+
+
+       
+      
+   
+
+
+
     } catch (error) {
         console.log(error.message)
     }
