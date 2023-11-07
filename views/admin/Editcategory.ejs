@@ -1,0 +1,87 @@
+<%-include('../layouts/adminlayout/header.ejs')%>
+
+
+    <!--**********************************
+            Sidebar end
+        ***********************************-->
+
+    <!--**********************************
+            Content body start
+        ***********************************-->
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="row page-titles mx-0">
+                <div class="col-sm-6 p-md-0">
+                    <div class="welcome-text">
+                        <h4>Form</h4>
+                    </div>
+                </div>
+                <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">Table</a></li>
+                        <li class="breadcrumb-item active"><a href="javascript:void(0)">Bootstrap</a></li>
+                    </ol>
+                </div>
+            </div>
+            <!-- row -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Edit Category </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="basic-form">
+                                <form method="post">
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>category Name</label>
+                                            <input type="text" class="form-control"  name="categoryName"
+                                                required placeholder="Enter Category"
+                                                value="<%=category.categoryName%>">
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <% if(typeof message !='undefined' ){ %>
+                                            <p id="roll" style="color: red;">
+                                                <%=message%>
+                                            </p>
+                                            <% } %>
+                                    </div>
+                                    <input type="submit" class="btn btn-primary" value="Submit">
+
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--**********************************
+            Content body end
+        ***********************************-->
+
+
+    <!--**********************************
+            Footer start
+        ***********************************-->
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
+        </div>
+    </div>
+
+    <script src="./vendor/global/global.min.js"></script>
+    <script src="./js/quixnav-init.js"></script>
+    <script src="./js/custom.min.js"></script>
+
+
+
+
+    </body>
+   
+
+    </html>

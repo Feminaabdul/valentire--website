@@ -1,0 +1,185 @@
+<%-include('../layouts/adminlayout/header.ejs')%>
+
+
+    <!--**********************************
+            Sidebar end
+        ***********************************-->
+
+    <!--**********************************
+            Content body start
+        ***********************************-->
+    <div class="content-body">
+        <div class="container-fluid">
+            
+            <!-- row -->
+
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Edit product </h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="basic-form">
+                                <form method="post" enctype="multipart/form-data">
+
+                                    <div class="form-row">
+                                        <div class="form-group col-md-6">
+                                            <label>Product Name</label>
+                                            <input type="text" class="form-control" name="productName" placeholder="Product Name" value="<%=product.productname %>">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Stock Quantity</label>
+                                            <input type="number" class="form-control" name="stockquantity" placeholder="Stock Quantity" value="<%=product.stockquantity%>">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label>Price</label>
+                                            <input type="number" class="form-control" name="price" placeholder="price" value="<%=product.price%>">
+                                        </div>
+                                        <div class="form-group col-md-6">
+                                            <label for="imageUpload">Choose an Image:</label>
+                                            <input type="file" class="form-control" name="image" id="imageUpload"
+                                                accept="image/*" multiple>
+
+                                        </div>
+                                        <div class="form-group" id="preview-group" style="display: none;">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    Preview Images
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-4">
+                                                            <div class="img-preview-p">
+                                                                <img src="" alt="" class="preview" id="preview-img"
+                                                                    data-img-index="1"
+                                                                    style="max-width: 100%; object-fit: cover; display: block;" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="img-preview-p">
+                                                                <img src="" alt="" class="preview" data-img-index="2"
+                                                                    style="max-width: 100%; object-fit: cover; display: block;" />
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <div class="img-preview-p">
+                                                                <img src="" alt="" class="preview" id="preview-img"
+                                                                    data-img-index="3"
+                                                                    style="max-width: 100%; object-fit: cover; display: block;" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        
+                                        </div>  
+                                      
+                                        <div class="form-group col-md-12">
+                                            <label>Description</label>      
+                                            <input type="text" class="form-control" name="description" placeholder="Description" value="<%=product.description%>">
+                                        </div>
+
+                    
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                            <label>Catagory</label>
+                                            <select id="inputState" class="form-control" name="category">
+                                                <option></option>
+                                                <%
+                                                    for(let i=0;i<category.length;i++){
+                                                        %>
+                                                            <option><%=category[i].categoryName%></option>
+                                                        <%
+                                                    }
+                                                %>
+                                            </select>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label>material</label>
+                                        <input type="text" class="form-control" name="material"
+                                            placeholder="material">
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group col-md-4">
+                                            <label>offer</label>
+                                            <select id="inputState" class="form-control" name="offer">
+                                                <option></option>
+                                                <% for(let i=0;i<offer.length;i++){ %>
+                                                    <option value="<%= offer[i]._id %>">
+                                                        <%=offer[i].name%>
+                                                    </option>
+                                                    <% } %>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                    <input type="submit" class="btn btn-primary" value="Submit">
+                                    <div>
+                                        <%
+                                            if(typeof message != 'undefined'){
+                                                %>
+                                                    <p style="color: red;"><%=message%></p>
+                                                <%
+                                            }
+                                        %>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--**********************************
+            Content body end
+        ***********************************-->
+
+
+    <!--**********************************
+            Footer start
+        ***********************************-->
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
+        </div>
+    </div>
+     
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const previewInput = document.querySelector('#imageUpload')
+            const previewArea = document.getElementById('preview-group')
+
+            previewInput.addEventListener('change', function (e) {
+                console.log("sdfsdfsdf");
+                const previewImages = document.querySelectorAll('.preview');
+                if (e.target.files.length) {
+                    if (e.target.files.length > 3) {
+                        e.target.value = ''; // Reset the file input
+                        previewImages.forEach(image => image.src = ''); // Clear preview images
+                        alert("You can only select up to 3 images.");
+                    } else {
+                        for (let i = 0; i < e.target.files.length; i++) {
+                            previewImages[i].src = URL.createObjectURL(e.target.files[i])
+                        }
+                        previewArea.style.display = 'block'
+                    }
+                }
+            })
+        });
+    </script>
+
+    <script src="./vendor/global/global.min.js"></script>
+    <script src="./js/quixnav-init.js"></script>
+    <script src="./js/custom.min.js"></script>
+
+
+
+
+    </body>
+
+    </html>
