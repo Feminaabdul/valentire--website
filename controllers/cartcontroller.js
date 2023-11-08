@@ -16,7 +16,7 @@ const isLoggedIn = (req, res) => {
 const loadcart = async (req, res) => {
     try {
         const cus = await User.findById(req.session.user_id).populate("cart.product")
-
+        console.log(cus);
         const total = cus.cart.reduce((total, item) => {
             total + item.total
         }, 0)

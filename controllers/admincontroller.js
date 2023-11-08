@@ -20,13 +20,7 @@ const loadusers = async (req, res) => {
 
     }
 }
-const loadorder = async (req, res) => {
-    try {
-        res.render('order')
-    } catch (error) {
-        console.log(error.message);
-    }
-}
+
 
 
 const loadlogin = async (req,res)=>{
@@ -98,14 +92,24 @@ const loadLogout = async (req,res)=>{
         console.log(error.message);
     }
 }
+const loadorder = async (req, res) => {
+    try {
+        
+        const odd=await Order.find({})
+        res.render('order',{odd})
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 module.exports = {
     loaddashboard,
     loadusers,
-    loadorder,
+    
     loadlogin,
     postlogin,
     blockuser,
     unblockuser,
-    loadLogout
+    loadLogout,
+    loadorder
 }

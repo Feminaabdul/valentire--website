@@ -16,7 +16,7 @@ adminroute.use(express.static('public/Admins'))
 
 adminroute.get("/dashboard", adminauth.isadminLogin, admincontroller.loaddashboard)
 adminroute.get("/users", adminauth.isadminLogin, admincontroller.loadusers)
-adminroute.get("/order", adminauth.isadminLogin, admincontroller.loadorder)
+adminroute.get("/order", adminauth.isadminLogin,admincontroller.loadorder)
 adminroute.get("/addCatagory", adminauth.isadminLogin, categorycontroller.loadcatagory)
 adminroute.get("/listCategory", adminauth.isadminLogin, categorycontroller.listCategory)
 adminroute.get("/product", adminauth.isadminLogin, productcontroller.loadproduct)

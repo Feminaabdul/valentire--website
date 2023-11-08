@@ -73,9 +73,36 @@
 
 						</div>
 					</form><!-- END -->
+					<button type="button" id="openModalBtn">Select Address</button>
 
+					<div id="sampleModal" class="modal">
+						<div class="modal-content">
+							<span class="close" id="closeModalBtn">&times;</span>
+							
+							<h2>Sample Modal</h2>
+							<p>This is a sample modal. Click the close button to close it.</p>
+							<%= currentUser.name %>
+							<%= Address1.building %>
+							<% if (Array.isArray(Address1)) { %>
 
-
+								<% Address1.forEach(function(address) { %>
+									<div class="col-lg-12 p-4 border mb-3">
+								  <%= address.building %>
+								 
+			                       
+								  <%= address.area %>,
+								  <%= address.city %>,
+								  <%= address.state %>,
+								  <%= address.pincode %>
+								</div>
+								<% }); %>
+							  <% } else { %>
+								<!-- Display a message or handle the case where Address is not an array -->
+							
+							  <% } %>
+						</div>
+					</div>
+				
 					<div class="row mt-5 pt-3 d-flex">
 						<div class="col-md-6 d-flex">
 							<div class="cart-detail cart-total bg-light p-3 p-md-4">
@@ -96,7 +123,7 @@
 								<p class="d-flex total-price">
 									<span>Total</span>
 									<span>$<%= total+10 %><span>
-										
+
 								</p>
 							</div>
 						</div>
@@ -142,7 +169,7 @@
 		</div>
 	</section> <!-- .section -->
 
-
+	
 	<footer class="ftco-footer ftco-section">
 		<div class="container">
 			<div class="row">
@@ -286,7 +313,78 @@
 			});
 
 		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+            const openModalBtn = document.getElementById("openModalBtn");
+            const closeModalBtn = document.getElementById("closeModalBtn");
+            const sampleModal = document.getElementById("sampleModal");
+
+            // Function to open the modal
+            openModalBtn.addEventListener("click", function () {
+                sampleModal.style.display = "block";
+            });
+
+            // Function to close the modal
+            closeModalBtn.addEventListener("click", function () {
+                sampleModal.style.display = "none";
+            });
+
+            // Close the modal if the user clicks outside of it
+            window.addEventListener("click", function (event) {
+                if (event.target === sampleModal) {
+                    sampleModal.style.display = "none";
+                }
+            });
+        });
 	</script>
+
+
+	<style>
+	
+        /* Styling for the modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 10%;
+            left: 10%;
+            width: 50%;
+            height: 50%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        /* Styling for the open modal button */
+        #openModalBtn {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #openModalBtn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Close button */
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+        }
+	</style>
 
 	</body>
 

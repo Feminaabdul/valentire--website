@@ -8,14 +8,12 @@ const address = require('../models/addressmodel');
 const async = require("hbs/lib/async");
 const isLoggedIn = (req, res,user) => {
     if (req.session.user_id) {
-        const user=req.session.user_id
+       const user =req.session.user_id
         return true;
     }
     return false;
 }
 
-// console.log("yuio");
-// console.log("yuio");
 
 const loadHome = async (req, res) => {
     try {
@@ -310,14 +308,17 @@ const loadlogout = async (req, res) => {
 
 const loadcheckout = async (req, res) => {
     try {
-        const Address = await address.findOne({ user: req.session.user_id, default: true })
+        const Address = await address.findOne({ user: req.session.user_id, default: true }).populate("user")
+        const Address1 = await address.find({ user: req.session.user_id, default: false })
         const currentUser = await User.findById(req.session.user_id)
+        const user =req.session.user_id
         if (currentUser) {
             await currentUser.populate("cart.product")
             await catagories.find({})
             const cartproducts = currentUser.cart
             const total = currentUser.cart.reduce((total, item) => {
                 return total + (item.product.price * item.quantity)
+
             }, 0)
             console.log(total);
 
@@ -326,7 +327,9 @@ const loadcheckout = async (req, res) => {
                 currentUser,
                 cartproducts,
                 Address,
-                total
+                Address1,
+                total,
+                user
             })
         }
 
@@ -339,6 +342,7 @@ const loadcheckout = async (req, res) => {
 
 const loadprofle = async (req, res) => {
     try {
+        const user =req.session.user_id
         const currentUser = await User.findById(req.session.user_id)
         const Address = await address.find({ user: req.session.user_id })
 
@@ -347,6 +351,7 @@ const loadprofle = async (req, res) => {
             isLoggedIn: isLoggedIn(req, res),
             currentUser,
             Address,
+            user
         })
 
 
@@ -359,12 +364,13 @@ const loadaddress = async (req, res) => {
     try {
         const currentUser = await User.findById(req.session.user_id)
         const Address = await address.find({ user: req.session.user_id })
-
+        const user =req.session.user_id
 
         res.render('AddAddress', {
             isLoggedIn: isLoggedIn(req, res),
             currentUser,
             Address,
+            user
         })
 
 
@@ -423,6 +429,7 @@ const placeorder = async (req, res) => {
         console.log(error.message);
     }
 }
+
 module.exports = {
     loadHome,
     loadlogin,
@@ -440,4 +447,5 @@ module.exports = {
     loadaddress,
     postAddress,
     placeorder
+    
 }

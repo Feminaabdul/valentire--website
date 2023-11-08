@@ -57,12 +57,14 @@
 
                                                     <td>
                                                         <% if (product[i].offer) { %>
-                                                            <span><del><%=product[i].mrp%></del></span>
+                                                            <span><del>
+                                                                    <%=product[i].mrp%>
+                                                                </del></span>
                                                             <%=product[i].price%>
-                                                            
-                                                        <% } else { %>
-                                                            <%=product[i].price%>
-                                                        <% } %>
+
+                                                                <% } else { %>
+                                                                    <%=product[i].price%>
+                                                                        <% } %>
                                                     </td>
                                                     <td><span class="text-muted">
                                                             <%=product[i].category%>
@@ -73,9 +75,15 @@
                                                         </span>
                                                     </td>
                                                     <td><span class="text-muted">
-                                                        <% if (product[i].offer) { %>
-                                                            <%=product[i].offer.discount%>
-                                                            <% }%>
+                                                            <% if (product[i].offer) { %>
+                                                                <%=product[i].offer.discount%>
+                                                                    <% } else { %>
+
+                                                                        <p style="margin-top: 16px; color: brown;">No
+                                                                            Offer</p>
+
+
+                                                                        <% }%>
                                                         </span>
                                                     </td>
                                                     <td>
@@ -90,10 +98,11 @@
                                                     </td>
 
                                                     <td>
-                                                        <img src="/Admins/productImages/<%= product[i].image[0] %>" width="80px" height="80px">
-                                                        </td>
+                                                        <img src="/Admins/productImages/<%= product[i].image[0] %>"
+                                                            width="80px" height="80px">
+                                                    </td>
 
-                                                  
+
 
                                                     <td><span class="badge badge-success"></span>
                                                         <% if(product[i].status){ %>
@@ -103,9 +112,9 @@
                                                                 <a class="btn btn-danger"
                                                                     href="/admin/listproduct?id=<%=product[i]._id%>">List</a>
                                                                 <% } %>
-                                                        <a class="btn btn-success"
-                                                            href="/admin/Editproduct?id=<%=product[i]._id%>">Edit</a>
-                                                       
+                                                                    <a class="btn btn-success"
+                                                                        href="/admin/Editproduct?id=<%=product[i]._id%>">Edit</a>
+
                                                     </td>
                                                     <td><span>
                                                             <%=product[i].description%>
