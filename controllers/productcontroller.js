@@ -88,16 +88,17 @@ const postEditProduct = async (req, res) => {
         for (let i = 0; i < req.files.length; i++) {
             image[i] = req.files[i].filename;
         }
-
+        const newprice=Number(req.body.price)
         const Data = await Product.findById(req.query.id);
         const offer=req.body.offer
         
-        const newprice=Number(req.body.price)
+      
         
       if(offer){
         const offers = await Offer.findById(offer)
-        const calculator = newprice - (newprice * offers.discount / 100)
         const newprice=Number(req.body.price)
+        const calculator = newprice - (newprice * offers.discount / 100)
+       
         Data.productname = req.body.productName
         Data.mrp = newprice
         Data.price = calculator

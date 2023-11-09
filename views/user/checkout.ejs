@@ -79,23 +79,23 @@
 						<div class="modal-content">
 							<span class="close" id="closeModalBtn">&times;</span>
 							
-							<h2>Sample Modal</h2>
-							<p>This is a sample modal. Click the close button to close it.</p>
+							<h2>select Address</h2>
+							<p>choose</p>
 							<%= currentUser.name %>
 							<%= Address1.building %>
 							<% if (Array.isArray(Address1)) { %>
-
-								<% Address1.forEach(function(address) { %>
-									<div class="col-lg-12 p-4 border mb-3">
-								  <%= address.building %>
-								 
-			                       
-								  <%= address.area %>,
-								  <%= address.city %>,
-								  <%= address.state %>,
-								  <%= address.pincode %>
-								</div>
-								<% }); %>
+							<select name="" id=""><% Address1.forEach(function(address) { %>
+								<div class="col-lg-12 p-4 border mb-3">
+							  <%= address.building %>
+							 
+							   
+							  <%= address.area %>,
+							  <%= address.city %>,
+							  <%= address.state %>,
+							  <%= address.pincode %>
+							</div>
+							<% }); %></select>
+								
 							  <% } else { %>
 								<!-- Display a message or handle the case where Address is not an array -->
 							

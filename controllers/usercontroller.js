@@ -6,9 +6,9 @@ const products = require("../models/productmodel")
 const catagories = require('../models/category');
 const address = require('../models/addressmodel');
 const async = require("hbs/lib/async");
-const isLoggedIn = (req, res,user) => {
+const isLoggedIn = (req, res, user) => {
     if (req.session.user_id) {
-       const user =req.session.user_id
+        const user = req.session.user_id
         return true;
     }
     return false;
@@ -20,7 +20,7 @@ const loadHome = async (req, res) => {
         const product = await products.find({ status: true })
         const user = await User.findById(req.session.user_id)
         const catagory = await catagories.find({})
-        res.render('home', { isLoggedIn: isLoggedIn(req, res), product: product, catagory: catagory,user:user })
+        res.render('home', { isLoggedIn: isLoggedIn(req, res), product: product, catagory: catagory, user: user })
     } catch (error) {
         console.log(error.message);
     }
@@ -45,7 +45,7 @@ const loadwish = async (req, res) => {
 const loadshop = async (req, res) => {
     try {
         const user = await User.findById(req.session.user_id)
-     
+
         let product
         if (req.query.material) {
             product = await products.find({ status: true, material: req.query.material })
@@ -55,7 +55,7 @@ const loadshop = async (req, res) => {
 
         let category
         if (req.query.category) {
-         
+
             product = await products.find({ status: true, category: req.query.category })
         } else {
             category = await catagories.find({})
@@ -308,10 +308,12 @@ const loadlogout = async (req, res) => {
 
 const loadcheckout = async (req, res) => {
     try {
-        const Address = await address.findOne({ user: req.session.user_id, default: true }).populate("user")
+        const Address = await address.findOne({ user: req.session.user_id, default: true })
+        console.log("jkkk",Address);
         const Address1 = await address.find({ user: req.session.user_id, default: false })
+
         const currentUser = await User.findById(req.session.user_id)
-        const user =req.session.user_id
+        const user = req.session.user_id
         if (currentUser) {
             await currentUser.populate("cart.product")
             await catagories.find({})
@@ -342,9 +344,9 @@ const loadcheckout = async (req, res) => {
 
 const loadprofle = async (req, res) => {
     try {
-        const user =req.session.user_id
+        const user = req.session.user_id
         const currentUser = await User.findById(req.session.user_id)
-        const Address = await address.find({ user: req.session.user_id })
+        const Address = await address.find({ user: req.session.user_id }).populate("user");
 
 
         res.render('profile', {
@@ -360,11 +362,23 @@ const loadprofle = async (req, res) => {
         console.log(error.message);
     }
 }
+const postprofile = async (req, res) => {
+    const user = req.session.user_id
+    const currentUser = await User.findById(user)
+    await address.find({ user })
+    const { name, email, phone } = req.body;
+    currentUser.name = name;
+    currentUser.email = email;
+    currentUser.phone = phone;
+    await currentUser.save()
+    res.redirect("/profile");
+}
+
 const loadaddress = async (req, res) => {
     try {
         const currentUser = await User.findById(req.session.user_id)
         const Address = await address.find({ user: req.session.user_id })
-        const user =req.session.user_id
+        const user = req.session.user_id
 
         res.render('AddAddress', {
             isLoggedIn: isLoggedIn(req, res),
@@ -381,13 +395,12 @@ const loadaddress = async (req, res) => {
 }
 const postAddress = async (req, res) => {
     try {
-
         const Address = await address.find({ user: req.session.user_id })
         if (Address.length < 3) {
-            const { state, building, area, city, pincode } = req.body
-            console.log(req.body);
+            const { name, state, building, area, city, pincode } = req.body;
             const newAddress = new address({
                 user: req.session.user_id,
+                name,
                 pincode,
                 state,
                 city,
@@ -446,6 +459,7 @@ module.exports = {
     , loadprofle,
     loadaddress,
     postAddress,
-    placeorder
-    
+    placeorder,
+    postprofile
+
 }

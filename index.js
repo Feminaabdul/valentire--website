@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const db=require("./Config/db")
 
+const methodOverride = require('method-override');
 
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
@@ -10,6 +11,7 @@ var morgan = require('morgan')
 
 
 app.use(express.static('public'));
+app.use(methodOverride('_method'));
 app.use(express.urlencoded({extends:true}))
 app.use(express.json());
 app.use(cookieParser());
