@@ -1,13 +1,14 @@
 const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
     Address:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Address',
         required:true
     },
-    
-    userName:{
-        type:String,
-        required:true
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
     },
     paymentMethod:{
         type:String,
@@ -17,6 +18,7 @@ const orderSchema = new mongoose.Schema({
         type:String
     },
     products:[{
+        
         productId:{
             type:String,
             ref:"product",
@@ -37,7 +39,6 @@ const orderSchema = new mongoose.Schema({
         type:Number,
         required:true
     },
- 
     discountAmount : {
         type:Number,
         default: 0
@@ -46,7 +47,9 @@ const orderSchema = new mongoose.Schema({
         type:Date
     },
     status:{
-        type:String
+        type:String,
+      
+        default: ' not Processing',
     },
     orderWallet:{
         type:Number

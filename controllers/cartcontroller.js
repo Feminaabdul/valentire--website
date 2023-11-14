@@ -15,12 +15,13 @@ const isLoggedIn = (req, res) => {
 
 const loadcart = async (req, res) => {
     try {
+        const user = req.session.user_id
         const cus = await User.findById(req.session.user_id).populate("cart.product")
-        console.log(cus);
+
         const total = cus.cart.reduce((total, item) => {
             total + item.total
         }, 0)
-        res.render('cart', { isLoggedIn: isLoggedIn(req, res), cus, total })
+        res.render('cart', { isLoggedIn: isLoggedIn(req, res),user, cus, total })
     } catch (error) {
         console.log(error.message);
     }

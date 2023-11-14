@@ -1,4 +1,5 @@
 require('dotenv').config();
+var cors = require('cors')
 const express = require('express');
 const app = express();
 const db=require("./Config/db")
@@ -9,7 +10,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 var morgan = require('morgan')
 
-
+app.use(cors())
 app.use(express.static('public'));
 app.use(methodOverride('_method'));
 app.use(express.urlencoded({extends:true}))

@@ -17,7 +17,8 @@ const postAddProduct = async (req, res) => {
        if(offer){
         const offers = await Offer.findById(offer)
         const newprice=Number(price)
-        const calculator = newprice - (newprice * offers.discount / 100)
+        const calculator = newprice * (1 - offers.discount / 100);
+
         
         const product = new Product({
             mrp: newprice,
@@ -55,7 +56,7 @@ const postAddProduct = async (req, res) => {
           
         })
         const saveProduct = await product.save();
-        
+        console.log(product)
         if (saveProduct) {
             res.redirect("/admin/listproduct");
         } else {
@@ -97,8 +98,9 @@ const postEditProduct = async (req, res) => {
       if(offer){
         const offers = await Offer.findById(offer)
         const newprice=Number(req.body.price)
-        const calculator = newprice - (newprice * offers.discount / 100)
-       
+   
+        const calculator = newprice * (1 - offers.discount / 100);
+
         Data.productname = req.body.productName
         Data.mrp = newprice
         Data.price = calculator
@@ -122,7 +124,7 @@ const postEditProduct = async (req, res) => {
         Data.image = image
         Data.description = req.body.description
         Data.material = req.body.material
-        
+        Data.offer = null; 
       }
        
 

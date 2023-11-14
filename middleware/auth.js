@@ -1,4 +1,4 @@
-
+const User = require("../models/user")
 
 const isLogin = async (req, res, next) => {
     try {
@@ -23,8 +23,15 @@ const isLogout = async (req, res, next) => {
         console.log(error.message);
     }
 }
-
+ const checkToBlock = async (req, res, next) => {
+    const currentUser = await User.findById(req.session.user_id);
+    if (currentUser && currentUser.block === true) {
+        req.session.user_id = null;
+    }
+    next();
+};
 module.exports = {
     isLogin,
-    isLogout
+    isLogout,
+    checkToBlock
 }

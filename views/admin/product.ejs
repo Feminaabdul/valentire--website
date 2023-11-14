@@ -56,11 +56,16 @@
                                                     </td>
 
                                                     <td>
+
+
+
+
+
                                                         <% if (product[i].offer) { %>
-                                                            <span><del>
+                                                            <div><del>
                                                                     <%=product[i].mrp%>
-                                                                </del></span>
-                                                            <%=product[i].price%>
+                                                                </del></div>
+                                                           <div> <%=product[i].price%></div>
 
                                                                 <% } else { %>
                                                                     <%=product[i].price%>

@@ -17,159 +17,185 @@
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-xl-10 ftco-animate">
-					<form action="#" class="billing-form">
+					<form action="/placeorder" method="post" class="billing-form">
+
 						<h3 class="mb-4 billing-heading">Billing Details</h3>
-						<div class="row align-items-end">
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="firstname"> Name</label>
-									<input type="text" class="form-control" value="<%=currentUser.name %>"
-										placeholder="">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="state">state</label>
-									<input type="text" class="form-control" value="<%=Address.state %>" placeholder="">
-								</div>
-							</div>
-							<div class="w-100"></div>
-
-							<div class="w-100"></div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="streetaddress">building</label>
-									<input type="text" class="form-control" value="<%=Address.building %>"
-										placeholder="">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="postcodezip">Area</label>
-									<input type="text" class="form-control" value="<%=Address.area %>" placeholder="">
-								</div>
-							</div>
-
-
-							<div class="w-100"></div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="towncity">City</label>
-									<input type="text" class="form-control" value="<%=Address.city %> " placeholder="">
-								</div>
-							</div>
-							<div class="col-md-6">
-								<div class="form-group">
-									<label for="postcodezip">Pincode</label>
-									<input type="text" class="form-control" value="<%=Address.pincode %> "
-										placeholder="">
-								</div>
-							</div>
-
-
-
-
-
-
-						</div>
-					</form><!-- END -->
-					<button type="button" id="openModalBtn">Select Address</button>
-
-					<div id="sampleModal" class="modal">
-						<div class="modal-content">
-							<span class="close" id="closeModalBtn">&times;</span>
-							
-							<h2>select Address</h2>
-							<p>choose</p>
-							<%= currentUser.name %>
-							<%= Address1.building %>
-							<% if (Array.isArray(Address1)) { %>
-							<select name="" id=""><% Address1.forEach(function(address) { %>
-								<div class="col-lg-12 p-4 border mb-3">
-							  <%= address.building %>
-							 
-							   
-							  <%= address.area %>,
-							  <%= address.city %>,
-							  <%= address.state %>,
-							  <%= address.pincode %>
-							</div>
-							<% }); %></select>
-								
-							  <% } else { %>
-								<!-- Display a message or handle the case where Address is not an array -->
-							
-							  <% } %>
-						</div>
-					</div>
-				
-					<div class="row mt-5 pt-3 d-flex">
-						<div class="col-md-6 d-flex">
-							<div class="cart-detail cart-total bg-light p-3 p-md-4">
-								<h3 class="billing-heading mb-4">Cart Total</h3>
-								<p class="d-flex">
-									<span>Subtotal</span>
-									<span>$<%= total %></span>
-								</p>
-								<p class="d-flex">
-									<span>Delivery</span>
-									<span>$10.00</span>
-								</p>
-								<p class="d-flex">
-									<span>Discount</span>
-									<span>$0.00</span>
-								</p>
-								<hr>
-								<p class="d-flex total-price">
-									<span>Total</span>
-									<span>$<%= total+10 %><span>
-
-								</p>
-							</div>
-						</div>
-						<div class="col-md-6">
-							<div class="cart-detail bg-light p-3 p-md-4">
-								<h3 class="billing-heading mb-4">Payment Method</h3>
-
-								<div class="form-group">
-									<div class="col-md-12">
-										<div class="radio">
-											<label><input type="radio" name="optradio" class="mr-2"> Cash On
-												Delivery</label>
-										</div>
+						<% if (Address) { %>
+							<div class="row align-items-end">
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="firstname"> Name</label>
+										<input type="text" class="form-control" value="<%=Address.name %>"
+											placeholder="">
 									</div>
 								</div>
-								<div class="form-group">
-									<div class="col-md-12">
-										<div class="radio">
-											<label><input type="radio" name="optradio" class="mr-2"> razorpay</label>
-										</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="state">state</label>
+										<input type="text" class="form-control" value="<%=Address.state %>"
+											placeholder="">
+									</div>
+								</div>
+								<div class="w-100"></div>
+
+								<div class="w-100"></div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="streetaddress">building</label>
+										<input type="text" class="form-control" value="<%=Address.building %>"
+											placeholder="">
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="postcodezip">Area</label>
+										<input type="text" class="form-control" value="<%=Address.area %>"
+											placeholder="">
 									</div>
 								</div>
 
-								<p><a href="#" class="btn btn-primary py-3 px-4">Place an order</a></p>
-							</div>
-							<div>
-								<form action="" method="post">
-									<div class="col-md-4">
-										<div>
-											<h4>coupon</h4>
-											<input type="text" class="form-group py-3" name="coupon" id="coupon"
-												placeholder="Paste Coupon Code">
-										</div>
-										<button type="submit" class="btn btn-primary btn-sm">Apply Coupon</button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
 
+								<div class="w-100"></div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="towncity">City</label>
+										<input type="text" class="form-control" value="<%=Address.city %>"
+											placeholder="">
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group">
+										<label for="postcodezip">Pincode</label>
+										<input type="text" class="form-control" value="<%=Address.pincode %>"
+											placeholder="">
+									</div>
+								</div>
+
+
+							</div>
+							<% } else { %>
+								<p>No address is available. Please add an address before proceeding.</p>
+								<% } %>
+
+									<div class="col-md-6">
+										<div class="cart-detail bg-light p-3 p-md-4">
+											<h2 class="billing-heading mb-4">Select address</h2>
+											<% if (Address) { %>
+												
+												<div class="form-group">
+													<div class="col-md-12">
+														<label>
+															<input type="radio" name="address" value="default">
+															<%= Address.name %>, <%= Address.state %>, <%=
+																		Address.building %>,
+																		<%= Address.pincode %>, <%= Address.city %>, <%=
+																					Address.area %>
+														</label>
+													</div>
+												</div>
+											
+												<% } else { %>
+													<p>No address is added</p>
+													
+													<% } %>
+
+													<% if (Address1 &&Address1.length> 0) { %>
+														<% for (let i=0; i < Address1.length; i++) { %>
+															<div class="form-group">
+																<div class="col-md-12">
+																	<label>
+																		<input type="radio" name="address"
+																			value="<%= 'address' + (i + 1) %>">
+																		<%= Address1[i].name %>, <%= Address1[i].state
+																				%>, <%= Address1[i].building %>, <%=
+																						Address1[i].pincode %>, <%=
+																							Address1[i].city %>, <%=
+																								Address1[i].area %>
+																	</label>
+																</div>
+															</div>
+															<% } %>
+																<% } else { %>
+																	
+																	<a href="/addaddress" class="btn btn-primary">Add Address</a>
+																	<% } %>
+
+
+
+										</div>
+									</div>
+									<div class="row mt-5 pt-3 d-flex">
+										<div class="col-md-6 d-flex">
+											<div class="cart-detail cart-total bg-light p-3 p-md-4">
+												<h3 class="billing-heading mb-4">Cart Total</h3>
+												<p class="d-flex">
+													<span>Subtotal</span>
+													<span>$<%= total %></span>
+												</p>
+												<p class="d-flex">
+													<span>Delivery</span>
+													<span>$10.00</span>
+												</p>
+												<p class="d-flex">
+													<span>Discount</span>
+													<span>$0.00</span>
+												</p>
+												<hr>
+												<p class="d-flex total-price">
+													<span>Total</span>
+													<span>$<%= total+10 %><span>
+
+												</p>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="cart-detail bg-light p-3 p-md-4">
+												<h3 class="billing-heading mb-4">Payment Method</h3>
+
+												<div class="form-group">
+													<div class="col-md-12">
+														<div class="radio">
+															<label><input type="radio" name="paymentMethod" value="cod"
+																	class="mr-2"> Cash On Delivery</label>
+														</div>
+													</div>
+												</div>
+												<div class="form-group">
+													<div class="col-md-12">
+														<div class="radio">
+															<label><input type="radio" name="paymentMethod"
+																	value="razorpay" class="mr-2"> Razorpay</label>
+														</div>
+													</div>
+												</div>
+
+
+												<p><button type="submit" class="btn btn-primary py-3 px-4">Place an
+														order</button>
+												</p>
+											</div>
+											<div>
+												<form action="" method="post">
+													<div class="col-md-4">
+														<div>
+															<h4>coupon</h4>
+															<input type="text" class="form-group py-3" name="coupon"
+																id="coupon" placeholder="Paste Coupon Code">
+														</div>
+														<button type="submit" class="btn btn-primary btn-sm">Apply
+															Coupon</button>
+													</div>
+												</form>
+											</div>
+										</div>
+									</div>
+					</form>
 				</div> <!-- .col-md-8 -->
 			</div>
 		</div>
 	</section> <!-- .section -->
 
-	
+
 	<footer class="ftco-footer ftco-section">
 		<div class="container">
 			<div class="row">
@@ -259,7 +285,6 @@
 				stroke="#F96D00" />
 		</svg></div>
 
-
 	<script src="js/jquery.min.js"></script>
 	<script src="js/jquery-migrate-3.0.1.min.js"></script>
 	<script src="js/popper.min.js"></script>
@@ -314,77 +339,10 @@
 
 		});
 
-		document.addEventListener("DOMContentLoaded", function () {
-            const openModalBtn = document.getElementById("openModalBtn");
-            const closeModalBtn = document.getElementById("closeModalBtn");
-            const sampleModal = document.getElementById("sampleModal");
-
-            // Function to open the modal
-            openModalBtn.addEventListener("click", function () {
-                sampleModal.style.display = "block";
-            });
-
-            // Function to close the modal
-            closeModalBtn.addEventListener("click", function () {
-                sampleModal.style.display = "none";
-            });
-
-            // Close the modal if the user clicks outside of it
-            window.addEventListener("click", function (event) {
-                if (event.target === sampleModal) {
-                    sampleModal.style.display = "none";
-                }
-            });
-        });
 	</script>
 
 
-	<style>
-	
-        /* Styling for the modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 10%;
-            left: 10%;
-            width: 50%;
-            height: 50%;
-            background-color: rgba(0, 0, 0, 0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1;
-        }
 
-        .modal-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            text-align: center;
-        }
-
-        /* Styling for the open modal button */
-        #openModalBtn {
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #openModalBtn:hover {
-            background-color: #0056b3;
-        }
-
-        /* Close button */
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-        }
-	</style>
 
 	</body>
 

@@ -1,6 +1,18 @@
 <%-include("../layouts/userlayout/header.ejs")%>
+<style>
+	#zoom-container {
+		overflow: hidden;
+	}
 
- <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
+	#zoom-image {
+		transition: transform 0.2s ease-in-out;
+	}
+
+	#zoom-container:hover #zoom-image {
+		transform: scale(1.5);
+	}
+</style>
+ <div class="hero-wrap hero-bread" style="background-image: url('/Users/images/bg_6.jpg');">
       <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
           <div class="col-md-9 ftco-animate text-center">
@@ -10,49 +22,79 @@
         </div>
       </div>
     </div>
-
     <section class="ftco-section">
     	<div class="container">
     		<div class="row">
-    			<div class="col-lg-6 mb-5 ftco-animate">
-    				<a href="images/product-1.png" class="image-popup prod-img-bg"><img src="images/product-1.png" class="img-fluid" alt="Colorlib Template"></a>
-    			</div>
+    			<div class="col-lg-6 mb-5 ftco-animate" id="zoom-container">
+					<div class="semi-image-container mr-1 d-flex" style="display: flex ; justify-content: space-between; width: 33%; height:auto;">
+						<% for (let i = 0; i < product.image.length; i++) { %>
+							<img src="<%= '/Admins/productImages/' + product.image[i] %>" class="img-fluid" alt="Colorlib Template">
+						<% } %>
+					</div>
+					<div class="main " style="width: 100%; height: auto; display: block; margin-bottom: 20px;"><a href="images/product-1.png" class="image-popup prod-img-bg" id="zoom-link">
+						<img src="/Admins/productImages/<%=product.image[0]%>" class="img-fluid" alt="Colorlib Template" id="zoom-image">
+					</a></div>
+					
+				
+				</div>
+				<script>
+					document.addEventListener('DOMContentLoaded', function () {
+						var container = document.getElementById('zoom-container');
+						var image = document.getElementById('zoom-image');
+						var scaleFactor = 1.5; // Adjust the scale factor as needed
+	
+						container.addEventListener('wheel', function (e) {
+							e.preventDefault();
+	
+							scaleFactor += e.deltaY * -0.01;
+	
+							// Limit the zoom scale to a reasonable range
+							scaleFactor = Math.min(Math.max(0.5, scaleFactor), 3);
+	
+							image.style.transform = 'scale(' + scaleFactor + ')';
+						});
+					});
+				</script>				
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var container = document.getElementById('zoom-container');
+        var image = document.getElementById('zoom-image');
+        var magnifier = document.getElementById('magnifier');
+
+        // Get all sub-images
+        var subImages = document.querySelectorAll('.semi-image-container img');
+
+        // Add click event listener to each sub-image
+        subImages.forEach(function(subImage, index) {
+            subImage.addEventListener('click', function() {
+                // Update the main image source with the clicked sub-image
+                image.src = subImage.src;
+
+                // Reset magnifier position
+                magnifier.style.display = 'none';
+            });
+        });
+
+        container.addEventListener('mousemove', function (e) {
+            // Your existing code for magnifying the image goes here
+        });
+
+        container.addEventListener('mouseout', function () {
+            magnifier.style.display = 'none';
+        });
+    });
+</script>
+
     			<div class="col-lg-6 product-details pl-md-5 ftco-animate">
-    				<h3>Nike Free RN 2019 iD</h3>
-    				<div class="rating d-flex">
-							<p class="text-left mr-4">
-								<a href="#" class="mr-2">5.0</a>
-								<a href="#"><span class="ion-ios-star-outline"></span></a>
-								<a href="#"><span class="ion-ios-star-outline"></span></a>
-								<a href="#"><span class="ion-ios-star-outline"></span></a>
-								<a href="#"><span class="ion-ios-star-outline"></span></a>
-								<a href="#"><span class="ion-ios-star-outline"></span></a>
-							</p>
-							<p class="text-left mr-4">
-								<a href="#" class="mr-2" style="color: #000;">100 <span style="color: #bbb;">Rating</span></a>
-							</p>
-							<p class="text-left">
-								<a href="#" class="mr-2" style="color: #000;">500 <span style="color: #bbb;">Sold</span></a>
-							</p>
-						</div>
-    				<p class="price"><span>$120.00</span></p>
+    				<h3><%=product.productname%></h3>
+    			
+    				<p class="price"><span><%=product.price%></span></p>
     				<p>A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.</p>
     				<p>On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word "and" and the Little Blind Text should turn around and return to its own, safe country. But nothing the copy said could convince her and so it didn’t take long until a few insidious Copy Writers ambushed her, made her drunk with Longe and Parole and dragged her into their agency, where they abused her for their.
-						</p>
+						<%=product.description%>
+					</p>
 						<div class="row mt-4">
-							<div class="col-md-6">
-								<div class="form-group d-flex">
-		              <div class="select-wrap">
-	                  <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-	                  <select name="" id="" class="form-control">
-	                  	<option value="">Small</option>
-	                    <option value="">Medium</option>
-	                    <option value="">Large</option>
-	                    <option value="">Extra Large</option>
-	                  </select>
-	                </div>
-		            </div>
-							</div>
+							
 							<div class="w-100"></div>
 							<div class="input-group col-md-6 d-flex mb-3">
 	             	<span class="input-group-btn mr-2">
@@ -60,7 +102,7 @@
 	                   <i class="ion-ios-remove"></i>
 	                	</button>
 	            		</span>
-	             	<input type="text" id="quantity" name="quantity" class="quantity form-control input-number" value="1" min="1" max="100">
+	             	<input type="text" id="quantity" name="quantity" class="quantity form-control input-number" value="<%=product.stockquantity%>" min="1" max="100">
 	             	<span class="input-group-btn ml-2">
 	                	<button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
 	                     <i class="ion-ios-add"></i>
@@ -69,7 +111,7 @@
 	          	</div>
 	          	<div class="w-100"></div>
 	          	<div class="col-md-12">
-	          		<p style="color: #000;">80 piece available</p>
+	          		<p style="color: #000;"><%=product.stockquantity%> piece available</p>
 	          	</div>
           	</div>
           	<p><a href="cart.html" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a><a href="cart.html" class="btn btn-primary py-3 px-5">Buy now</a></p>
@@ -96,7 +138,7 @@
 
               <div class="tab-pane fade show active" id="v-pills-1" role="tabpanel" aria-labelledby="day-1-tab">
               	<div class="p-4">
-	              	<h3 class="mb-4">Nike Free RN 2019 iD</h3>
+	              	<h3 class="mb-4"><%=product.productname%></h3>
 	              	<p>On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word "and" and the Little Blind Text should turn around and return to its own, safe country. But nothing the copy said could convince her and so it didn’t take long until a few insidious Copy Writers ambushed her, made her drunk with Longe and Parole and dragged her into their agency, where they abused her for their.</p>
               	</div>
               </div>
@@ -152,7 +194,7 @@
 								   		</div>
 								   	</div>
 								   	<div class="review">
-								   		<div class="user-img" style="background-image: url(images/person_3.jpg)"></div>
+								   		<div class="user-img" style="background-image: url(/Users/images/person_3.jpg)"></div>
 								   		<div class="desc">
 								   			<h4>
 								   				<span class="text-left">Jacob Webb</span>
@@ -321,22 +363,23 @@
   <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px"><circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee"/><circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00"/></svg></div>
 
 
-  <script src="js/jquery.min.js"></script>
-  <script src="js/jquery-migrate-3.0.1.min.js"></script>
-  <script src="js/popper.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/jquery.easing.1.3.js"></script>
-  <script src="js/jquery.waypoints.min.js"></script>
-  <script src="js/jquery.stellar.min.js"></script>
-  <script src="js/owl.carousel.min.js"></script>
-  <script src="js/jquery.magnific-popup.min.js"></script>
-  <script src="js/aos.js"></script>
-  <script src="js/jquery.animateNumber.min.js"></script>
-  <script src="js/bootstrap-datepicker.js"></script>
-  <script src="js/scrollax.min.js"></script>
+  <script src="/Users/js/jquery.min.js"></script>
+  <script src="/Users/js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="/Users/js/popper.min.js"></script>
+  <script src="/Users/js/bootstrap.min.js"></script>
+  <script src="/Users/js/jquery.easing.1.3.js"></script>
+  <script src="/Users/js/jquery.waypoints.min.js"></script>
+  <script src="/Users/js/jquery.stellar.min.js"></script>
+  <script src="/Users/js/owl.carousel.min.js"></script>
+  <script src="/Users/js/jquery.magnific-popup.min.js"></script>
+  <script src="/Users/js/aos.js"></script>
+  <script src="/Users/js/jquery.animateNumber.min.js"></script>
+  <script src="/Users/js/bootstrap-datepicker.js"></script>
+  <script src="/Users/js/scrollax.min.js"></script>
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-  <script src="js/google-map.js"></script>
-  <script src="js/main.js"></script>
+  <script src="/Users/js/google-map.js"></script>
+  <script src="/Users/js/main.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
   <script>
 		$(document).ready(function(){
@@ -373,6 +416,7 @@
 		    });
 		    
 		});
+
 	</script>
     
   </body>

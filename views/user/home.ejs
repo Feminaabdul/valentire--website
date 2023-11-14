@@ -121,7 +121,16 @@
 								</div>
 								<h3><a href="#"><%= elem.productname %></a></h3>
 								<div class="pricing">
-									<p class="price"><span><%= elem.price %></span></p>
+									<p class="price"><span>
+										<%if(elem.offer){ %>
+										<div><del><%= elem.mrp %></del></div>
+										<div><%= elem.price %></div>
+										<% } else { %>
+										
+										<div><%= elem.price %></div>
+										<% } %>
+									</span>
+								</p>
 								</div>
 								<p class="bottom-area d-flex px-3">
 									<a href="#" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i

@@ -43,49 +43,50 @@
                                     <table class="table header-border table-responsive-sm">
                                         <thead>
                                             <tr>
-                                                <th>Name</th>
                                                 <th>product</th>
-                                                <th>count</th>
+                                                <th>Delivery Address</th>
+                                                <th>payment type</th>
+                                                <th>date</th>
                                                 <th>total</th>
-                                                <th>Address</th>
-                                                <th>Status</th>
+                                                <th>status</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td><a href="javascript:void(0)">Order #26589</a>
-                                                </td>
-                                                <td>Herman Beck</td>
-                                                <td><span class="text-muted">Oct 16, 2017</span>
-                                                </td>
-                                                <td>$45.00</td>
-                                                <td><span class="badge badge-success">Paid</span>
-                                                </td>
-                                               
-                                            </tr>
+                                            <% odd.forEach(order => { %>
+                                                <% order.products.forEach((product)=> { %>
+                                                <tr>
+                                                    <td><a href="javascript:void(0)"><%= product.productId.productname %></a></td>
+                                                    <td> <%= order.Address.name %><br>
+                                                        <%= order.Address.building %>, <%= order.Address.area %><br>
+                                                            <%= order.Address.city %>, <%= order.Address.state %><br>
+                                                                <%= order.Address.pincode %></td>
+                                                    <td><%= order.paymentMethod %></td>
+                                                    <td><%= order.createdAt.toDateString() %></td>
+                                                    <td>$<%= order.totalAmount %></td>
+                                                    <td>  <label>
+                                                        <input type="radio" name="orderStatus" value="Processing"> Processing
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio" name="orderStatus" value="Shipped"> Shipped
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio" name="orderStatus" value="Delivered"> Delivered
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio" name="orderStatus" value="Pending"> Pending
+                                                    </label>
+                                                    <label>
+                                                        <input type="radio" name="orderStatus" value="Cancelled"> Cancelled
+                                                    </label>
                                             
-                                            <tr>
-                                                <td><a href="javascript:void(0)">Order #98458</a>
-                                                </td>
-                                                <td>Caleb Richards</td>
-                                                <td><span class="text-muted">May 18, 2017</span>
-                                                </td>
-                                                <td>$38.00</td>
-                                                <td><span class="badge badge-info">Shipped</span>
-                                                </td>
-                                               
-                                            </tr>
-                                            <tr>
-                                                <td><a href="javascript:void(0)">Order #32658</a>
-                                                </td>
-                                                <td>June Lane</td>
-                                                <td><span class="text-muted">Apr 28, 2017</span>
-                                                </td>
-                                                <td>$77.99</td>
-                                                <td><span class="badge badge-success">Paid</span>
-                                                </td>
-                                               
-                                            </tr>
+                                                        <p class="text-primary font-weight-bolder"><%= order.status %></p>
+                                                        
+                                                    </td>
+                                                    
+                                                </tr>
+                                                <% }) %> 
+                                            <% }) %>
+                                           
                                         </tbody>
                                     </table>
                                 </div>

@@ -4,73 +4,72 @@
       <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
           <div class="col-md-9 ftco-animate text-center">
-          	<p class="breadcrumbs"><span class="mr-2"><a href="/">Home</a></span> <span>Cart</span></p>
+          	<p class="breadcrumbs"><span class="mr-2"><a href="/">Home</a></span> <span>wishlist</span></p>
             <h1 class="mb-0 bread">My Wishlist</h1>
           </div>
         </div>
       </div>
     </div>
 
-    <section class="ftco-section ftco-cart">
+    <section class="ftco-section ftco-wishlist">
 			<div class="container">
 				<div class="row">
     			<div class="col-md-12 ftco-animate">
-    				<div class="cart-list">
+    				<div class="wishlist-list">
 	    				<table class="table">
 						    <thead class="thead-primary">
 						      <tr class="text-center">
-						        <th>&nbsp;</th>
-						        <th>&nbsp;</th>
-						        <th>Product</th>
+						       
+						        <th>product</th>
+						        <th>name</th>
 						        <th>Price</th>
-						        <th>Quantity</th>
-						        <th>Total</th>
+						        <th>remove</th>
+								<th></th>
+						     
+						       
 						      </tr>
 						    </thead>
 						    <tbody>
-						      <tr class="text-center">
-						        <td class="product-remove"><a href="#"><span class="ion-ios-close"></span></a></td>
 						        
-						        <td class="image-prod"><div class="img" style="background-image:url(images/product-3.jpg);"></div></td>
-						        
-						        <td class="product-name">
-						        	<h3>Nike Free RN 2019 iD</h3>
-						        	<p>Far far away, behind the word mountains, far from the countries</p>
-						        </td>
-						        
-						        <td class="price">$4.90</td>
-						        
-						        <td class="quantity">
-						        	<div class="input-group mb-3">
-					             	<input type="text" name="quantity" class="quantity form-control input-number" value="1" min="1" max="100">
-					          	</div>
-					          </td>
-						        
-						        <td class="total">$4.90</td>
-						      </tr><!-- END TR-->
+									<% if (wis.wishlist && Array.isArray(wis.wishlist) && wis.wishlist.length > 0) { %>
+										<% for (let i = 0; i < wis.wishlist.length; i++) { %>
+											<tr class="text-center">
+												<td class="image-prod">
+													<img class="image"
+														src="/Admins/productImages/<%= wis.wishlist[i].product.image[0] %>"
+														alt="<%= wis.wishlist[i].product.productname %>" height="100px"
+														width="100px">
+												</td>
+												<td class="product-name">
+													<p><%= wis.wishlist[i].product.productname %></p>
+													
+												</td>
+												<td class="price">$<%= wis.wishlist[i].product.price %></td>
+												<td class="product-remove">
+													<a href="/remove-from-wish/<%= wis.wishlist[i].product._id %>"><span
+															class="ion-ios-close"></span></a>
+												</td>
+												<td class="add-to-cart">
+													<form action="/add-cart" method="post">
+														<input type="hidden" name="productId" value="<%= wis.wishlist[i].product._id %>">
+														<button type="submit" class="btn btn-primary">Add to Cart</button>
+													</form>
+												</td>
+											</tr>
+											
+										<% } %>
+									<% } else { %>
+										<tr>
+											<td colspan="3">Wishlist is empty</td>
+										</tr>
+									<% } %>
 
-						      <tr class="text-center">
-						        <td class="product-remove"><a href="#"><span class="ion-ios-close"></span></a></td>
-						        
-						        <td class="image-prod"><div class="img" style="background-image:url(images/product-4.jpg);"></div></td>
-						        
-						        <td class="product-name">
-						        	<h3>Nike Free RN 2019 iD</h3>
-						        	<p>Far far away, behind the word mountains, far from the countries</p>
-						        </td>
-						        
-						        <td class="price">$15.70</td>
-						        
-						        <td class="quantity">
-						        	<div class="input-group mb-3">
-					             	<input type="text" name="quantity" class="quantity form-control input-number" value="1" min="1" max="100">
-					          	</div>
-					          </td>
-						        
-						        <td class="total">$15.70</td>
-						      </tr><!-- END TR-->
-						    </tbody>
+								</tbody>
+								
+											
+						  
 						  </table>
+						 
 					  </div>
     			</div>
     		</div>

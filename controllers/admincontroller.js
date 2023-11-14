@@ -1,7 +1,7 @@
 const async = require('hbs/lib/async');
 const User = require('../models/user')
 const bcrypt = require("bcrypt")
-
+const Order = require("../models/order")
 const loaddashboard = async (req, res) => {
     try {
         res.render('dashboard')
@@ -94,14 +94,37 @@ const loadLogout = async (req,res)=>{
 }
 const loadorder = async (req, res) => {
     try {
-        
-        const odd=await Order.find({})
-        res.render('order',{odd})
+          await updateOrderStatus();
+        const odd = await Order.find({ user: req.session.user_id })
+            .populate([
+                { path: 'user', model: 'User' },
+                { path: 'Address', model: 'Address' },
+                { path: 'products.productId', model: 'product' }
+            ]);
+
+        console.log("Orders: ", odd);
+        res.render('order', { odd });
     } catch (error) {
         console.log(error.message);
     }
 }
+const updateOrderStatus = async (req, res, next) => {
+    try {
+        const twoDaysAgo = new Date();
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
+        // Update orders from Processing to Shipped after two days
+        await Order.updateMany(
+            {
+                status: 'Processing',
+                date: { $lte: twoDaysAgo },
+            },
+            { $set: { status: 'Shipped' } }
+        );
+    } catch (error) {
+        next(error);
+    }
+};
 module.exports = {
     loaddashboard,
     loadusers,

@@ -25,10 +25,12 @@ const addoffer = async (req, res) => {
 
 const postAddOffer = async (req, res) => {
     try {
+        console.log(req.body);
 
         const { offername, discount, startingDate, expiryDate, status } = req.body;
         const offer = new Offer({
-            offername: name,
+
+            name: offername,
             discount: discount,
             startingDate: startingDate,
             expiryDate: expiryDate,
@@ -111,28 +113,28 @@ const listbro = async (req, res) => {
 
 
 const OfferChecknandDelete = async (req, res) => {
-   try {
-    const currentDate = new Date();
+    try {
+        const currentDate = new Date();
 
-    const findExpiredOffers = await Offer.find({ is_deleted: false, expiryDate: { $lte: currentDate } });
-    if (findExpiredOffers.length > 0) {
-        for (const offer of findExpiredOffers) {
-            offer.is_deleted = true;
-            const offerId = offer._id;
-            await products.updateMany({ offer: offerId }, {
-                $unset: { offer: 1 },
-                $set: { price: 0 }
-            })
-            await offer.save();
-          
+        const findExpiredOffers = await Offer.find({ is_deleted: false, expiryDate: { $lte: currentDate } });
+        if (findExpiredOffers.length > 0) {
+            for (const offer of findExpiredOffers) {
+                offer.is_deleted = true;
+                const offerId = offer._id;
+                await products.updateMany({ offer: offerId }, {
+                    $unset: { offer: 1 },
+                    $set: { price: 0 }
+                })
+                await offer.save();
+
+            }
+
         }
-       
-    }
 
-   } catch (error) {
-    console.error("Error in OfferCheckAndDeleteOffer:", error);
-    res.status(500).json({ error: "Internal server error" });
-   }
+    } catch (error) {
+        console.error("Error in OfferCheckAndDeleteOffer:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 
 }
 

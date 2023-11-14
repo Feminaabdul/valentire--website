@@ -65,8 +65,11 @@ const listcategorybutton = async (req,res) => {
 }
 const Editcategory = async (req, res) => {
     try {
+      
+       
         let id=req.query.id
-        const categorydata = await Category.findOne({_id:id});
+        const upperCat = id.toUpperCase();
+        const categorydata = await Category.findOne({_id:upperCat});
         res.render('Editcategory',{category:categorydata,})
 
     } catch (error) {

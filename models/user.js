@@ -31,12 +31,19 @@ const userSchema = new mongoose.Schema({
     },
   
    
-   wishlist:[{ type: mongoose.Schema.Types.ObjectId       ,
+   wishlist:[{    
 
     product: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "product",
 
+    }, quantity: {
+        type: Number,
+        default: 1
+    },
+    total: {
+        type: Number,
+        default: 0
     }
 
 }]

@@ -4325,7 +4325,7 @@ button.close {
 a.close.disabled {
   pointer-events: none; }
 
-.toast {
+/* .toast {
   max-width: 350px;
   overflow: hidden;
   font-size: 0.875rem;
@@ -4506,7 +4506,7 @@ a.close.disabled {
 
 @media (min-width: 1200px) {
   .modal-xl {
-    max-width: 1140px; } }
+    max-width: 1140px; } } */
 
 .tooltip {
   position: absolute;
