@@ -1,17 +1,12 @@
-<%-include("../layouts/userlayout/header.ejs")%>
-<style>
-	#zoom-container {
-		overflow: hidden;
-	}
+<%-include("../layouts/userlayout/normal.ejs")%>
 
-	#zoom-image {
-		transition: transform 0.2s ease-in-out;
-	}
 
-	#zoom-container:hover #zoom-image {
-		transform: scale(1.5);
-	}
-</style>
+<script>
+    function changeMainImage(imageName) {
+        var mainImage = document.getElementById('mainImage');
+        mainImage.src = "/Admins/productImages/" + imageName;
+    }
+</script>
  <div class="hero-wrap hero-bread" style="background-image: url('/Users/images/bg_6.jpg');">
       <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
@@ -25,65 +20,20 @@
     <section class="ftco-section">
     	<div class="container">
     		<div class="row">
-    			<div class="col-lg-6 mb-5 ftco-animate" id="zoom-container">
-					<div class="semi-image-container mr-1 d-flex" style="display: flex ; justify-content: space-between; width: 33%; height:auto;">
+    			<div class="col-lg-6 mb-5 ftco-animate">
+					<div class="semi-image-container mr-1 d-flex" style="display: flex; justify-content: space-between; width: 36.5%; height:23%;">
 						<% for (let i = 0; i < product.image.length; i++) { %>
-							<img src="<%= '/Admins/productImages/' + product.image[i] %>" class="img-fluid" alt="Colorlib Template">
+							<img src="<%='/Admins/productImages/'+product.image[i]%>" class="img-fluid semi-image" alt="Colorlib Template" onclick="changeMainImage('<%=product.image[i]%>')">
 						<% } %>
 					</div>
-					<div class="main " style="width: 100%; height: auto; display: block; margin-bottom: 20px;"><a href="images/product-1.png" class="image-popup prod-img-bg" id="zoom-link">
-						<img src="/Admins/productImages/<%=product.image[0]%>" class="img-fluid" alt="Colorlib Template" id="zoom-image">
-					</a></div>
-					
-				
+					<div class="main" style="width: 100%; height: 100%; display: block; margin-bottom: 20px;">
+						<a href="/Users/images/product-1.png">
+							<img id="mainImage" src="/Admins/productImages/<%=product.image[0]%>" class="img-fluid" alt="Colorlib Template">
+						</a>
+					</div>
 				</div>
-				<script>
-					document.addEventListener('DOMContentLoaded', function () {
-						var container = document.getElementById('zoom-container');
-						var image = document.getElementById('zoom-image');
-						var scaleFactor = 1.5; // Adjust the scale factor as needed
-	
-						container.addEventListener('wheel', function (e) {
-							e.preventDefault();
-	
-							scaleFactor += e.deltaY * -0.01;
-	
-							// Limit the zoom scale to a reasonable range
-							scaleFactor = Math.min(Math.max(0.5, scaleFactor), 3);
-	
-							image.style.transform = 'scale(' + scaleFactor + ')';
-						});
-					});
-				</script>				
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var container = document.getElementById('zoom-container');
-        var image = document.getElementById('zoom-image');
-        var magnifier = document.getElementById('magnifier');
+							
 
-        // Get all sub-images
-        var subImages = document.querySelectorAll('.semi-image-container img');
-
-        // Add click event listener to each sub-image
-        subImages.forEach(function(subImage, index) {
-            subImage.addEventListener('click', function() {
-                // Update the main image source with the clicked sub-image
-                image.src = subImage.src;
-
-                // Reset magnifier position
-                magnifier.style.display = 'none';
-            });
-        });
-
-        container.addEventListener('mousemove', function (e) {
-            // Your existing code for magnifying the image goes here
-        });
-
-        container.addEventListener('mouseout', function () {
-            magnifier.style.display = 'none';
-        });
-    });
-</script>
 
     			<div class="col-lg-6 product-details pl-md-5 ftco-animate">
     				<h3><%=product.productname%></h3>
@@ -154,7 +104,7 @@
 						   		<div class="col-md-7">
 						   			<h3 class="mb-4">23 Reviews</h3>
 						   			<div class="review">
-								   		<div class="user-img" style="background-image: url(images/person_1.jpg)"></div>
+								   		<div class="user-img" style="background-image: url(/Users/images/person_1.jpg)"></div>
 								   		<div class="desc">
 								   			<h4>
 								   				<span class="text-left">Jacob Webb</span>
@@ -174,7 +124,7 @@
 								   		</div>
 								   	</div>
 								   	<div class="review">
-								   		<div class="user-img" style="background-image: url(images/person_2.jpg)"></div>
+								   		<div class="user-img" style="background-image: url(/Users/images/person_2.jpg)"></div>
 								   		<div class="desc">
 								   			<h4>
 								   				<span class="text-left">Jacob Webb</span>

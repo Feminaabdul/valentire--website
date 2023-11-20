@@ -1,6 +1,19 @@
 const User = require("../models/user")
 const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
+const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
+const Razorpay = require('razorpay');
+
+
+const razorpay = new Razorpay({
+    key_id: RAZORPAY_ID_KEY,
+    key_secret: RAZORPAY_SECRET_KEY,
+  });
+ 
+
+
+ 
+
 const mongoose = require('mongoose')
 const randomstring = require("randomstring")
 const UserOTPVerification = require('../models/otpmodel');
@@ -475,7 +488,7 @@ const updateOrderStatus = async (req, res, next) => {
 };
 const lodplaceorder = async (req, res) => {
     try {
-        await updateOrderStatus();
+       
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
         const addorder = await Order.find({ user: req.session.user_id })
@@ -484,16 +497,17 @@ const lodplaceorder = async (req, res) => {
                 { path: 'Address', model: 'Address' },
                 { path: 'products.productId', model: 'product' }
             ]);
-console.log("sdfgstfhd",addorder);
-       
+
+       const count=addorder.length
         const user = req.session.user_id
-       
+       console.log("order",count);
         res.render('placeorder', {
             isLoggedIn: isLoggedIn(req, res),
             currentUser,
             Delivery,
             user,
-            addorder
+            addorder,
+            count
         })
     } catch (error) {
         console.log(error.message);
@@ -506,48 +520,146 @@ const placeorder = async (req, res) => {
         const user = req.session.user_id
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
-
+ 
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
-        }, 0);
+        }, 0);   
 
-        const orderedProducts = currentUser.cart.map((item) => {
+         // Create a new order for each product in the cart
+         const orders = await Promise.all(
+            currentUser.cart.map(async (item) => {
+                const orderedProduct = new Order({
+                    user: user,
+                    paymentMethod: paymentMethod,
+                    Address: Delivery,
+                    products: [
+                        {
+                            productId: item.product._id,
+                            quantity: item.quantity,
+                            productPrice: item.product.price,
+                            status: "pending",
+                        },
+                    ],
+                    totalAmount: grandTotal + 10,
+                });
 
-            return {
-                productId: item.product._id,
-                quantity: item.quantity,
-                productPrice: item.product.price
+                  if (req.body.paymentMethod === 'cod') {
+                    await orderedProduct.save();
+              
+                } else if (req.body.paymentMethod === 'razorpay') {
+                    
+                    // Create a Razorpay order
+                    const razorpayOrder = razorpay.orders.create({
+                        amount: (grandTotal - 0 + 10) * 100, // Total amount in paise
+                        currency: 'INR', // Currency code (change as needed)
+                        receipt: `${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}${Date.now()}`, // Provide a unique receipt ID
+                    },(error, order) => {
+                        if (error) {
+                            console.error(error);
+                        } else {
+                            console.log("gfvdcsxa",order.amount);
+                            console.log("razor",razorpayOrder);
+                        }
+                    });
+                 
 
-            }
-        });
+        console.log("razor",razorpayOrder);
+                    // Save the order details to your database
+                    orderedProduct.razorpayOrderId = razorpayOrder.id;
+        console.log("razorpayOrderId", orderedProduct.razorpayOrderId);
+                    // Redirect the user to the Razorpay checkout page
+                    return res.render('rzp', {
+                        isLoggedIn: isLoggedIn(req, res),
+                        order: razorpayOrder,
+                        key_id: process.env.RAZORPAY_ID_KEY,
+                        user: currentUser
+                    });
+                }
+                else {
+                    await orderedProduct.save();
+                   
+                    const transactionData = {
+                        amount: grandTotal + 10,
+                        description: 'Order placed.',
+                        type: 'Debit',
+                    };
+                   console.log("transactionData",transactionData);
+                }
+               
+               
 
-        const newpro = new Order({
-            user: user,
-            paymentMethod: paymentMethod,
-            Address: Delivery,
-            products: orderedProducts,
-            totalAmount: grandTotal + 10,
-           
-
-        })
-
-        await newpro.save();
-
-
-        // // stock update
-        currentUser.cart.forEach(async (item) => {
+               // stock update
+             currentUser.cart.forEach(async (item) => {
             const foundProduct = await products.findById(item.product._id);
-            foundProduct.stockquantity -= item.stockquantity;
+            foundProduct.stockquantity -= item.quantity;
             await foundProduct.save();
-
-           
         });
-
-        res.redirect('/placeorder')
+                return orderedProduct
+            })
+            
+            
+        );
+          
+        
+        res.redirect('/ordersuccess')
     } catch (error) {
         console.log(error.message);
     }
 }
+
+
+
+const saveRzpOrder = async (req, res, next) => {
+    
+    try { const paymentMethod = req.body.paymentMethod
+        const user = req.session.user_id
+        const currentUser = await User.findById(req.session.user_id).populate("cart.product")
+        const Delivery = await address.findOne({ user: req.session.user_id, default: true })
+ 
+        const grandTotal = currentUser.cart.reduce((total, element) => {
+            return total + (element.quantity * element.product.price);
+        }, 0);
+
+        const { transactionId, orderId, signature } = req.body;
+        const amount = parseInt(req.body.amount / 100);
+           
+        
+        
+        if (transactionId && orderId && signature) {
+             // stock update
+             currentUser.cart.forEach(async (item) => {
+                const foundProduct = await products.findById(item.product._id);
+                foundProduct.stockquantity -= item.quantity;
+                await foundProduct.save();
+            });
+            currentUser.cart.map(async (item) => {
+                const orderedProduct = new Order({
+                    user: user,
+                    paymentMethod: "razorpay",
+                    Address: Delivery,
+                    products: [
+                        {
+                            productId: item.product._id,
+                            quantity: item.quantity,
+                            productPrice: item.product.price,
+                            status: "pending",
+                        },
+                    ],
+                    totalAmount: amount,
+                });
+                await orderedProduct.save();
+                return orderedProduct
+            })
+        }
+        return res.status(200).json({
+            message: "order placed successfully",
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
 
 //forgetpassword//
 const loadpassword = async (req, res) => {
@@ -698,6 +810,19 @@ const cartpost = async (req, res) => {
 };
 
 
+const orderSuccess = async (req, res) => {
+    try {
+        const user = req.session.user_id
+        res.render('ordersuccess', {
+            isLoggedIn: isLoggedIn(req, res),
+            user
+           
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 
 module.exports = {
     loadHome,
@@ -724,5 +849,7 @@ module.exports = {
     , postreset,
     loadpost,
     removewish,
-    cartpost
+    cartpost,
+    orderSuccess,saveRzpOrder
+    
 }

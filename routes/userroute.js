@@ -42,8 +42,14 @@ userroute.get('/AddAddress',auth.checkToBlock,auth.isLogin, usercontroller.loada
 
 userroute.post('/AddAddress',auth.checkToBlock,auth.isLogin, usercontroller.postAddress)
 
+userroute.get('/ordersuccess', auth.checkToBlock, auth.isLogin, usercontroller.orderSuccess);
+
 userroute.get('/placeorder',auth.checkToBlock,auth.isLogin, usercontroller.lodplaceorder)
 userroute.post('/placeorder',auth.checkToBlock,auth.isLogin, usercontroller.placeorder)
+
+userroute.post("/save-rzporder", auth.checkToBlock,auth.isLogin,usercontroller.saveRzpOrder);
+
+
 
 userroute.post('/register', usercontroller.postregister);
 userroute.post('/otp', usercontroller.postotp);

@@ -94,45 +94,49 @@ const loadLogout = async (req,res)=>{
 }
 const loadorder = async (req, res) => {
     try {
-          await updateOrderStatus();
-        const odd = await Order.find({ user: req.session.user_id })
+        
+        const odd = await Order.find({ })
             .populate([
                 { path: 'user', model: 'User' },
                 { path: 'Address', model: 'Address' },
                 { path: 'products.productId', model: 'product' }
             ]);
 
-        console.log("Orders: ", odd);
+         
         res.render('order', { odd });
     } catch (error) {
         console.log(error.message);
     }
 }
-const updateOrderStatus = async (req, res, next) => {
-    try {
-        const twoDaysAgo = new Date();
-        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
-        // Update orders from Processing to Shipped after two days
-        await Order.updateMany(
-            {
-                status: 'Processing',
-                date: { $lte: twoDaysAgo },
-            },
-            { $set: { status: 'Shipped' } }
+const update=async(req,res)=>{
+    const { orderId } = req.params;
+    const { newStatus } = req.body;
+    try {
+        const order = await Order.findOneAndUpdate(
+          { _id: orderId },
+          { status: newStatus },
+          { new: true }
         );
-    } catch (error) {
-        next(error);
-    }
-};
+    
+        if (!order) {
+          return res.status(404).redirect('/order');
+        }
+  } catch(error){
+  console.log(error.message);
+  }
+}
+
+
 module.exports = {
     loaddashboard,
     loadusers,
-    
     loadlogin,
     postlogin,
     blockuser,
     unblockuser,
     loadLogout,
-    loadorder
+    loadorder,
+   update,
+  
 }

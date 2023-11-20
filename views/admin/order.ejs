@@ -1,131 +1,138 @@
 <%-include('../layouts/adminlayout/header.ejs')%>
 
-  
-        <!--**********************************
+
+    <!--**********************************
             Sidebar end
         ***********************************-->
 
-        <!--**********************************
+    <!--**********************************
             Content body start
         ***********************************-->
-        <div class="content-body">
-            <div class="container-fluid">
-                <div class="row page-titles mx-0">
-                    <div class="col-sm-6 p-md-0">
-                        <div class="welcome-text">
-                            <h4>Hi, welcome back!</h4>
-                            <p class="mb-0">Your business dashboard template</p>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0)">Table</a></li>
-                            <li class="breadcrumb-item active"><a href="javascript:void(0)">Bootstrap</a></li>
-                        </ol>
+    <div class="content-body">
+        <div class="container-fluid">
+            <div class="row page-titles mx-0">
+                <div class="col-sm-6 p-md-0">
+                    <div class="welcome-text">
+                        <h4>Hi, welcome back!</h4>
+                        <p class="mb-0">Your business dashboard template</p>
                     </div>
                 </div>
-                <!-- row -->
-
-                <div class="row">
-                   
-                   
-                   
-                  
-                   
-                    
-                    <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-header">
-                                <h4 class="card-title">Responsive Table</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table header-border table-responsive-sm">
-                                        <thead>
-                                            <tr>
-                                                <th>product</th>
-                                                <th>Delivery Address</th>
-                                                <th>payment type</th>
-                                                <th>date</th>
-                                                <th>total</th>
-                                                <th>status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% odd.forEach(order => { %>
-                                                <% order.products.forEach((product)=> { %>
-                                                <tr>
-                                                    <td><a href="javascript:void(0)"><%= product.productId.productname %></a></td>
-                                                    <td> <%= order.Address.name %><br>
-                                                        <%= order.Address.building %>, <%= order.Address.area %><br>
-                                                            <%= order.Address.city %>, <%= order.Address.state %><br>
-                                                                <%= order.Address.pincode %></td>
-                                                    <td><%= order.paymentMethod %></td>
-                                                    <td><%= order.createdAt.toDateString() %></td>
-                                                    <td>$<%= order.totalAmount %></td>
-                                                    <td>  <label>
-                                                        <input type="radio" name="orderStatus" value="Processing"> Processing
-                                                    </label>
-                                                    <label>
-                                                        <input type="radio" name="orderStatus" value="Shipped"> Shipped
-                                                    </label>
-                                                    <label>
-                                                        <input type="radio" name="orderStatus" value="Delivered"> Delivered
-                                                    </label>
-                                                    <label>
-                                                        <input type="radio" name="orderStatus" value="Pending"> Pending
-                                                    </label>
-                                                    <label>
-                                                        <input type="radio" name="orderStatus" value="Cancelled"> Cancelled
-                                                    </label>
-                                            
-                                                        <p class="text-primary font-weight-bolder"><%= order.status %></p>
-                                                        
-                                                    </td>
-                                                    
-                                                </tr>
-                                                <% }) %> 
-                                            <% }) %>
-                                           
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    
-             
-                  
+                <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="javascript:void(0)">Table</a></li>
+                        <li class="breadcrumb-item active"><a href="javascript:void(0)">Bootstrap</a></li>
+                    </ol>
                 </div>
             </div>
+            <!-- row -->
+
+            <div class="row">
+
+
+
+
+
+
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Responsive Table</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table header-border table-responsive-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>product</th>
+                                            <th>Delivery Address</th>
+                                            <th>payment type</th>
+                                            <th>date</th>
+                                            <th>total</th>
+                                            <th>status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% odd.forEach(order=> { %>
+                                            <% order.products.forEach((product)=> { %>
+                                                <tr>
+                                                    <td><a href="javascript:void(0)">
+                                                            <%= product.productId.productname %>
+                                                        </a></td>
+                                                    <td>
+                                                        <%= order.Address.name %><br>
+                                                            <%= order.Address.building %>, <%= order.Address.area %><br>
+                                                                    <%= order.Address.city %>, <%= order.Address.state
+                                                                            %><br>
+                                                                            <%= order.Address.pincode %>
+                                                    </td>
+                                                    <td>
+                                                        <%= order.paymentMethod %>
+                                                    </td>
+                                                    <td>
+                                                        <%= order.createdAt.toDateString() %>
+                                                    </td>
+                                                    <td>$<%= order.totalAmount %>
+                                                    </td>
+                                                    <td>
+                                                        <div class="btn-container">
+                                                            <form action="/admin/order/<%= order._id %>/change-status" method="POST">
+                                                                <select name="newStatus">
+                                                                  <option value="Order Pending" <% if (order.status === "Order Pending") { %> selected <% } %>>Order Pending</option>
+                                                                  <option value="Delivered" <% if (order.status === "Delivered") { %> selected <% } %>>Delivered</option>
+                                                                  <option value="Cancelled" <% if (order.status === "Cancelled") { %> selected <% } %>>Cancelled</option>
+                                                                  <option value="shipped" <% if (order.status === "shipped") { %> selected <% } %>>shipped</option>
+                                                                  <option value="shipped" <% if (order.status === "shipped") { %> selected <% } %>>return</option>
+                                                                  <!-- Add more status options as needed -->
+                                                                </select>
+                                                                <button type="submit" class="btn btn-info">Update Status</button>
+                                                              </form>
+                                                              
+                                                        </div>
+                                                    </td>
+
+                                                </tr>
+                                                <% }) %>
+                                                    <% }) %>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
         </div>
-        <!--**********************************
+    </div>
+    <!--**********************************
             Content body end
         ***********************************-->
 
 
-        <!--**********************************
+    <!--**********************************
             Footer start
         ***********************************-->
-        <div class="footer">
-            <div class="copyright">
-                <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
-            </div>
+    <div class="footer">
+        <div class="copyright">
+            <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
         </div>
-        <!--**********************************
+    </div>
+    <!--**********************************
             Footer end
         ***********************************-->
 
-        <!--**********************************
+    <!--**********************************
            Support ticket button start
         ***********************************-->
 
-        <!--**********************************
+    <!--**********************************
            Support ticket button end
         ***********************************-->
 
-        
+
     </div>
     <!--**********************************
         Main wrapper end
@@ -138,10 +145,8 @@
     <script src="./vendor/global/global.min.js"></script>
     <script src="./js/quixnav-init.js"></script>
     <script src="./js/custom.min.js"></script>
-    
 
 
+    </body>
 
-</body>
-
-</html>
+    </html>

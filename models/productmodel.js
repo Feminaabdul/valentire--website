@@ -42,7 +42,7 @@ const productSchema = new mongoose.Schema({
         ref:"offer"                                                                        
     },
 
-})
+},{timestamps:true})
 
 const productmodel = mongoose.model("product",productSchema)
 module.exports = productmodel

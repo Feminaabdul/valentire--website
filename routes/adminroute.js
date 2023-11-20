@@ -6,7 +6,7 @@ const admincontroller = require('../controllers/admincontroller');
 const productcontroller = require('../controllers/productcontroller');
 const categorycontroller = require('../controllers/categorycontroller');
 const offer=require("../controllers/Offercontroller")
-
+const Order = require("../models/order")
 const { upload } = require('../Config/multer');
 
 adminroute.set('view engine', 'ejs');
@@ -17,6 +17,28 @@ adminroute.use(express.static('public/Admins'))
 adminroute.get("/dashboard", adminauth.isadminLogin, admincontroller.loaddashboard)
 adminroute.get("/users", adminauth.isadminLogin, admincontroller.loadusers)
 adminroute.get("/order", adminauth.isadminLogin,admincontroller.loadorder)
+adminroute.post("/order/:orderId/change-status", adminauth.isadminLogin,admincontroller.update)
+
+
+// adminroute.post("/order/:orderId/change-status", async (req, res) => {
+//     const { orderId } = req.params;
+//     const { newStatus } = req.body; // Assuming you send the new status in the request body
+  
+//     try {
+//       const order = await Order.findOneAndUpdate(
+//         { _id: orderId },
+//         { status: newStatus },
+//         { new: true }
+//       );
+  
+//       if (!order) {
+//         return res.status(404).redirect('/order');
+//       }
+// } catch(error){
+// console.log(error.message);
+// }
+// })
+   
 adminroute.get("/addCatagory", adminauth.isadminLogin, categorycontroller.loadcatagory)
 adminroute.get("/listCategory", adminauth.isadminLogin, categorycontroller.listCategory)
 adminroute.get("/product", adminauth.isadminLogin, productcontroller.loadproduct)
@@ -32,6 +54,11 @@ adminroute.get("/unlistproduct", adminauth.isadminLogin, productcontroller.unlis
 
 adminroute.get("/unlistoffer", adminauth.isadminLogin, offer.unlistoffer)
 adminroute.get("/listbro", adminauth.isadminLogin, offer.listbro)
+
+
+
+
+
 
 
 

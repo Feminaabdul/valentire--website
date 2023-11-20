@@ -37,7 +37,7 @@
                     <div class="heading-section-bold mb-4 mt-md-5">
                       <div class="ml-md-0">
                         <h2 class="mb-4">Orders</h2>
-
+                           <p class="ion-ios-basket" style="color: black;"><%= count %></p>
                       </div>
                       <% if (!addorder.length) { %>
                         No orders found.
@@ -64,10 +64,10 @@
                                     <%= order.totalAmount %>
                                   </td>
                                   <td class="product-name">
-                                    
-                                      <p class="text-primary font-weight-bolder"><%= order.status %></p>
-                                      
-                                  </td>
+                                 
+                                        <p class="text-primary font-weight-bolder"><%= order.status %></p>
+                                   
+                                </td>
                                 </tr>
                                   <% }) %> 
                             <% }) %>
@@ -180,6 +180,7 @@
     </svg></div>
 
 
+    
   <script src="js/jquery.min.js"></script>
   <script src="js/jquery-migrate-3.0.1.min.js"></script>
   <script src="js/popper.min.js"></script>

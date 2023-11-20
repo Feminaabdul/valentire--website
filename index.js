@@ -26,6 +26,7 @@ app.use(session({
 }));
 
 
+
 const userroute = require('./routes/userroute')
 const adminroute = require('./routes/adminroute')
 app.use('/',userroute)

@@ -49,7 +49,13 @@ const orderSchema = new mongoose.Schema({
     status:{
         type:String,
       
-        default: ' not Processing',
+        default: 'processing',
+    },
+    razorpayOrderId: {
+        type: String,
+    },
+    transactionId: {
+        type: String,
     },
     orderWallet:{
         type:Number
