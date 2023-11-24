@@ -49,7 +49,7 @@
           const orderId = response.razorpay_order_id;
           const signature = response.razorpay_signature;
           // Handle successful payment
-          // Send an AJAX POST request to save the order    
+          // Send an AJAX POST request to save the order
           $.ajax({
             type: 'POST',
             url: '/save-rzporder',

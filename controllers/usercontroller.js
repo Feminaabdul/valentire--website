@@ -550,24 +550,27 @@ const placeorder = async (req, res) => {
                     
                     // Create a Razorpay order
                     const razorpayOrder = razorpay.orders.create({
-                        amount: (grandTotal - 0 + 10) * 100, // Total amount in paise
+                      
+                        amount: parseInt((grandTotal - 0 + 10) * 100), // Convert amount to integer in paise
                         currency: 'INR', // Currency code (change as needed)
                         receipt: `${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}${Date.now()}`, // Provide a unique receipt ID
                     },(error, order) => {
                         if (error) {
                             console.error(error);
                         } else {
-                            console.log("gfvdcsxa",order.amount);
-                            console.log("razor",razorpayOrder);
+                            console.log("gfvdcsxa",order);
+                            const razorpayorderId = order.id;
+                            console.log("Razorpay Order ID:", razorpayorderId);
+                            orderedProduct.razorpayOrderId = razorpayorderId
+                            console.log("razorpayOrhjkderId", orderedProduct.razorpayOrderId);
+                            
+                      orderedProduct.save();
+
                         }
                     });
                  
 
-        console.log("razor",razorpayOrder);
-                    // Save the order details to your database
-                    orderedProduct.razorpayOrderId = razorpayOrder.id;
-        console.log("razorpayOrderId", orderedProduct.razorpayOrderId);
-                    // Redirect the user to the Razorpay checkout page
+       
                     return res.render('rzp', {
                         isLoggedIn: isLoggedIn(req, res),
                         order: razorpayOrder,
@@ -575,16 +578,8 @@ const placeorder = async (req, res) => {
                         user: currentUser
                     });
                 }
-                else {
-                    await orderedProduct.save();
+               
                    
-                    const transactionData = {
-                        amount: grandTotal + 10,
-                        description: 'Order placed.',
-                        type: 'Debit',
-                    };
-                   console.log("transactionData",transactionData);
-                }
                
                
 
