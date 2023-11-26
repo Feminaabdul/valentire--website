@@ -1,5 +1,9 @@
 <%-include('../layouts/adminlayout/header.ejs')%>
 
+    <link rel="stylesheet" href="path/to/cropper.css">
+    <script src="path/to/cropper.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.js"></script>
 
     <div class="content-body">
         <div class="container-fluid">
@@ -65,11 +69,13 @@
                                                             <div><del>
                                                                     <%=product[i].mrp%>
                                                                 </del></div>
-                                                           <div> <%=product[i].price%></div>
+                                                            <div>
+                                                                <%=product[i].price%>
+                                                            </div>
 
-                                                                <% } else { %>
-                                                                    <%=product[i].price%>
-                                                                        <% } %>
+                                                            <% } else { %>
+                                                                <%=product[i].price%>
+                                                                    <% } %>
                                                     </td>
                                                     <td><span class="text-muted">
                                                             <%=product[i].category%>
@@ -103,8 +109,11 @@
                                                     </td>
 
                                                     <td>
-                                                        <img src="/Admins/productImages/<%= product[i].image[0] %>"
+                                                        <img id="productImage<%= i %>"
+                                                            src="/Admins/productImages/<%= product[i].image[0] %>"
                                                             width="80px" height="80px">
+                                                        <button onclick="initiateImageCrop('productImage<%= i %>')">Crop
+                                                            Image</button>
                                                     </td>
 
 
@@ -152,10 +161,36 @@
             <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
         </div>
     </div>
+    <script>
+        function initiateImageCrop(imageId) {
+            console.log("Initiating image crop for:", imageId);
+
+            var image = document.getElementById(imageId);
+
+            // Initialize Cropper
+            var cropper = new Cropper(image, {
+                aspectRatio: 1,  // Set the aspect ratio as needed
+                // Other Cropper options if required
+            });
+
+
+            // Optionally, handle the crop result
+            // You can obtain the cropped data using cropper.getCroppedCanvas()
+            // For example: var croppedCanvas = cropper.getCroppedCanvas();
+            // Then you can use croppedCanvas.toDataURL() to get the cropped image data URL
+
+            // When you are done, you may want to destroy the Cropper instance
+            // cropper.destroy();
+        }
+    </script>
+    <script src="./vendor/global/global.min.js"></script>
+    <script src="./js/quixnav-init.js"></script>
+    <script src="./js/custom.min.js"></script>
 
     <script src="./vendor/global/global.min.js"></script>
     <script src="./js/quixnav-init.js"></script>
     <script src="./js/custom.min.js"></script>
+
 
 
 

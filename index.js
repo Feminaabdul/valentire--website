@@ -3,6 +3,7 @@ var cors = require('cors')
 const express = require('express');
 const app = express();
 const db=require("./Config/db")
+const razorpay = require('razorpay');
 
 const methodOverride = require('method-override');
 
