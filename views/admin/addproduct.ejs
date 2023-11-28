@@ -103,20 +103,7 @@
                                         <input type="text" class="form-control" name="material"
                                             placeholder="material">
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label>Avaliable Offer</label>
-                                            <select id="inputState" class="form-control" name="offer">
-                                                <option></option>
-                                                <% for(let i=0;i<offers.length;i++){ %>
-                                                    <option value="<%= offers[i]._id %>">
-                                                        <%=offers[i].name%>
-                                                    </option>
-                                                    <% } %>
-                                            </select>
-                                        </div>
-
-                                    </div>
+                                   
                                     <input type="submit" class="btn btn-primary" value="Submit">
                                     <div>
                                         <% if(typeof message !='undefined' ){ %>

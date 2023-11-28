@@ -5,7 +5,14 @@ const Offer = require("../models/offermodel")
 const Joi = require('joi');
 const postAddProduct = async (req, res) => {
     try {
+        
+        const { productname, stockquantity, price, description, category, material, offer } = req.body;
+       
 
+        if (!req.files || req.files.length === 0) {
+            const categorydata = await Category.find({});
+            return res.render('addproduct', { category: categorydata, message: "Please upload at least one image for the product." });
+        }
         let image = []
         for (let i = 0; i < req.files.length; i++) {
             image[i] = req.files[i].filename;
@@ -13,36 +20,39 @@ const postAddProduct = async (req, res) => {
 
 
 
-        const { productname, stockquantity, price, description, category, material, offer } = req.body;
-       if(offer){
-        const offers = await Offer.findById(offer)
-        const newprice=Number(price)
-        const calculator = newprice * (1 - offers.discount / 100);
+    //    if(offer){
+    //     const offers = await Offer.findById(offer)
+    //     const newprice=Number(price)
+    //     const calculator = newprice * (1 - offers.discount / 100);
     
 
        
 
-        const product = new Product({
-            mrp: newprice,
-            productname: productname,
-            stockquantity: stockquantity,
-            price: calculator,
+    //     const product = new Product({
+    //         mrp: newprice,
+    //         productname: productname,
+    //         stockquantity: stockquantity,
+    //         price: calculator,
 
-            description: description,
-            category: category,
-            image: image,
-            material: material,
-            offer: offer
-        })
-        const save1Product = await product.save();
+    //         description: description,
+    //         category: category,
+    //         image: image,
+    //         material: material,
+    //         offer: offer
+    //     })
+    //     const save1Product = await product.save();
         
-        if (save1Product) {
-            res.redirect("/admin/listproduct");
-        } else {
-            const categorydata = await Category.find({});
-            res.render('addproduct', { category: categorydata, message: "Something went wrong" })
-        }
-       }else{
+    //     if (save1Product) {
+    //         res.redirect("/admin/listproduct");
+    //     } else {
+    //         if(!image){
+    //             const categorydata = await Category.find({});
+    //             res.render('addproduct', { category: categorydata, message: "image not inserted" })
+    //         }
+    //         const categorydata = await Category.find({});
+    //         res.render('addproduct', { category: categorydata, message: "Something went wrong" })
+    //     }
+    //    }else{
         const newprice=Number(price)
         
         const product = new Product({
@@ -58,14 +68,18 @@ const postAddProduct = async (req, res) => {
           
         })
         const saveProduct = await product.save();
+      
         console.log(product)
         if (saveProduct) {
             res.redirect("/admin/listproduct");
         } else {
+           
             const categorydata = await Category.find({});
             res.render('addproduct', { category: categorydata, message: "Something went wrong" })
         }
-       }
+
+
+    //    }
 
 
 
@@ -145,7 +159,9 @@ const postEditProduct = async (req, res) => {
     try {
 
         const id = req.query.id;
-
+        if (!req.files || req.files.length === 0) {
+            throw new Error("Please upload at least one image for the product.");
+        }
         let image = []
         for (let i = 0; i < req.files.length; i++) {
             image[i] = req.files[i].filename;
@@ -183,25 +199,25 @@ const validationResult = schema.validate({
             throw new Error(validationResult.error.details[0].message);
         }
 
-        if (offer) {
-            const offers = await Offer.findById(offer)
-            const newprice = Number(req.body.price)
+        // if (offer) {
+        //     const offers = await Offer.findById(offer)
+        //     const newprice = Number(req.body.price)
 
-            const calculator = newprice * (1 - offers.discount / 100);
+        //     const calculator = newprice * (1 - offers.discount / 100);
 
-            Data.productname = req.body.productName
-            Data.mrp = newprice
-            Data.price = calculator
+        //     Data.productname = req.body.productName
+        //     Data.mrp = newprice
+        //     Data.price = calculator
 
-            Data.category = req.body.category
-            Data.stockquantity = req.body.stockquantity
+        //     Data.category = req.body.category
+        //     Data.stockquantity = req.body.stockquantity
 
-            Data.image = image
-            Data.description = req.body.description
-            Data.material = req.body.material
-            Data.offer = offer
+        //     Data.image = image
+        //     Data.description = req.body.description
+        //     Data.material = req.body.material
+        //     Data.offer = offer
 
-        } else {
+        // } else {
             Data.productname = req.body.productName
 
             Data.price = newprice
@@ -213,7 +229,7 @@ const validationResult = schema.validate({
             Data.description = req.body.description
             Data.material = req.body.material
             Data.offer = null;
-        }
+        // }
 
         const saved = await Data.save()
 

@@ -104,16 +104,14 @@
                                                     </td>
 
                                                     <td>
-                                                        <div  style="padding-bottom: 5px;">
-                                                            <img src="/Admins/productImages/<%= product[i].image[0] %>"
-                                                            width="80px" height="80px">
+                                                        <div >
+                                                         <%   for (let j = 0; j <  product[i].image.length; j++) {%>
+                          
+                                                            <img  style="padding-bottom: 5px;" src="/Admins/productImages/<%= product[i].image[j] %>"width="80px" height="80px">
+
+                                                            <%}%>
                                                         </div>
-                                                       <div style="padding-bottom: 5px;"> <img src="/Admins/productImages/<%= product[i].image[1] %>"
-                                                            width="80px" height="80px"></div>
-                                                            <div style="padding-bottom: 5px;"><img src="/Admins/productImages/<%= product[i].image[2] %>"
-                                                            width="80px" height="80px"></div>
-                                                  
-                                                  
+                                                 
                                                         
                                                     </td>
 

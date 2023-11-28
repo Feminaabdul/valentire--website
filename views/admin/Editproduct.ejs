@@ -103,20 +103,7 @@
                                         <input type="text" class="form-control" name="material"
                                             placeholder="material">
                                     </div>
-                                    <div class="form-row">
-                                        <div class="form-group col-md-4">
-                                            <label>offer</label>
-                                            <select id="inputState" class="form-control" name="offer">
-                                                <option></option>
-                                                <% for(let i=0;i<offer.length;i++){ %>
-                                                    <option value="<%= offer[i]._id %>">
-                                                        <%=offer[i].name%>
-                                                    </option>
-                                                    <% } %>
-                                            </select>
-                                        </div>
-
-                                    </div>
+                                
                                     <input type="submit" class="btn btn-primary" value="Submit">
                                     <div>
                                         <%
