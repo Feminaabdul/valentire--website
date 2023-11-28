@@ -2,7 +2,7 @@ const Category = require('../models/category');
 const productmodel = require('../models/productmodel');
 const Product = require('../models/productmodel')
 const Offer = require("../models/offermodel")
-
+const Joi = require('joi');
 const postAddProduct = async (req, res) => {
     try {
 
@@ -18,8 +18,10 @@ const postAddProduct = async (req, res) => {
         const offers = await Offer.findById(offer)
         const newprice=Number(price)
         const calculator = newprice * (1 - offers.discount / 100);
+    
 
-        
+       
+
         const product = new Product({
             mrp: newprice,
             productname: productname,
@@ -79,67 +81,149 @@ const postAddProduct = async (req, res) => {
 }
 
 
+// const postEditProduct = async (req, res) => {
+//     try {
+
+//         const id = req.query.id;
+
+
+//         let image = []
+//         for (let i = 0; i < req.files.length; i++) {
+//             image[i] = req.files[i].filename;
+//         }
+//         const newprice=Number(req.body.price)
+//         const Data = await Product.findById(req.query.id);
+//         const offer=req.body.offer
+        
+      
+        
+//       if(offer){
+//         const offers = await Offer.findById(offer)
+//         const newprice=Number(req.body.price)
+   
+//         const calculator = newprice * (1 - offers.discount / 100);
+
+//         Data.productname = req.body.productName
+//         Data.mrp = newprice
+//         Data.price = calculator
+
+//         Data.category = req.body.category
+//         Data.stockquantity = req.body.stockquantity
+
+//         Data.image = image
+//         Data.description = req.body.description
+//         Data.material = req.body.material
+//         Data.offer =offer
+        
+//       }else{
+//         Data.productname = req.body.productName
+        
+//         Data.price =newprice
+
+//         Data.category = req.body.category
+//         Data.stockquantity = req.body.stockquantity
+
+//         Data.image = image
+//         Data.description = req.body.description
+//         Data.material = req.body.material
+//         Data.offer = null; 
+//       }
+       
+
+
+//         const saved = await Data.save()
+
+
+//         res.redirect('/admin/product');
+
+
+//     } catch (error) {
+//         console.log(error.message)
+//     }
+// }
 const postEditProduct = async (req, res) => {
     try {
 
         const id = req.query.id;
 
-
         let image = []
         for (let i = 0; i < req.files.length; i++) {
             image[i] = req.files[i].filename;
         }
-        const newprice=Number(req.body.price)
+
+        const newprice = Number(req.body.price)
         const Data = await Product.findById(req.query.id);
-        const offer=req.body.offer
-        
-      
-        
-      if(offer){
-        const offers = await Offer.findById(offer)
-        const newprice=Number(req.body.price)
-   
-        const calculator = newprice * (1 - offers.discount / 100);
+        const offer = req.body.offer
 
-        Data.productname = req.body.productName
-        Data.mrp = newprice
-        Data.price = calculator
+        const schema = Joi.object({
+            productName: Joi.string().min(3).required(),
+            price: Joi.number().min(1).required(),
+            category: Joi.string().min(3).required(),
+            stockquantity: Joi.number().min(1).required(),
+            description: Joi.string().min(3).required(),
+            material: Joi.string().min(3).required(),
+           
+        });
 
-        Data.category = req.body.category
-        Data.stockquantity = req.body.stockquantity
+     
 
-        Data.image = image
-        Data.description = req.body.description
-        Data.material = req.body.material
-        Data.offer =offer
-        
-      }else{
-        Data.productname = req.body.productName
-        
-        Data.price =newprice
-
-        Data.category = req.body.category
-        Data.stockquantity = req.body.stockquantity
-
-        Data.image = image
-        Data.description = req.body.description
-        Data.material = req.body.material
-        Data.offer = null; 
-      }
        
+const validationResult = schema.validate({
+            productName: req.body.productName,
+            price: newprice,
+            category: req.body.category,
+            stockquantity: req.body.stockquantity,
+            description: req.body.description,
+            material: req.body.material,
+           
+        },);
 
+
+        if (validationResult.error) {
+            throw new Error(validationResult.error.details[0].message);
+        }
+
+        if (offer) {
+            const offers = await Offer.findById(offer)
+            const newprice = Number(req.body.price)
+
+            const calculator = newprice * (1 - offers.discount / 100);
+
+            Data.productname = req.body.productName
+            Data.mrp = newprice
+            Data.price = calculator
+
+            Data.category = req.body.category
+            Data.stockquantity = req.body.stockquantity
+
+            Data.image = image
+            Data.description = req.body.description
+            Data.material = req.body.material
+            Data.offer = offer
+
+        } else {
+            Data.productname = req.body.productName
+
+            Data.price = newprice
+
+            Data.category = req.body.category
+            Data.stockquantity = req.body.stockquantity
+
+            Data.image = image
+            Data.description = req.body.description
+            Data.material = req.body.material
+            Data.offer = null;
+        }
 
         const saved = await Data.save()
 
-
         res.redirect('/admin/product');
-
 
     } catch (error) {
         console.log(error.message)
+        res.status(400).send(error.message);
     }
 }
-
 
 const loadAddproduct = async (req, res) => {
     try {
