@@ -1,18 +1,18 @@
 const User = require("../models/user")
 const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
-const {RAZORPAY_ID_KEY,RAZORPAY_SECRET_KEY}=process.env
+const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env
 const Razorpay = require('razorpay');
 
 
 const razorpay = new Razorpay({
     key_id: RAZORPAY_ID_KEY,
     key_secret: RAZORPAY_SECRET_KEY,
-  });
- 
+});
 
 
- 
+
+
 
 const mongoose = require('mongoose')
 const randomstring = require("randomstring")
@@ -94,13 +94,13 @@ const loadshop = async (req, res) => {
                 query.price = { $gte: min, $lte: max }
             }
 
-            if (data.search||"") {
+            if (data.search || "") {
                 query.$or = [
                     { productname: { $regex: data.search, $options: 'i' } },
                     { description: { $regex: `\\b${data.search}\\b`, $options: 'i' } }
-                   
+
                 ];
-               
+
             }
 
             if (data.desc === 'true') {
@@ -120,7 +120,7 @@ const loadshopdetail = async (req, res) => {
     try {
         const user = await User.findById(req.session.user_id)
         const product = await products.findById(req.params.id)
-     
+
         res.render('shopdetail', { isLoggedIn: isLoggedIn(req, res), user, product })
     } catch (error) {
         console.log(error.message);
@@ -488,7 +488,7 @@ const updateOrderStatus = async (req, res, next) => {
 };
 const lodplaceorder = async (req, res) => {
     try {
-       
+
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
         const addorder = await Order.find({ user: req.session.user_id })
@@ -498,9 +498,9 @@ const lodplaceorder = async (req, res) => {
                 { path: 'products.productId', model: 'product' }
             ]);
 
-       const count=addorder.length
+        const count = addorder.length
         const user = req.session.user_id
-       console.log("order",count);
+        console.log("order", count);
         res.render('placeorder', {
             isLoggedIn: isLoggedIn(req, res),
             currentUser,
@@ -520,13 +520,14 @@ const placeorder = async (req, res) => {
         const user = req.session.user_id
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
- 
+
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
-        }, 0);   
+        }, 0);
+        console.log('Before map:', currentUser.cart.length);
+        // Create a new order for each product in the cart
+        const orders = await Promise.all(
 
-         // Create a new order for each product in the cart
-         const orders = await Promise.all(
             currentUser.cart.map(async (item) => {
                 const orderedProduct = new Order({
                     user: user,
@@ -543,34 +544,37 @@ const placeorder = async (req, res) => {
                     totalAmount: grandTotal + 10,
                 });
 
-                  if (req.body.paymentMethod === 'cod') {
+                if (req.body.paymentMethod === 'cod') {
                     await orderedProduct.save();
-              
+
                 } else if (req.body.paymentMethod === 'razorpay') {
-                    
+
+                    const amountInPaise = Math.max(parseInt(grandTotal * 100), 100); // Set a minimum of 100 paise
+                    console.log("Amount in Paise:", amountInPaise);
+
                     // Create a Razorpay order
-                    const razorpayOrder = razorpay.orders.create({
-                      
-                        amount: parseInt((grandTotal - 0 + 10) * 100), // Convert amount to integer in paise
-                        currency: 'INR', // Currency code (change as needed)
-                        receipt: `${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}${Date.now()}`, // Provide a unique receipt ID
-                    },(error, order) => {
-                        if (error) {
-                            console.error(error);
-                        } else {
-                            console.log("gfvdcsxa",order);
-                            const razorpayorderId = order.id;
-                            console.log("Razorpay Order ID:", razorpayorderId);
-                            orderedProduct.razorpayOrderId = razorpayorderId
-                            console.log("razorpayOrhjkderId", orderedProduct.razorpayOrderId);
-                            
-                      orderedProduct.save();
+                    const razorpayOrder = await new Promise((resolve, reject) => {
+                        const razorpayOrder = razorpay.orders.create({
 
-                        }
+                            amount: amountInPaise,
+                            currency: 'INR', // Currency code (change as needed)
+                            receipt: `${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}${Date.now()}`, // Provide a unique receipt ID
+                        }, (error, order) => {
+                            if (error) {
+                                console.error(error);
+                                reject(error);
+                            } else {
+                                console.log("Razorpay Order ID:", order.id);
+                                resolve(order);
+
+
+
+                            }
+                        });
                     });
-                 
+                    orderedProduct.razorpayOrderId = razorpayOrder.id;
+                    orderedProduct.save();
 
-       
                     return res.render('rzp', {
                         isLoggedIn: isLoggedIn(req, res),
                         order: razorpayOrder,
@@ -578,24 +582,38 @@ const placeorder = async (req, res) => {
                         user: currentUser
                     });
                 }
-               
-                   
-               
-               
 
-               // stock update
-             currentUser.cart.forEach(async (item) => {
-            const foundProduct = await products.findById(item.product._id);
-            foundProduct.stockquantity -= item.quantity;
-            await foundProduct.save();
-        });
+
+
+
+
+                // stock update
+                const updatedCart = [];
+                for (const item of currentUser.cart) {
+                    const foundProduct = await products.findById(item.product._id);
+                    if (item.quantity > foundProduct.stockquantity) {
+                        console.error(`Product "${foundProduct.productname}" is out of stock.`);
+                        // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
+                        // For example:
+                        return res.status(400).json({ error: `Product bcvx"${foundProduct.productname}" is out of stock.` });
+                    } else {
+                        foundProduct.stockquantity -= item.quantity;
+                        await foundProduct.save();
+                        updatedCart.push(item);
+                    }
+                };
+
+                // Update the user's cart with the items that are still in stock
+                currentUser.cart = updatedCart;
+                await currentUser.save();
+
                 return orderedProduct
             })
-            
-            
+
+
         );
-          
-        
+        console.log('After map:', currentUser.cart.length);
+
         res.redirect('/ordersuccess')
     } catch (error) {
         console.log(error.message);
@@ -605,27 +623,37 @@ const placeorder = async (req, res) => {
 
 
 const saveRzpOrder = async (req, res, next) => {
-    
-    try { const paymentMethod = req.body.paymentMethod
+
+    try {
+        const paymentMethod = req.body.paymentMethod
         const user = req.session.user_id
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
- 
+
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
         }, 0);
 
         const { transactionId, orderId, signature } = req.body;
         const amount = parseInt(req.body.amount / 100);
-           
-        
-        
+
+        console.log("cheatamount:", amount);
+
         if (transactionId && orderId && signature) {
-             // stock update
-             currentUser.cart.forEach(async (item) => {
+            // stock update
+            currentUser.cart.forEach(async (item) => {
                 const foundProduct = await products.findById(item.product._id);
-                foundProduct.stockquantity -= item.quantity;
-                await foundProduct.save();
+                if (item.quantity > foundProduct.stockquantity) {
+                    console.error(`Product "${foundProduct.productname}" is out of stock.`);
+                    // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
+                    // For example:
+                    // return res.status(400).json({ error: `Product "${foundProduct.productname}" is out of stock.` });
+                }
+                else {
+                    foundProduct.stockquantity -= item.quantity;
+                    await foundProduct.save();
+                }
+
             });
             currentUser.cart.map(async (item) => {
                 const orderedProduct = new Order({
@@ -642,7 +670,7 @@ const saveRzpOrder = async (req, res, next) => {
                     ],
                     totalAmount: amount,
                 });
-                await orderedProduct.save();
+                // await orderedProduct.save();
                 return orderedProduct
             })
         }
@@ -678,7 +706,7 @@ const forgetverify = async (req, res) => {
             } else {
                 const randomString = randomstring.generate()
                 const updatedData = await User.updateOne({ email: email }, { $set: { token: randomString } })
-                
+
                 sendreset(userData.name, userData.email, randomString)
                 res.render('forget', { message: "check mail to reset password" })
             }
@@ -721,13 +749,13 @@ const postreset = async (req, res) => {
     }
 }
 const loadwish = async (req, res) => {
-  
+
     try {
         const user = req.session.user_id
-        const wis=await User.findById(req.session.user_id).populate("wishlist.product")
-        console.log("axSAX",wis);
-    
-        res.render('wishlist', { isLoggedIn: isLoggedIn(req, res) ,wis,user})
+        const wis = await User.findById(req.session.user_id).populate("wishlist.product")
+        console.log("axSAX", wis);
+
+        res.render('wishlist', { isLoggedIn: isLoggedIn(req, res), wis, user })
     } catch (error) {
         console.log(error.message);
     }
@@ -735,30 +763,30 @@ const loadwish = async (req, res) => {
 const loadpost = async (req, res) => {
     try {
         const user = req.session.user_id
-    if (req.query.product) {
-        const currentProduct = await products.findById(req.query.product);
-        const currentUser = await User.findById(req.session.user_id);
-         // Check if the product is already in the wishlist
-         const existingItemIndex = currentUser.wishlist.findIndex(item => item.product.toString() === req.query.product);
-            
-         if (existingItemIndex !== -1) {
-             // Product is already in the wishlist, remove it
-            //  currentUser.wishlist.splice(existingItemIndex, 1);
-         } else {
-             // Product is not in the wishlist, add it
-             let newItem = {
-                 product: req.query.product,
-                 total: currentProduct.price
-             };
-             currentUser.wishlist.push(newItem);
-         }
+        if (req.query.product) {
+            const currentProduct = await products.findById(req.query.product);
+            const currentUser = await User.findById(req.session.user_id);
+            // Check if the product is already in the wishlist
+            const existingItemIndex = currentUser.wishlist.findIndex(item => item.product.toString() === req.query.product);
 
-         await currentUser.save();
-         res.redirect('wishlist');
-     }
- } catch (error) {
-    console.log(error.message);
-}
+            if (existingItemIndex !== -1) {
+                // Product is already in the wishlist, remove it
+                //  currentUser.wishlist.splice(existingItemIndex, 1);
+            } else {
+                // Product is not in the wishlist, add it
+                let newItem = {
+                    product: req.query.product,
+                    total: currentProduct.price
+                };
+                currentUser.wishlist.push(newItem);
+            }
+
+            await currentUser.save();
+            res.redirect('wishlist');
+        }
+    } catch (error) {
+        console.log(error.message);
+    }
 }
 
 
@@ -766,9 +794,9 @@ const removewish = async (req, res) => {
     try {
         const currentUser = await User.findById(req.session.user_id);
         const existingItemIndex = currentUser.wishlist.findIndex(item => item.product.toString() === req.query.product);
-   
-      
-       
+
+
+
         currentUser.wishlist.splice(existingItemIndex, 1);
         await currentUser.save();
 
@@ -811,7 +839,7 @@ const orderSuccess = async (req, res) => {
         res.render('ordersuccess', {
             isLoggedIn: isLoggedIn(req, res),
             user
-           
+
         });
     } catch (error) {
         console.log(error.message);
@@ -845,6 +873,6 @@ module.exports = {
     loadpost,
     removewish,
     cartpost,
-    orderSuccess,saveRzpOrder
-    
+    orderSuccess, saveRzpOrder
+
 }
