@@ -572,6 +572,25 @@ const placeorder = async (req, res) => {
                             }
                         });
                     });
+                    // stock update
+                    const updatedCart = [];
+                    for (const item of currentUser.cart) {
+                        const foundProduct = await products.findById(item.product._id);
+                        if (item.quantity > foundProduct.stockquantity) {
+                            console.error(`Product "${foundProduct.productname}" is out of stock.`);
+                            // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
+                            // For example:
+                            return res.status(400).json({ error: `Product bcvx"${foundProduct.productname}" is out of stock.` });
+                        } else {
+                            foundProduct.stockquantity -= item.quantity;
+                            await foundProduct.save();
+                            updatedCart.push(item);
+                        }
+                    };
+
+                    // Update the user's cart with the items that are still in stock
+                    currentUser.cart = updatedCart;
+                    await currentUser.save();
                     orderedProduct.razorpayOrderId = razorpayOrder.id;
                     orderedProduct.save();
 
@@ -641,20 +660,24 @@ const saveRzpOrder = async (req, res, next) => {
 
         if (transactionId && orderId && signature) {
             // stock update
-            currentUser.cart.forEach(async (item) => {
+            const updatedCart = [];
+            for (const item of currentUser.cart) {
                 const foundProduct = await products.findById(item.product._id);
                 if (item.quantity > foundProduct.stockquantity) {
                     console.error(`Product "${foundProduct.productname}" is out of stock.`);
                     // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
                     // For example:
-                    // return res.status(400).json({ error: `Product "${foundProduct.productname}" is out of stock.` });
-                }
-                else {
+                    return res.status(400).json({ error: `Product bcvx"${foundProduct.productname}" is out of stock.` });
+                } else {
                     foundProduct.stockquantity -= item.quantity;
                     await foundProduct.save();
+                    updatedCart.push(item);
                 }
+            };
 
-            });
+            // Update the user's cart with the items that are still in stock
+            currentUser.cart = updatedCart;
+            await currentUser.save();
             currentUser.cart.map(async (item) => {
                 const orderedProduct = new Order({
                     user: user,
@@ -670,6 +693,25 @@ const saveRzpOrder = async (req, res, next) => {
                     ],
                     totalAmount: amount,
                 });
+                // stock update
+                const updatedCart = [];
+                for (const item of currentUser.cart) {
+                    const foundProduct = await products.findById(item.product._id);
+                    if (item.quantity > foundProduct.stockquantity) {
+                        console.error(`Product "${foundProduct.productname}" is out of stock.`);
+                        // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
+                        // For example:
+                        return res.status(400).json({ error: `Product bcvx"${foundProduct.productname}" is out of stock.` });
+                    } else {
+                        foundProduct.stockquantity -= item.quantity;
+                        await foundProduct.save();
+                        updatedCart.push(item);
+                    }
+                };
+
+                // Update the user's cart with the items that are still in stock
+                currentUser.cart = updatedCart;
+                await currentUser.save();
                 // await orderedProduct.save();
                 return orderedProduct
             })

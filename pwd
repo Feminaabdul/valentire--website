@@ -1,0 +1,83 @@
+[33mcommit dff3559782482d6b31af27cc69a381cabb85d55e[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Wed Nov 29 13:13:44 2023 +0530
+
+    razorpay paymentinterogation
+
+[33mcommit 1aafb28e47542c5fdb5ec6ee2ce84df144f6a41b[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Tue Nov 28 17:04:27 2023 +0530
+
+    product edit validation
+
+[33mcommit e917c1df720236f14e95fa31aa833b18e2470c23[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Tue Nov 28 15:43:45 2023 +0530
+
+    product edit validation
+
+[33mcommit 46c3cd6ecb746eceda512408fb2b176f9996199c[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Sun Nov 26 22:07:21 2023 +0530
+
+    handled the cropping of image
+
+[33mcommit 5ef430a4211342a14238929be67e7ed42b540bbe[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Fri Nov 24 12:44:27 2023 +0530
+
+     implemented a zooming effect .in This code it sets up a zooming effect for the product image inside the .img_producto_container element. When the mouse is over the container, the JavaScript code adjusts the transform property of the image, creating a scaling effect. This gives the appearance of zooming in when the mouse is over the image.
+
+[33mcommit ff7249a447cc19119d96c1f5c298cb1a83f57f17[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Mon Nov 20 18:46:12 2023 +0530
+
+    completed cod and order management
+
+[33mcommit 0fb13ff6c6b4f104ecd3b5839a4ff57f98bdd3eb[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Tue Nov 14 21:59:23 2023 +0530
+
+    handled the block already logged in user
+
+[33mcommit be91264c4c91a0a4d7cea8c5d39c98a6dd283027[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Thu Nov 9 05:45:49 2023 +0530
+
+     raw
+
+[33mcommit 9ede5c7677d1014849c3ec4efcf8f0b4efb3466b[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Wed Nov 8 10:02:10 2023 +0530
+
+    new
+
+[33mcommit 8607642c1aefe1e5d7b8f4291d66c8c537574d68[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Wed Nov 8 01:54:25 2023 +0530
+
+    product offer implemented
+
+[33mcommit 5c11b2dbfe06ddf4a60e57591f3f22cdb0358cfa[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Wed Nov 8 01:17:35 2023 +0530
+
+    test deleted
+
+[33mcommit bbdd9a36506fdd3a61cd91993528762e0c94b454[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Wed Nov 8 00:58:57 2023 +0530
+
+    new commmit
+
+[33mcommit 9d384eddec7cbb44288e05fa3f1e8ed464458983[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Wed Nov 8 00:52:03 2023 +0530
+
+    third commit
+
+[33mcommit 5eb16f689a376b8a998d8d6e840eab7fdd23c127[m
+Author: Feminaabdul <zain.3email.com@gmail.com>
+Date:   Wed Nov 8 00:33:23 2023 +0530
+
+    second commit
