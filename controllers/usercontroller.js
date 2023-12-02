@@ -605,7 +605,16 @@ const placeorder = async (req, res) => {
                         user: currentUser,
                        
                     });
+
+                 
+
                 }
+                    
+              
+
+
+
+
 
                 // stock update
                 const updatedCart = [];
@@ -765,15 +774,16 @@ const forgetverify = async (req, res) => {
 }
 
 
+
 const lodreset = async (req, res) => {
     try {
         const user = req.session.user_id
         const token = req.query.token
-
-        const userData = await User.findOne({ token })
-
+console.log("token",token);
+        const userData = await User.findOne({user},{token:token})
+console.log("userData",userData);
         const tokenOg = userData.token
-
+console.log("tokenOg",tokenOg);
         if (token == tokenOg) {
             res.render("reset", { user_id: userData._id })
         } else {
