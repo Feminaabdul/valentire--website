@@ -49,6 +49,7 @@ userroute.post('/placeorder',auth.checkToBlock,auth.isLogin, usercontroller.plac
 
 userroute.post("/save-rzporder", auth.checkToBlock,auth.isLogin,usercontroller.saveRzpOrder);
 
+// Add this route in your user routes file (e.g., userroutes.js)
 
 
 userroute.post('/register', usercontroller.postregister);

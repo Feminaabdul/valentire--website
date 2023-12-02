@@ -95,66 +95,6 @@ const postAddProduct = async (req, res) => {
 }
 
 
-// const postEditProduct = async (req, res) => {
-//     try {
-
-//         const id = req.query.id;
-
-
-//         let image = []
-//         for (let i = 0; i < req.files.length; i++) {
-//             image[i] = req.files[i].filename;
-//         }
-//         const newprice=Number(req.body.price)
-//         const Data = await Product.findById(req.query.id);
-//         const offer=req.body.offer
-        
-      
-        
-//       if(offer){
-//         const offers = await Offer.findById(offer)
-//         const newprice=Number(req.body.price)
-   
-//         const calculator = newprice * (1 - offers.discount / 100);
-
-//         Data.productname = req.body.productName
-//         Data.mrp = newprice
-//         Data.price = calculator
-
-//         Data.category = req.body.category
-//         Data.stockquantity = req.body.stockquantity
-
-//         Data.image = image
-//         Data.description = req.body.description
-//         Data.material = req.body.material
-//         Data.offer =offer
-        
-//       }else{
-//         Data.productname = req.body.productName
-        
-//         Data.price =newprice
-
-//         Data.category = req.body.category
-//         Data.stockquantity = req.body.stockquantity
-
-//         Data.image = image
-//         Data.description = req.body.description
-//         Data.material = req.body.material
-//         Data.offer = null; 
-//       }
-       
-
-
-//         const saved = await Data.save()
-
-
-//         res.redirect('/admin/product');
-
-
-//     } catch (error) {
-//         console.log(error.message)
-//     }
-// }
 const postEditProduct = async (req, res) => {
     try {
 

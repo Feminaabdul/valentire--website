@@ -116,6 +116,9 @@ const loadshop = async (req, res) => {
         console.log(error.message);
     }
 }
+
+
+
 const loadshopdetail = async (req, res) => {
     try {
         const user = await User.findById(req.session.user_id)
@@ -549,8 +552,10 @@ const placeorder = async (req, res) => {
 
                 } else if (req.body.paymentMethod === 'razorpay') {
 
-                    const amountInPaise = Math.max(parseInt(grandTotal * 100), 100); // Set a minimum of 100 paise
-                    console.log("Amount in Paise:", amountInPaise);
+                    // const amountInPaise = Math.max(parseInt(grandTotal * 100), 100); // Set a minimum of 100 paise
+                    const amountInPaise = Math.max(parseInt((grandTotal + 10) * 100), 100); 
+
+                   
 
                     // Create a Razorpay order
                     const razorpayOrder = await new Promise((resolve, reject) => {
@@ -564,7 +569,7 @@ const placeorder = async (req, res) => {
                                 console.error(error);
                                 reject(error);
                             } else {
-                                console.log("Razorpay Order ID:", order.id);
+              
                                 resolve(order);
 
 
@@ -592,19 +597,15 @@ const placeorder = async (req, res) => {
                     currentUser.cart = updatedCart;
                     await currentUser.save();
                     orderedProduct.razorpayOrderId = razorpayOrder.id;
-                    orderedProduct.save();
-
-                    return res.render('rzp', {
+                    console.log("  orderedProduct.razorpayOrderId ",  orderedProduct.razorpayOrderId );
+                    return res.render('rzp',   {
                         isLoggedIn: isLoggedIn(req, res),
                         order: razorpayOrder,
                         key_id: process.env.RAZORPAY_ID_KEY,
-                        user: currentUser
+                        user: currentUser,
+                       
                     });
                 }
-
-
-
-
 
                 // stock update
                 const updatedCart = [];
@@ -631,7 +632,7 @@ const placeorder = async (req, res) => {
 
 
         );
-        console.log('After map:', currentUser.cart.length);
+        
 
         res.redirect('/ordersuccess')
     } catch (error) {
@@ -654,9 +655,10 @@ const saveRzpOrder = async (req, res, next) => {
         }, 0);
 
         const { transactionId, orderId, signature } = req.body;
-        const amount = parseInt(req.body.amount / 100);
+        
+        const amount = parseInt(req.body.amount / 100)+10;
 
-        console.log("cheatamount:", amount);
+     
 
         if (transactionId && orderId && signature) {
             // stock update
@@ -693,6 +695,8 @@ const saveRzpOrder = async (req, res, next) => {
                     ],
                     totalAmount: amount,
                 });
+                console.log("orderedProduct.save()",orderedProduct);
+                orderedProduct.save()
                 // stock update
                 const updatedCart = [];
                 for (const item of currentUser.cart) {

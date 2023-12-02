@@ -72,18 +72,18 @@
 										<div class="pricing">
 											<p class="price"><span>
 												<% if (elem.offer) { %>
-													<div><del><%= elem.mrp %></del></div>
-													<div><%= elem.price %></div>
+													<div><del>&#8377;<%= elem.mrp %></del></div>
+													<div>&#8377;<%= elem.price %></div>
 													
 												<% } else { %>
-													<div><%= elem.price %></div>
+													<div>&#8377;<%= elem.price %></div>
 												<% } %>
 													
 												</span>
 											</p>
 										</div>
 										<p class="bottom-area d-flex px-3">
-											<% console.log('Stock:', elem.stockquantity); %>
+											
 											<% if (elem.stockquantity > 0) { %>
 											<% if (user && user.cart.some(item => item.product.equals(elem._id))) { %>
 												<a href="/cart" class="add-to-cart text-center py-2 mr-1"><span>Go to cart</span></a>

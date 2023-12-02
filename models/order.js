@@ -33,6 +33,10 @@ const orderSchema = new mongoose.Schema({
         },
         totalPrice:{
             type:Number
+        },
+         isCancelled: {
+            type: Boolean,
+            default: false
         }
     }],
     totalAmount:{
@@ -48,7 +52,7 @@ const orderSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-      
+        enum: ['processing', 'completed', 'failed'],
         default: 'processing',
     },
     razorpayOrderId: {

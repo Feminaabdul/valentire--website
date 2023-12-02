@@ -29,8 +29,9 @@ app.use(session({
 
 
 const userroute = require('./routes/userroute')
-const adminroute = require('./routes/adminroute')
 app.use('/',userroute)
+const adminroute = require('./routes/adminroute')
+
 app.use('/admin',adminroute)
 
 app.listen(3000,()=>{
