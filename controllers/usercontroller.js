@@ -780,7 +780,7 @@ const lodreset = async (req, res) => {
         const user = req.session.user_id
         const token = req.query.token
 console.log("token",token);
-        const userData = await User.findOne({user},{token:token})
+        const userData = await User.findOne({token:token})
 console.log("userData",userData);
         const tokenOg = userData.token
 console.log("tokenOg",tokenOg);
@@ -799,6 +799,7 @@ const postreset = async (req, res) => {
         const user_id = req.body.user_id
         const secure_password = await secure(password)
         const updatedData = await User.findByIdAndUpdate({ _id: user_id }, { $set: { password: secure_password, token: "" } })
+        console.log("updatedData",updatedData);
         res.redirect("/login")
     } catch (error) {
         console.log(error.message);
