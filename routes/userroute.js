@@ -46,11 +46,11 @@ userroute.get('/ordersuccess', auth.checkToBlock, auth.isLogin, usercontroller.o
 
 userroute.get('/placeorder',auth.checkToBlock,auth.isLogin, usercontroller.lodplaceorder)
 userroute.post('/placeorder',auth.checkToBlock,auth.isLogin, usercontroller.placeorder)
-
+userroute.post('/cancel-order/:orderId', auth.checkToBlock, auth.isLogin, usercontroller.cancelOrder);
 userroute.post("/save-rzporder", auth.checkToBlock,auth.isLogin,usercontroller.saveRzpOrder);
 
 // Add this route in your user routes file (e.g., userroutes.js)
-
+userroute.get("/wallet",auth.checkToBlock,usercontroller.getWallet);
 
 userroute.post('/register', usercontroller.postregister);
 userroute.post('/otp', usercontroller.postotp);

@@ -1,4 +1,31 @@
 const mongoose = require("mongoose")
+const transactionSchema = new mongoose.Schema({
+    amount: {
+        type: Number,
+        required: true,
+    },
+    description: {
+        type: String,
+        required: true,
+    },
+    type: {
+        type: String,
+        enum: ['Credit', 'Debit'],
+        required: true,
+    },
+    timestamp: {
+        type: Date,
+        default: Date.now,
+    }
+});
+
+const walletSchema = new mongoose.Schema({
+    balance: {
+        type: Number,
+        default: 0,
+    },
+    transactions: [transactionSchema],
+});
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -46,7 +73,7 @@ const userSchema = new mongoose.Schema({
         default: 0
     }
 
-}]
+}] ,wallet: walletSchema
    ,
     cart: [{
         product: {
@@ -61,8 +88,10 @@ const userSchema = new mongoose.Schema({
             type: Number,
             default: 0
         }
-    }
-    ]
+    }],
+
+   
+
 })
 
 module.exports = mongoose.model("User", userSchema)

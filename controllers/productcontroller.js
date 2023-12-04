@@ -18,6 +18,11 @@ const postAddProduct = async (req, res) => {
             image[i] = req.files[i].filename;
         }
 
+ // Check if the price is greater than 1 and not 0 or a negative number
+ if (price <= 1) {
+    const categorydata = await Category.find({});
+    return res.render('addproduct', { category: categorydata, message: "Please enter a  valid price " });
+}
 
 
     //    if(offer){

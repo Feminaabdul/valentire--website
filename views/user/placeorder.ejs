@@ -12,6 +12,7 @@
   </div>
 
   <section class="ftco-section ftco-wishlist">
+
     <div class="container">
       <div class="row">
         <div class="col-md-12 ftco-animate">
@@ -20,12 +21,13 @@
               <thead class="thead-primary">
                 <tr class="text-center">
 
-                  <th>product</th>
+                  <th>product</th> 
                   <th>Delivery Address</th>
                   <th>payment type</th>
                   <th>date</th>
                   <th>total</th>
                   <th>status</th>
+               
 
 
                 </tr>
@@ -47,7 +49,20 @@
                               
                                 <% order.products.forEach((product)=> { %>
                                   <tr class="text-center"></tr>
-                                  <td class="product-name"><%= product.productId.productname %></td>
+                                
+                                  <td class="product-name">
+                                    <img  style="height: 100px; width: 100px;"  src="/Admins/productImages/<%= product.productId.image[0] %>" alt="<%= product.productId.productname %>">
+                                    <br>   
+                                    <%= product.productId.productname %>,<br>
+                                    <%= product.productId.category%>,<br>
+
+                                    <%= product.productId.description%></td><br>
+
+
+                                   
+
+
+
                                   <td class="product-Address">
                                     <%= order.Address.name %><br>
                                       <%= order.Address.building %>, <%= order.Address.area %><br>
@@ -56,6 +71,7 @@
                                   </td>
                                   <td class="product-name">
                                     <%= order.paymentMethod %>
+                                    
                                   </td>
                                   <td class="product-name">
                                     <%= order.createdAt.toDateString() %>
@@ -66,13 +82,42 @@
                                   <td class="product-name">
                                  
                                         <p class="text-primary font-weight-bolder"><%= order.status %></p>
+                                        
+                                     <% if (order.status === 'processing') { %>
+                                          <form action="/cancel-order/<%= order._id %>" method="POST">
+                                            <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                          </form>
+                                        <% } %>
+                                         
                                    
                                 </td>
                                 </tr>
                                   <% }) %> 
                             <% }) %>
                               <% } %>
-
+                           
+                              <div class="modal fade" id="cancelOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+                                <div class="modal-dialog" role="document">
+                                  <div class="modal-content">
+                                    <div class="modal-header">
+                                      <h5 class="modal-title" id="cancelOrderModalLabel">Confirm Cancel Order</h5>
+                                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                      </button>
+                                    </div>
+                                    <div class="modal-body">
+                                      Are you sure you want to cancel your order?
+                                    </div>
+                                    <div class="modal-footer">
+                                      <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                      <button type="button" class="btn btn-danger" id="confirmCancelOrder">
+                                        Cancel Order
+                                      </button>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                          
                     </div>
                   </div>
                 </div>

@@ -549,6 +549,7 @@ const placeorder = async (req, res) => {
 
                 if (req.body.paymentMethod === 'cod') {
                     await orderedProduct.save();
+                 
 
                 } else if (req.body.paymentMethod === 'razorpay') {
 
@@ -569,11 +570,8 @@ const placeorder = async (req, res) => {
                                 console.error(error);
                                 reject(error);
                             } else {
-              
                                 resolve(order);
-
-
-
+                                console.log("dgfhj",order);
                             }
                         });
                     });
@@ -605,16 +603,30 @@ const placeorder = async (req, res) => {
                         user: currentUser,
                        
                     });
-
-                 
-
+                 }else {
+                    if (currentUser.wallet.balance < grandTotal + 10) {
+                        return res.render("checkout", {
+                            isLoggedIn: isLoggedIn(req, res),
+                            currentUser,
+                            cartProducts: currentUser.cart,
+                            currentAddress: deliveryAddress,
+                            discount: 0,
+                            grandTotal,
+                            currentCoupon: '',
+                            couponError: '',
+                            error: "Insufficient wallet balance.",
+                        });
+                    } else {
+                        await newOrder.save();
+                        currentUser.wallet.balance -= (grandTotal + 10);
+                        const transactionData = {
+                            amount: grandTotal + 10,
+                            description: 'Order placed.',
+                            type: 'Debit',
+                        };
+                        currentUser.wallet.transactions.push(transactionData);
+                    }
                 }
-                    
-              
-
-
-
-
 
                 // stock update
                 const updatedCart = [];
@@ -739,6 +751,36 @@ const saveRzpOrder = async (req, res, next) => {
 
 
 
+const cancelOrder = async (req, res) => {
+    try {
+      const orderId = req.params.orderId;
+   // Find the order and get the order details
+   const cancelledOrder = await Order.findById(orderId);
+   const cancelledAmount = cancelledOrder.totalAmount;
+
+      // Add logic to update the order status to 'cancelled' in the database
+      await Order.findByIdAndUpdate(orderId, { status: 'cancelled' });
+      
+        // Add the cancelled order amount to the user's wallet
+        const user = await User.findById(req.session.user_id);
+        const walletTransaction = {
+            description: `Cancelled order #${orderId}`,
+            amount: cancelledAmount,
+            type: 'Credit', // Credit the wallet with the cancelled amount
+            timestamp: new Date(),
+        };
+
+        user.wallet.transactions.push(walletTransaction);
+        user.wallet.balance += cancelledAmount;
+        await user.save();
+
+  
+      res.redirect('/placeorder'); // Redirect back to the order page
+    } catch (error) {
+      console.error(error.message);
+      res.status(500).send('Internal Server Error');
+    }
+  };
 //forgetpassword//
 const loadpassword = async (req, res) => {
     try {
@@ -903,7 +945,30 @@ const orderSuccess = async (req, res) => {
     }
 }
 
+const getWallet = async (req, res, next) => {
+    try {
+        // fix sorting 
+         const user = req.session.user_id
+         console.log("user",user); 
+        const currentUser = await User.findById(req.session.user_id).populate('wallet.transactions');
+        
+        console.log("qwe",currentUser);
+        if (!currentUser.wallet) {
+            currentUser.wallet = { transactions: [] };
+            await currentUser.save();
+        }
 
+        res.render("wallet", {
+            isLoggedIn: isLoggedIn(req, res),
+            user,
+            currentUser,
+           
+        });
+    } catch (error) {
+        res.status(500).send('Internal Server Error');
+        next(error);
+    }
+};
 module.exports = {
     loadHome,
     loadlogin,
@@ -930,6 +995,7 @@ module.exports = {
     loadpost,
     removewish,
     cartpost,
-    orderSuccess, saveRzpOrder
-
+    orderSuccess, saveRzpOrder,
+    getWallet
+,cancelOrder
 }
