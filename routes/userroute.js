@@ -55,5 +55,11 @@ userroute.get("/wallet",auth.checkToBlock,usercontroller.getWallet);
 userroute.post('/register', usercontroller.postregister);
 userroute.post('/otp', usercontroller.postotp);
 userroute.post('/login', auth.isLogout, usercontroller.verifylogin);
+userroute.get('/editaddress/:id',usercontroller.editaddress)
+userroute.post('/update-address/:id',usercontroller.postedit)
+userroute.get('/deleteaddress/:id',usercontroller.deleteEdit)
+
+
+
 
 module.exports = userroute;

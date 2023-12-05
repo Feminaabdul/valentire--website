@@ -24,6 +24,7 @@
     "express-session": "^1.17.3",
     "express-validator": "^7.0.1",
     "fs": "^0.0.1-security",
+    "helmet-csp": "^3.4.0",
     "joi": "^17.11.0",
     "method-override": "^3.0.0",
     "mongoose": "^7.6.4",

@@ -1,12 +1,12 @@
 <%-include("../layouts/userlayout/header.ejs")%>
 
 
-<div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
+<div class="hero-wrap hero-bread" style="background-image: url('/Users/images/bg_6.jpg');">
     <div class="container">
         <div class="row no-gutters slider-text align-items-center justify-content-center">
             <div class="col-md-9 ftco-animate text-center">
                 <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Checkout</span></p>
-                <h1 class="mb-0 bread">Add Address</h1>
+                <h1 class="mb-0 bread">Edit Address</h1>
             </div>
         </div>
     </div>
@@ -20,19 +20,19 @@
 
 
 					<div id="error-message" class="text-danger"></div>
-					<form id="address-form" action="/AddAddress" method="post" class="billing-form">
+					<form id="address-form" action="/update-address/<%= addressToEdit._id %>" method="post" class="billing-form">
 						<h3 class="mb-4 billing-heading">address</h3>
 						<div class="row align-items-end">
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="firstname"> Name</label>
-									<input type="text" name="name" class="form-control" placeholder="">
+									<input type="text" name="name" class="form-control" placeholder="" value="<%= addressToEdit.name %>">
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="state">state</label>
-									<input type="text" name="state" class="form-control" placeholder="">
+									<input type="text" name="state" class="form-control" placeholder="" value="<%= addressToEdit.state %>">
 								</div>
 							</div>
 							<div class="w-100"></div>
@@ -41,13 +41,13 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="streetaddress">building</label>
-									<input type="text" name="building" class="form-control" placeholder="">
+									<input type="text" name="building" class="form-control" placeholder=""  value="<%= addressToEdit.building %>">
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="postcodezip">Area</label>
-									<input type="text" name="area" class="form-control" placeholder="">
+									<input type="text" name="area" class="form-control" placeholder=""  value="<%= addressToEdit.area %>">
 								</div>
 							</div>
 
@@ -56,13 +56,13 @@
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="towncity">City</label>
-									<input type="text" name="city" class="form-control" placeholder="">
+									<input type="text" name="city" class="form-control" placeholder="" value="<%= addressToEdit.city %>">
 								</div>
 							</div>
 							<div class="col-md-6">
 								<div class="form-group">
 									<label for="postcodezip">Pincode</label>
-									<input type="number" name="pincode" class="form-control" placeholder="">
+									<input type="number" name="pincode" class="form-control" placeholder="" value="<%= addressToEdit.pincode %>">
 								</div>
 							</div>
 
@@ -72,7 +72,7 @@
 
 
 						</div>
-						<button type="submit" class="btn btn-primary">Add Address</button>
+						<button type="submit" class="btn btn-primary">Update Address</button>
 					</form><!-- END -->
 
 
@@ -173,23 +173,23 @@
 		</svg></div>
 
 
-	<script src="js/jquery.min.js"></script>
-	<script src="js/jquery-migrate-3.0.1.min.js"></script>
-	<script src="js/popper.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/jquery.easing.1.3.js"></script>
-	<script src="js/jquery.waypoints.min.js"></script>
-	<script src="js/jquery.stellar.min.js"></script>
-	<script src="js/owl.carousel.min.js"></script>
-	<script src="js/jquery.magnific-popup.min.js"></script>
-	<script src="js/aos.js"></script>
-	<script src="js/jquery.animateNumber.min.js"></script>
-	<script src="js/bootstrap-datepicker.js"></script>
-	<script src="js/scrollax.min.js"></script>
+	<script src="/Users/js/jquery.min.js"></script>
+	<script src="/Users/js/jquery-migrate-3.0.1.min.js"></script>
+	<script src="/Users/js/popper.min.js"></script>
+	<script src="/Users/js/bootstrap.min.js"></script>
+	<script src="/Users/js/jquery.easing.1.3.js"></script>
+	<script src="/Users/js/jquery.waypoints.min.js"></script>
+	<script src="/Users/js/jquery.stellar.min.js"></script>
+	<script src="/Users/js/owl.carousel.min.js"></script>
+	<script src="/Users/js/jquery.magnific-popup.min.js"></script>
+	<script src="/Users/js/aos.js"></script>
+	<script src="/Users/js/jquery.animateNumber.min.js"></script>
+	<script src="/Users/js/bootstrap-datepicker.js"></script>
+	<script src="/Users/js/scrollax.min.js"></script>
 	<script
 		src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-	<script src="js/google-map.js"></script>
-	<script src="js/main.js"></script>
+	<script src="/Users/js/google-map.js"></script>
+	<script src="/Users/js/main.js"></script>
 
 	<script>
 

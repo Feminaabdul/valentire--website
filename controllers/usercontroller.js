@@ -969,6 +969,52 @@ const getWallet = async (req, res, next) => {
         next(error);
     }
 };
+
+
+const editaddress=async(req,res)=>{
+    try {
+        const user = req.session.user_id
+        const addressToEdit = await address.findById(req.params.id);
+        res.render('editaddress', {
+            addressToEdit,
+            currentUser: await User.findById(req.session.user_id),
+            isLoggedIn: isLoggedIn(req, res),
+            user
+        });
+    } catch (error) {
+        console.log(error.message);
+    }
+
+}
+
+const postedit=async(req,res)=>{
+    try {
+        const { name, state, building, area, city, pincode } = req.body;
+        await address.findByIdAndUpdate(req.params.id, {
+            name,
+            state,
+            building,
+            area,
+            city,
+            pincode
+        });
+        res.redirect('/profile');
+    } catch (error) {
+        console.log(error.message);
+    }
+
+
+}
+
+const  deleteEdit= async (req, res) => {
+    try {
+        await address.findByIdAndRemove(req.params.id);
+        res.redirect('/profile');
+    } catch (error) {
+        console.log(error.message);
+    }
+
+}
 module.exports = {
     loadHome,
     loadlogin,
@@ -995,7 +1041,11 @@ module.exports = {
     loadpost,
     removewish,
     cartpost,
-    orderSuccess, saveRzpOrder,
-    getWallet
-,cancelOrder
+    orderSuccess,
+     saveRzpOrder,
+    getWallet,
+    deleteEdit,
+cancelOrder,
+editaddress,
+postedit
 }

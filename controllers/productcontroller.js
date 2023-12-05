@@ -2,13 +2,14 @@ const Category = require('../models/category');
 const productmodel = require('../models/productmodel');
 const Product = require('../models/productmodel')
 const Offer = require("../models/offermodel")
+const Order = require("../models/order")
 const Joi = require('joi');
 const postAddProduct = async (req, res) => {
     try {
         
         const { productname, stockquantity, price, description, category, material, offer } = req.body;
        
-
+       
         if (!req.files || req.files.length === 0) {
             const categorydata = await Category.find({});
             return res.render('addproduct', { category: categorydata, message: "Please upload at least one image for the product." });
@@ -80,7 +81,7 @@ const postAddProduct = async (req, res) => {
         } else {
            
             const categorydata = await Category.find({});
-            res.render('addproduct', { category: categorydata, message: "Something went wrong" })
+            res.render('addproduct', { category: categorydata, message: "Something went wrong", })
         }
 
 
@@ -111,6 +112,7 @@ const postEditProduct = async (req, res) => {
         for (let i = 0; i < req.files.length; i++) {
             image[i] = req.files[i].filename;
         }
+       
 
         const newprice = Number(req.body.price)
         const Data = await Product.findById(req.query.id);

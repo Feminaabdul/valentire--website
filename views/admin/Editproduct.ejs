@@ -42,6 +42,7 @@
                                                 accept="image/*" multiple>
 
                                         </div>
+                                        
                                         <div class="form-group" id="preview-group" style="display: none;">
                                             <div class="card">
                                                 <div class="card-header">
@@ -83,20 +84,18 @@
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group col-md-4">
-                                            <label>Catagory</label>
+                                            <label>Category</label>
                                             <select id="inputState" class="form-control" name="category">
-                                                <option></option>
-                                                <%
-                                                    for(let i=0;i<category.length;i++){
-                                                        %>
-                                                            <option><%=category[i].categoryName%></option>
-                                                        <%
-                                                    }
-                                                %>
+                                                <% for (let i = 0; i < category.length; i++) { %>
+                                                    <option value="<%= category[i].categoryName %>" <%= product.category === category[i].categoryName ? 'selected' : '' %>>
+                                                        <%= category[i].categoryName %>
+                                                    </option>
+                                                <% } %>
                                             </select>
                                         </div>
-                                       
                                     </div>
+                                    
+                                    
                                     <div class="form-group col-md-6">
                                         <label>material</label>
                                         <input type="text" class="form-control" name="material"

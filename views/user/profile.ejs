@@ -74,8 +74,8 @@
                                                         <%= Address.state %>,
                                                             <%= Address.pincode %>
                                         </p>
-                                        <a href="" class="btn-outline">edit</a>
-                                        <a href="" class="btn-outline">delete</a>
+                                        <a href="/editaddress/<%=Address._id%>" class="btn-outline">edit</a>
+                                        <a href="/deleteaddress/<%= Address._id %>" class="btn-outline">delete</a>
 
                                     </div>
                                     <% }) %>

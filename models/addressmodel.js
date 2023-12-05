@@ -6,27 +6,33 @@ const addressSchema = new mongoose.Schema({
     },
     name: {
         type: String,
-        required: true
+      
     },
     pincode: {
         type: Number,
-        required: true,
+   
+        validate: {
+            validator: function (v) {
+              return /^\d{6}$/.test(v); // Ensure PIN code is 6 digits
+            },
+            message: props => `${props.value} is not a valid PIN code!`
+        }
     },
     state: {
         type: String,
-        required: true,
+       
     },
     city: {
         type: String,
-        required: true,
+        
     },
     building: {
         type: String,
-        required: true,
+      
     },
     area: {
         type: String,
-        required: true,
+        
     },
     default: {
         type: Boolean,
