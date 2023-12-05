@@ -1,53 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<%- include("../layouts/userlayout/head.ejs") %>
-
-<body>
-  <div class="site-wrap">
-
-    <div class="bg-light py-3">
+  <!DOCTYPE html>
+  <html lang="en">
+  
+ 
+  
+  <body>
+    <div class="site-wrap">
+      <%- include("../layouts/userlayout/head.ejs") %>
+      <div class="bg-light py-3">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Wallet</strong></div>
+          </div>
+        </div>
+      </div>
+  
       <div class="container">
-        <div class="row">
-          <div class="col-md-12 mb-0"><a href="/">Home</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">Wallet</strong></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container">
-      <div class="form-group">
-        <div class="p-4 border m-5">
-          <span class="d-block text-primary h5 text-uppercase">My Wallet</span>
-
-          <% if (currentUser.wallet && currentUser.wallet.transactions !== null && currentUser.wallet.transactions !== undefined) { %>
-            <% if (currentUser.wallet.transactions.length) { %>
-              <% currentUser.wallet.transactions.forEach((transaction) => { %>
-                <div class="d-flex">
-                  <p class="mb-0">
-                    <span class="text-dark"><%= transaction.timestamp %>,</span>
-                    <span><%= transaction.description %></span>
-                    <% if (transaction.type === 'Credit' && transaction.description.startsWith('Cancelled order #')) { %>
-                      <span class="text-danger ml-3"><%= transaction.description.split('#')[1] %></span>
-                    <% } %>
-                  </p>
-                  <% if (transaction.type === 'Credit') { %>
-                    <span class="text-success ml-3">₹<%= transaction.amount %></span>
-                  <% } else { %>
-                    <span class="text-dark ml-3">₹<%= transaction.amount %></span>
-                  <% } %>
-                </div>
-              <% }) %>
+        <div class="form-group">
+          <div class="p-4 border m-5">
+            <span class="d-block text-primary h5 text-uppercase">My Wallet</span>
+            <span class="d-block h6 text-uppercase">
+              Balance: <strong>₹<%= currentUser.wallet.balance.toFixed(2) %></strong>
+            </span>
+            <span class="d-block text-primary mt-4 text-uppercase">Transaction History</span>
+            <% if (!currentUser.wallet.transactions.length) { %>
+            <p class="mb-0">No data found.</p>
             <% } else { %>
-              <p class="mb-0">No data found.</p>
+            <% currentUser.wallet.transactions.forEach((transaction)=> { %>
+            <div class="d-flex">
+              <p class="mb-0">
+                <span class="text-dark"><%= transaction.timestamp %>,</span>
+                <span><%= transaction.description %></span>
+              </p>
+              <% if (transaction.type === 'Credit') { %>
+              <span class="text-success ml-3">₹<%= transaction.amount %></span>
+              <% } else { %>
+              <span class="text-dark ml-3">₹<%= transaction.amount %></span>
+              <% } %>
+            </div>
+            <% }) %>
             <% } %>
-          <% } else { %>
-            <p class="mb-0">No wallet found for the user.</p>
-          <% } %>
-
+          </div>
+  
         </div>
       </div>
-    </div>
-  </div>
-</body>
-
-</html>
+  
+  

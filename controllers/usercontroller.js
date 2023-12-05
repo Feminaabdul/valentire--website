@@ -541,7 +541,7 @@ const placeorder = async (req, res) => {
                             productId: item.product._id,
                             quantity: item.quantity,
                             productPrice: item.product.price,
-                            status: "pending",
+                            status: "Pending",
                         },
                     ],
                     totalAmount: grandTotal + 10,
@@ -711,7 +711,7 @@ const saveRzpOrder = async (req, res, next) => {
                             productId: item.product._id,
                             quantity: item.quantity,
                             productPrice: item.product.price,
-                            status: "pending",
+                            status: "Pending",
                         },
                     ],
                     totalAmount: amount,
@@ -950,9 +950,16 @@ const getWallet = async (req, res, next) => {
         // fix sorting 
          const user = req.session.user_id
          console.log("user",user); 
-        const currentUser = await User.findById(req.session.user_id).populate('wallet.transactions');
+        const currentUser = await User.findById(req.session.user_id).populate({
+            path: 'wallet',
+            populate: {
+                path: 'transactions',
+            },
+        });
         
-        console.log("qwe",currentUser);
+        console.log("wallet",currentUser.wallet);
+        console.log("trantaction",currentUser.wallet.transactions);
+        console.log("details",currentUser);
         if (!currentUser.wallet) {
             currentUser.wallet = { transactions: [] };
             await currentUser.save();
@@ -969,6 +976,7 @@ const getWallet = async (req, res, next) => {
         next(error);
     }
 };
+
 
 
 const editaddress=async(req,res)=>{
@@ -1015,6 +1023,52 @@ const  deleteEdit= async (req, res) => {
     }
 
 }
+
+
+
+// Add this function in your user controller
+const returnProduct = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const productId = req.params.productId;
+
+        // Find the order and product
+        const order = await Order.findById(orderId) 
+          
+        const product = order.products.find(p => p.productId.toString() === productId);
+
+        if (!order || !product || order.status !== 'Delivered') {
+            return res.status(400).json({ error: 'Invalid request for return' });
+        }
+
+        // Add logic to handle the return: update wallet balance, remove product from stock, etc.
+        // Update the user's wallet balance (example: increase by the product price)
+        const user = await User.findById(req.session.user_id);
+        user.wallet.balance += product.productPrice;
+        product.returnStatus = 'Pending Return';
+
+        // // Remove the returned product from the order's products array
+        // order.products = order.products.filter(p => p.productId.toString() !== productId);
+
+
+         // Update the status of the returned product to 'Pending Return'
+         order.status = 'Pending';
+console.log("knjbvhcgrxfez",  product.returnStatus );
+        // Save changes
+        await user.save();
+        await order.save();
+
+        res.status(200).json({ message: 'Product returned successfully' });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
+
+
 module.exports = {
     loadHome,
     loadlogin,
@@ -1047,5 +1101,6 @@ module.exports = {
     deleteEdit,
 cancelOrder,
 editaddress,
-postedit
+postedit,
+returnProduct
 }

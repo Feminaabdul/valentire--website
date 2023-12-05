@@ -79,17 +79,30 @@
                                   <td class="product-name">
                                     <%= order.totalAmount %>
                                   </td>
-                                  <td class="product-name">
+                                  <td class="order-status">
                                  
-                                        <p class="text-primary font-weight-bolder"><%= order.status %></p>
-                                        
-                                     <% if (order.status === 'processing') { %>
-                                          <form action="/cancel-order/<%= order._id %>" method="POST">
-                                            <button type="submit" class="btn btn-danger">Cancel Order</button>
-                                          </form>
+
+                                    <% if (product.returnRequested) { %>
+                                      <%= product.returnRequested %>
+                                    <% } else { %>
+                                      <p class="text-primary font-weight-bolder"><%= order.status %></p>
+
+                                      
+                                      <% if (order.status === 'Delivered') { %>
+                                        <button class="btn btn-primary return-btn" data-orderid="<%= order._id %>" data-productid="<%= product.productId._id %>">Return</button>
                                         <% } %>
-                                         
-                                   
+                                   <% if (order.status === 'Processing'||order.status === 'shipped') { %>
+                                        <form action="/cancel-order/<%= order._id %>" method="POST">
+                                          <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                        </form>
+                                      <% } %>
+                                       
+                                 
+                                    <% } %>
+
+                                  </td>
+
+
                                 </td>
                                 </tr>
                                   <% }) %> 
@@ -280,6 +293,35 @@
 
     });
   </script>
+<!-- Add this script at the bottom of your HTML file, after including other scripts -->
+<script>
+  $(document).ready(function () {
+      // Handle return button click
+      $('.return-btn').click(function (e) {
+          e.preventDefault();
+          const orderId = $(this).data('orderid');
+          const productId = $(this).data('productid');
+          const confirmation = confirm('Are you sure you want to return this product?');
+          const $button = $(this);
+          if (confirmation) {
+              // Make an AJAX request to your server to handle the return logic
+              $.post(`/return-product/${orderId}/${productId}`, function (data) {
+                  // Handle the response from the server (e.g., update UI)
+                  console.log(data);
+                  // You may want to reload the page or update the UI accordingly
+
+
+                    // Update the UI: Change the status to 'Pending'
+                    $button.closest('tr').find('.order-status').text('Pending');
+
+
+
+                  location.reload();
+              });
+          }
+      });
+  });
+</script>
 
   </body>
 

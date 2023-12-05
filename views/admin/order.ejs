@@ -55,9 +55,13 @@
                                         <% odd.forEach(order=> { %>
                                             <% order.products.forEach((product)=> { %>
                                                 <tr>
-                                                    <td><a href="javascript:void(0)">
-                                                            <%= product.productId.productname %>
-                                                        </a></td>
+                                                    <td><p href="javascript:void(0)">
+                                                            <%= product.productId.productname %> <br>
+                                                            <%= product.productId.category%>,<br>
+
+                                                            <%= product.productId.description%></td><br>
+                        
+                                                    </p></td>
                                                     <td>
                                                         <%= order.Address.name %><br>
                                                             <%= order.Address.building %>, <%= order.Address.area %><br>
@@ -71,17 +75,20 @@
                                                     <td>
                                                         <%= order.createdAt.toDateString() %>
                                                     </td>
-                                                    <td>$<%= order.totalAmount %>
+                                                    <td>&#8377;<%= order.totalAmount %>
                                                     </td>
                                                     <td>
                                                         <div class="btn-container">
                                                             <form action="/admin/order/<%= order._id %>/change-status" method="POST">
                                                                 <select name="newStatus">
+
+                                                                  <option value="<%=order.status%>"><%=order.status%></option>
+
                                                                   <option value="Order Pending" <% if (order.status === "Order Pending") { %> selected <% } %>>Order Pending</option>
                                                                   <option value="Delivered" <% if (order.status === "Delivered") { %> selected <% } %>>Delivered</option>
                                                                   <option value="Cancelled" <% if (order.status === "Cancelled") { %> selected <% } %>>Cancelled</option>
                                                                   <option value="shipped" <% if (order.status === "shipped") { %> selected <% } %>>shipped</option>
-                                                                  <option value="shipped" <% if (order.status === "shipped") { %> selected <% } %>>return</option>
+                                                                  <option value="shipped" <% if (order.status === "return") { %> selected <% } %>>return</option>
                                                                   <!-- Add more status options as needed -->
                                                                 </select>
                                                                 <button type="submit" class="btn btn-info">Update Status</button>

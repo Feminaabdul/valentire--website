@@ -51,6 +51,8 @@ userroute.post("/save-rzporder", auth.checkToBlock,auth.isLogin,usercontroller.s
 
 // Add this route in your user routes file (e.g., userroutes.js)
 userroute.get("/wallet",auth.checkToBlock,usercontroller.getWallet);
+// Add this route in your user controller
+userroute.post('/return-product/:orderId/:productId', auth.checkToBlock, auth.isLogin, usercontroller.returnProduct);
 
 userroute.post('/register', usercontroller.postregister);
 userroute.post('/otp', usercontroller.postotp);
