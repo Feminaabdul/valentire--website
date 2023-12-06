@@ -81,7 +81,72 @@
                               </div>
                                       <div class="site-section">
                                         <div class="container ">
-                                          
+                                          <% if (status) { %>
+                                            <% orders.forEach((order) => { %>
+                                              <% order.products.forEach((product)=> { %> 
+                                                <div class="d-flex flex-column flex-md-row border p-3 mb-3"  style="background-color: black;">
+                                                  <div class="col-md-3 col-12 d-flex justify-content-center mb-5">
+                                                    <% if (product.productId.image && product.productId.image.length > 0) { %>
+                                                      <img style="height: 100px; width: 100px;" src="/Admins/productImages/<%= product.productId.image[0] %>" alt="<%= product.productId.productname %>">
+                                                    <% } else { %>
+                                                      <p>No image available</p>
+                                                    <% } %>
+                                                    
+                                                  <br>  
+                                                  </div>
+                                                  <div class="col-md-6" style="color: white;">
+                                                    <span class="d-block text-primary h6 text-uppercase">
+                                                      <%= product.productId.productname %>,<br>
+                                                    </span>
+                                                    <p>
+                                                      Price: ₹<%=order.totalAmount  %>,<br>
+                                                     
+                                                      Quantity: <%= product.productId.stockquantity %>,<br>
+                                                      Payment Method: <%= order.paymentMethod %><br>
+                                                      Delivery Address:<%= order.Address.state %>,
+                                                      <%= order.Address.building %>,
+                                                      <%= order.Address.city %>,
+                                                      <%= order.Address.area %>,
+                                                      <%= order.Address.pincode %>
+                                                    </p>
+                                                    <div class="d-flex" style="color: white;">
+                                                      <div>
+                                                        <p class="text-black">
+                                                          Order Confirmed,  <%= order.createdAt.toDateString() %>
+                                                        </p>
+                                                        <p class="text-black">
+                                                          Delivery :<%= addDays(order.createdAt, 7).toDateString() %><br>
+                                                          <% if (!order.products.isCancelled) { %>
+                                                          <strong>Status:
+                                                            <% if (product.returnRequested) { %>
+                                                              <%= product.returnRequested %>
+                                                            <% } else { %>
+                                                              <p class="text-primary font-weight-bolder"><%= order.status %></p>
+                                        
+                                                              
+                                                              <% if (order.status === 'Delivered') { %>
+                                                                <button class="btn btn-primary return-btn" data-orderid="<%= order._id %>" data-productid="<%= product.productId._id %>">Return</button>
+                                                                <% } %>
+                                                           <% if (order.status === 'Processing'||order.status === 'shipped') { %>
+                                                                <form action="/cancel-order/<%= order._id %> " method="POST">
+                                                                  <button type="submit" class="btn btn-danger">Cancel Order</button>
+                                                                </form>
+                                                              <% } %>
+                                                               
+                                                         
+                                                            <% } %> </strong>
+                                                          <% } %>
+                                                        </p>
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                  
+                                                </div>
+                                        
+                                        
+                                                <% }) %> 
+                                            <% }) %>
+                                          <% } else { %>
                                           <% if (!addorder.length) { %>
                                           No orders found.
                                           <% } else { %>
@@ -145,6 +210,7 @@
                                           <% }) %> 
                                           <% }) %>
                                           <% } %>
+                                          <% } %>
                                           <div class="row">
                                             <div class="col-md-6">
                                               <div class="row">
@@ -178,7 +244,7 @@
               </div>
         
             </div>
-            <% if (addorder.length) { %>
+            <% if (orders.length) { %>
               <div class="container">
                 <div class="d-flex justify-content-end">
                   <nav aria-label="Page navigation">

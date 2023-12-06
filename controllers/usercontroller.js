@@ -123,7 +123,8 @@ const loadshopdetail = async (req, res) => {
     try {
         const user = await User.findById(req.session.user_id)
         const product = await products.findById(req.params.id)
-
+        const wis = await User.findById(req.session.user_id).populate("cart.product")
+        console.log("cart", wis);
         res.render('shopdetail', { isLoggedIn: isLoggedIn(req, res), user, product })
     } catch (error) {
         console.log(error.message);
@@ -496,6 +497,7 @@ function addDays(date, days) {
 }
 const lodplaceorder = async (req, res) => {
     try {
+        
         const page = parseInt(req.params.page) || 1;
         const pageSize = 3;
         const skip = (page - 1) * pageSize;
@@ -503,16 +505,22 @@ const lodplaceorder = async (req, res) => {
         const totalPages = Math.ceil(totalOrders / pageSize);
         const user = req.session.user_id
         const status = req.query.status;
-       console.log("status",status);
-        console.log("usr",user);
+
         let orders;
  if (status) {
-            orders = await Order.find({ user, status });
+            orders = await Order.find({ user, status }).populate([
+                { path: 'user', model: 'User' },
+                { path: 'Address', model: 'Address' },
+                { path: 'products.productId', model: 'product' }
+            ]) .skip(skip)
+            .limit(pageSize);
             console.log("ordersfilter",orders);
           } else {
             orders = await Order.find({ user });
              
           }
+
+
 
 
 
@@ -531,7 +539,7 @@ const lodplaceorder = async (req, res) => {
 
         const count = addorder.length
       
-        console.log("order", count);
+     
         res.render('placeorder', {
             isLoggedIn: isLoggedIn(req, res),
             currentUser,
@@ -539,6 +547,7 @@ const lodplaceorder = async (req, res) => {
             user,
             addorder,
             count,
+            status,
             addDays: function (date, days) {
                 var result = new Date(date);
                 result.setDate(result.getDate() + days);

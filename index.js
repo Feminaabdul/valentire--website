@@ -11,6 +11,9 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 var morgan = require('morgan')
 
+const nocache = require("nocache")
+app.use(nocache())
+
 app.use(cors())
 app.use(express.static('public'));
 app.use(methodOverride('_method'));

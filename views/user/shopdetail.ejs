@@ -48,6 +48,7 @@
 			<div class="row">
 				<div class="col-md-6" style="display: flex;   ">
 					<div class="col-md-2" style="max-width: 95.66667%">
+						
 						<% for(let i=0;i<product.image.length;i++){ %>
 							<img style="padding-bottom: 40px;" src="/Admins/productImages/<%=product.image[i]%>"
 								width="70px"  onclick="changeMainImage('<%=product.image[i]%>')">
@@ -97,13 +98,29 @@
 							</p>
 						</div>
 					</div>
-					<p><a href="/cart" class="btn btn-black py-3 px-5 mr-2">Add to Cart</a><a href="/checkout"
-							class="btn btn-primary py-3 px-5">Buy now</a></p>
+					<p><% if (product.stockquantity > 0) { %>
+						<% if (user && user.cart.some(item => item.product.equals(product._id))) { %>
+							<a href="/cart" class="add-to-cart text-center py-2 mr-1"><span>Go to cart</span></a>
+						<% } else { %>
+							<a href="/addcart?product=<%=product._id %>" class="add-to-cart text-center py-2 mr-1"><span>Add to cart <i
+								class="ion-ios-add ml-1"></i></span></a>
+						<% } %>
+						<!-- <form action="payform">
+							<input type="hidden" name="name" value="" >
+							<input type="hidden" name="price" value="">
+							<input type="hidden" name="description" value="">
+						</form> -->
+						<a href="" class="buy-now text-center py-2">Buy now<span><i
+									class="ion-ios-cart ml-1"></i></span></a>
+									<% } else { %>
+										<span class="out-of-stock" style="color: red;padding-left: 36px;">Out of Stock</span>
+										<% } %>
+					</p>
 				</div>
 			</div>
 
 
-
+			
 
 			<div class="row mt-5">
 				<div class="col-md-12 nav-link-wrap">

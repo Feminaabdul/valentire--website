@@ -44,9 +44,13 @@ userroute.post('/AddAddress',auth.checkToBlock,auth.isLogin, usercontroller.post
 
 userroute.get('/ordersuccess', auth.checkToBlock, auth.isLogin, usercontroller.orderSuccess);
 
-userroute.route('/placeorder/:page',auth.checkToBlock, auth.isLogin)
-    .get(usercontroller.lodplaceorder) // Handle GET requests to /shop
-    .post(usercontroller.placeorder); // Handle POST requests to /shop
+
+    userroute.get('/placeorder/:page', auth.checkToBlock, auth.isLogin, usercontroller.lodplaceorder);
+    userroute.post('/placeorder/:page', auth.checkToBlock, auth.isLogin, usercontroller.placeorder);
+
+
+
+
 
 userroute.post('/cancel-order/:orderId', auth.checkToBlock, auth.isLogin, usercontroller.cancelOrder);
 userroute.post("/save-rzporder", auth.checkToBlock,auth.isLogin,usercontroller.saveRzpOrder);
