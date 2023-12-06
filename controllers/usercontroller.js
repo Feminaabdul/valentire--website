@@ -489,20 +489,48 @@ const updateOrderStatus = async (req, res, next) => {
         next(error);
     }
 };
+function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
 const lodplaceorder = async (req, res) => {
     try {
+        const page = parseInt(req.params.page) || 1;
+        const pageSize = 3;
+        const skip = (page - 1) * pageSize;
+        const totalOrders = await Order.countDocuments();
+        const totalPages = Math.ceil(totalOrders / pageSize);
+        const user = req.session.user_id
+        const status = req.query.status;
+       console.log("status",status);
+        console.log("usr",user);
+        let orders;
+ if (status) {
+            orders = await Order.find({ user, status });
+            console.log("ordersfilter",orders);
+          } else {
+            orders = await Order.find({ user });
+             
+          }
+
+
 
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
+
+        
+
         const addorder = await Order.find({ user: req.session.user_id })
             .populate([
                 { path: 'user', model: 'User' },
                 { path: 'Address', model: 'Address' },
                 { path: 'products.productId', model: 'product' }
-            ]);
+            ]) .skip(skip)
+            .limit(pageSize);
 
         const count = addorder.length
-        const user = req.session.user_id
+      
         console.log("order", count);
         res.render('placeorder', {
             isLoggedIn: isLoggedIn(req, res),
@@ -510,7 +538,15 @@ const lodplaceorder = async (req, res) => {
             Delivery,
             user,
             addorder,
-            count
+            count,
+            addDays: function (date, days) {
+                var result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+             },
+             orders,
+             currentPage: page || 1,
+            totalPages: totalPages || 1,
         })
     } catch (error) {
         console.log(error.message);
@@ -555,7 +591,7 @@ const placeorder = async (req, res) => {
 
                     // const amountInPaise = Math.max(parseInt(grandTotal * 100), 100); // Set a minimum of 100 paise
                     const amountInPaise = Math.max(parseInt((grandTotal + 10) * 100), 100); 
-
+console.log("amountInPaise",amountInPaise);
                    
 
                     // Create a Razorpay order
@@ -563,6 +599,7 @@ const placeorder = async (req, res) => {
                         const razorpayOrder = razorpay.orders.create({
 
                             amount: amountInPaise,
+                          
                             currency: 'INR', // Currency code (change as needed)
                             receipt: `${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}${Date.now()}`, // Provide a unique receipt ID
                         }, (error, order) => {
@@ -571,7 +608,7 @@ const placeorder = async (req, res) => {
                                 reject(error);
                             } else {
                                 resolve(order);
-                                console.log("dgfhj",order);
+                                console.log("amount",order.amount);
                             }
                         });
                     });
@@ -604,7 +641,7 @@ const placeorder = async (req, res) => {
                        
                     });
                  }else {
-                    if (currentUser.wallet.balance < grandTotal + 10) {
+                    if (currentUser.wallet.balance < grandTotal) {
                         return res.render("checkout", {
                             isLoggedIn: isLoggedIn(req, res),
                             currentUser,
@@ -618,9 +655,9 @@ const placeorder = async (req, res) => {
                         });
                     } else {
                         await newOrder.save();
-                        currentUser.wallet.balance -= (grandTotal + 10);
+                        currentUser.wallet.balance -= (grandTotal);
                         const transactionData = {
-                            amount: grandTotal + 10,
+                            amount: grandTotal,
                             description: 'Order placed.',
                             type: 'Debit',
                         };
@@ -677,9 +714,9 @@ const saveRzpOrder = async (req, res, next) => {
 
         const { transactionId, orderId, signature } = req.body;
         
-        const amount = parseInt(req.body.amount / 100)+10;
+        const amount = parseInt(req.body.amount / 100)
 
-     
+     console.log("lkhujyh",amount);
 
         if (transactionId && orderId && signature) {
             // stock update
@@ -775,12 +812,16 @@ const cancelOrder = async (req, res) => {
         await user.save();
 
   
-      res.redirect('/placeorder'); // Redirect back to the order page
+      res.redirect('/placeorder/1'); // Redirect back to the order page
     } catch (error) {
       console.error(error.message);
       res.status(500).send('Internal Server Error');
     }
   };
+
+
+
+
 //forgetpassword//
 const loadpassword = async (req, res) => {
     try {
@@ -1026,7 +1067,7 @@ const  deleteEdit= async (req, res) => {
 
 
 
-// Add this function in your user controller
+
 const returnProduct = async (req, res) => {
     try {
         const orderId = req.params.orderId;
@@ -1044,16 +1085,28 @@ const returnProduct = async (req, res) => {
         // Add logic to handle the return: update wallet balance, remove product from stock, etc.
         // Update the user's wallet balance (example: increase by the product price)
         const user = await User.findById(req.session.user_id);
-        user.wallet.balance += product.productPrice;
-        product.returnStatus = 'Pending Return';
-
+        const returnAmount = product.productPrice;
+        // Add logic to handle the return: update wallet balance, remove product from stock, etc.
+        user.wallet.balance += returnAmount;
+        product.returnStatus = 'Pending Return'
         // // Remove the returned product from the order's products array
         // order.products = order.products.filter(p => p.productId.toString() !== productId);
 
 
          // Update the status of the returned product to 'Pending Return'
          order.status = 'Pending';
-console.log("knjbvhcgrxfez",  product.returnStatus );
+
+
+        // Add the return product transaction to the user's wallet
+        const walletTransaction = {
+            description: `Returned product #${productId} from order #${orderId}`,
+            amount: returnAmount,
+            type: 'Credit', // Credit the wallet with the return amount
+            timestamp: new Date(),
+        };
+        user.wallet.transactions.push(walletTransaction);
+
+
         // Save changes
         await user.save();
         await order.save();

@@ -2,6 +2,7 @@ const express = require('express');
 const adminroute = express();
 const cron = require('node-cron')
 const adminauth = require('../middleware/adminauth');
+const imageauth=require("../middleware/imageUplaodMiddleware")
 const admincontroller = require('../controllers/admincontroller');
 const productcontroller = require('../controllers/productcontroller');
 const categorycontroller = require('../controllers/categorycontroller');
@@ -44,7 +45,7 @@ adminroute.get("/listCategory", adminauth.isadminLogin, categorycontroller.listC
 adminroute.get("/product", adminauth.isadminLogin, productcontroller.loadproduct)
 adminroute.get("/offer", adminauth.isadminLogin, offer.loadoffer)
 adminroute.get("/addoffer", adminauth.isadminLogin, offer.addoffer)
-adminroute.get("/addproduct", adminauth.isadminLogin, productcontroller.loadAddproduct)
+adminroute.get("/addproduct", adminauth.isadminLogin ,productcontroller.loadAddproduct)
 adminroute.get("/", adminauth.isadminLogout, admincontroller.loadlogin);
 adminroute.get("/blockuser", adminauth.isadminLogin, admincontroller.blockuser)
 adminroute.get("/unblockuser", adminauth.isadminLogin, admincontroller.unblockuser)
@@ -80,12 +81,12 @@ adminroute.post("/addCatagory", categorycontroller.postAddCategory)
 adminroute.post("/addoffer", offer.postAddOffer)
 
 
-adminroute.post("/addproduct", upload.array("image", 10), productcontroller.postAddProduct)
+adminroute.post("/addproduct", upload.array("image", 10),imageauth.resizeProductImages, productcontroller.postAddProduct)
 adminroute.post("/Editcategory", categorycontroller.postEdit)
 
 
 
-adminroute.post("/Editproduct", upload.array("image", 10), productcontroller.postEditProduct)
+adminroute.post("/Editproduct", upload.array("image", 10),imageauth.resizeProductImages, productcontroller.postEditProduct)
 adminroute.post("/editoffer",offer.posteditoffer)
 
 //TRIGGER CHECK THE OFFER EXPIRY AND DELETE IT AT evey 12am and 12 pm
