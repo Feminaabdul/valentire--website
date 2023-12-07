@@ -43,13 +43,33 @@
 
                                         </div>
                                         
-                                        <div class="form-group" id="preview-group" style="display: none;">
+                                        <div class="form-group" id="preview-group" style="">
                                             <div class="card">
                                                 <div class="card-header">
                                                     Preview Images
                                                 </div>
                                                 <div class="card-body">
+                                                    
                                                     <div class="row">
+                                                        <div id="deleteImagePreview" data-product_id="<%= product._id %>">
+                                                            <% for (let i = 0; i < product.image.length; i++) { %>
+                                                                <div class="image-container">
+                                                                    <img 
+                                                                        data-imageNum="<%= i %>"
+                                                                        src="/Admins/productImages/<%= product.image[i] %>" 
+                                                                        alt="" 
+                                                                        class="preview" 
+                                                                        data-img-index="<%= i + 1 %>"
+                                                                        style="width: 100px; height: 100px; object-fit: cover; margin-right: 10px; border: 1px solid #ccc;" />
+                                                                        <a href="#" class="delete-btn" data-imageNum="<%= i %>">Delete</a>
+                                                                    </div>
+                                                            <% } %>
+                                                        </div>
+                                                    </div>
+                                                        
+                                                        
+                                                        
+                                                        
                                                         <div class="col-4">
                                                             <div class="img-preview-p">
                                                                 <img src="" alt="" class="preview" id="preview-img"
@@ -101,7 +121,8 @@
                                         <input type="text" class="form-control" name="material"
                                             placeholder="material"value="<%=product.material%>">
                                     </div>
-                                
+                                    <input type="hidden" name="deletedImages" id="deletedImages" value="<%= JSON.stringify([]) %>">
+
                                     <input type="submit" class="btn btn-primary" value="Submit">
                                     <div>
                                         <%
@@ -133,12 +154,13 @@
             <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
         </div>
     </div>
-     
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const previewInput = document.querySelector('#imageUpload')
             const previewArea = document.getElementById('preview-group')
-
+            
             previewInput.addEventListener('change', function (e) {
                 console.log("sdfsdfsdf");
                 const previewImages = document.querySelectorAll('.preview');
@@ -148,6 +170,7 @@
                         previewImages.forEach(image => image.src = ''); // Clear preview images
                         alert("You can only select up to 3 images.");
                     } else {
+                        console.log(previewImages)
                         for (let i = 0; i < e.target.files.length; i++) {
                             previewImages[i].src = URL.createObjectURL(e.target.files[i])
                         }
@@ -157,6 +180,47 @@
             })
         });
     </script>
+    <script>
+    $(document).ready(function () {
+        $(".delete-btn").on("click", function (event) {
+            event.preventDefault();
+
+            var imageNum = $(this).attr("data-imagenum");
+
+            // Change the appearance of the image (e.g., make it red border)
+            $(`.preview[data-imagenum="${imageNum}"]`).css("border-color", "red");
+
+            // Update the hidden input field with the information about deleted images
+            updateDeletedImagesField();
+        });
+
+        // Function to update the hidden input field with the information about deleted images
+        function updateDeletedImagesField() {
+            var deletedImages = [];
+
+            // Iterate through images and check if they are marked for deletion
+            $(".preview").each(function () {
+                var imageNum = $(this).data("imagenum");
+                if ($(this).css("border-color") === "rgb(255, 0, 0)") {
+                    deletedImages.push(imageNum);
+                }
+            });
+
+            // Update the value of the hidden input field
+            $("#deletedImages").val(JSON.stringify(deletedImages));
+        }
+
+        // Submit the form
+        $("#productForm").submit(function () {
+            // Before submitting, update the hidden input field with the information about deleted images
+            updateDeletedImagesField();
+        });
+    });
+</script>
+
+
+
+
 
     <script src="./vendor/global/global.min.js"></script>
     <script src="./js/quixnav-init.js"></script>

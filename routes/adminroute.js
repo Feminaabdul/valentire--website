@@ -81,12 +81,15 @@ adminroute.post("/addCatagory", categorycontroller.postAddCategory)
 adminroute.post("/addoffer", offer.postAddOffer)
 
 
-adminroute.post("/addproduct", upload.array("image", 10),imageauth.resizeProductImages, productcontroller.postAddProduct)
+adminroute.post("/addproduct", upload.array("image",3),imageauth.resizeProductImages, productcontroller.postAddProduct)
 adminroute.post("/Editcategory", categorycontroller.postEdit)
 
 
 
-adminroute.post("/Editproduct", upload.array("image", 10),imageauth.resizeProductImages, productcontroller.postEditProduct)
+
+adminroute.post("/Editproduct", upload.array("image",3),imageauth.resizeProductImages, productcontroller.postEditProduct)
+
+adminroute.post("/editoffer",offer.posteditoffer)
 adminroute.post("/editoffer",offer.posteditoffer)
 
 //TRIGGER CHECK THE OFFER EXPIRY AND DELETE IT AT evey 12am and 12 pm
