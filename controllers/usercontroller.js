@@ -497,7 +497,7 @@ function addDays(date, days) {
 }
 const lodplaceorder = async (req, res) => {
     try {
-        
+        const cus = await User.findById(req.session.user_id).populate("cart.product")
         const page = parseInt(req.params.page) || 1;
         const pageSize = 3;
         const skip = (page - 1) * pageSize;
@@ -525,6 +525,13 @@ const lodplaceorder = async (req, res) => {
 
 
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
+        for (const item of currentUser.cart) {
+            const foundProduct = await products.findById(item.product._id);
+            let quantity=item.quantity  
+           
+            console.log("wersdtfyquantityguhi",quantity);
+            console.log(" foundProduct.quantity", foundProduct);
+        
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
 
         
@@ -547,16 +554,24 @@ const lodplaceorder = async (req, res) => {
             user,
             addorder,
             count,
+            foundProduct,
             status,
+            cus,
             addDays: function (date, days) {
                 var result = new Date(date);
                 result.setDate(result.getDate() + days);
                 return result;
              },
+             quantity
+              ,
+              
              orders,
              currentPage: page || 1,
             totalPages: totalPages || 1,
+        
         })
+        console.log("789456fF@",quantity);
+    }
     } catch (error) {
         console.log(error.message);
     }
@@ -564,6 +579,9 @@ const lodplaceorder = async (req, res) => {
 
 const placeorder = async (req, res) => {
     try {
+        for (const item of currentUser.cart) {
+            const foundProduct = await products.findById(item.product._id);
+            let quantity=item.quantity 
         const paymentMethod = req.body.paymentMethod
         const user = req.session.user_id
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
@@ -572,7 +590,7 @@ const placeorder = async (req, res) => {
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
         }, 0);
-        console.log('Before map:', currentUser.cart.length);
+       
         // Create a new order for each product in the cart
         const orders = await Promise.all(
 
@@ -581,7 +599,8 @@ const placeorder = async (req, res) => {
                     user: user,
                     paymentMethod: paymentMethod,
                     Address: Delivery,
-                    products: [
+                   
+                   products: [
                         {
                             productId: item.product._id,
                             quantity: item.quantity,
@@ -589,19 +608,19 @@ const placeorder = async (req, res) => {
                             status: "Pending",
                         },
                     ],
+                    
                     totalAmount: grandTotal + 10,
                 });
 
                 if (req.body.paymentMethod === 'cod') {
                     await orderedProduct.save();
-                 
+                 console.log("quardgfhjkntity",orderedProduct.quantity);
 
                 } else if (req.body.paymentMethod === 'razorpay') {
 
                     // const amountInPaise = Math.max(parseInt(grandTotal * 100), 100); // Set a minimum of 100 paise
                     const amountInPaise = Math.max(parseInt((grandTotal + 10) * 100), 100); 
-console.log("amountInPaise",amountInPaise);
-                   
+
 
                     // Create a Razorpay order
                     const razorpayOrder = await new Promise((resolve, reject) => {
@@ -641,7 +660,7 @@ console.log("amountInPaise",amountInPaise);
                     currentUser.cart = updatedCart;
                     await currentUser.save();
                     orderedProduct.razorpayOrderId = razorpayOrder.id;
-                    console.log("  orderedProduct.razorpayOrderId ",  orderedProduct.razorpayOrderId );
+
                     return res.render('rzp',   {
                         isLoggedIn: isLoggedIn(req, res),
                         order: razorpayOrder,
@@ -700,7 +719,7 @@ console.log("amountInPaise",amountInPaise);
 
         );
         
-
+        }
         res.redirect('/ordersuccess')
     } catch (error) {
         console.log(error.message);
@@ -725,7 +744,7 @@ const saveRzpOrder = async (req, res, next) => {
         
         const amount = parseInt(req.body.amount / 100)
 
-     console.log("lkhujyh",amount);
+     
 
         if (transactionId && orderId && signature) {
             // stock update
@@ -762,7 +781,7 @@ const saveRzpOrder = async (req, res, next) => {
                     ],
                     totalAmount: amount,
                 });
-                console.log("orderedProduct.save()",orderedProduct);
+                console.log("orderedProduct.quantity()",orderedProduct.products.quantity);
                 orderedProduct.save()
                 // stock update
                 const updatedCart = [];
@@ -1129,7 +1148,24 @@ const returnProduct = async (req, res) => {
 
 
 
-
+const loadInvoice = async (req, res) => {
+    try {
+      const orderId = req.body.id
+      if (orderId) {
+        const userOrder = await Order.findById(orderId).populate([
+            { path: 'user', model: 'User' },
+            { path: 'Address', model: 'Address' },
+            { path: 'products.productId', model: 'product' }
+        ]) 
+        return res.render("invoice", {
+          order: userOrder
+        })
+      }
+    } catch (error) {
+      res.render("404", { message: "An error occurred. Please try again later." });
+    }
+  }
+  
 
 module.exports = {
     loadHome,
@@ -1164,5 +1200,6 @@ module.exports = {
 cancelOrder,
 editaddress,
 postedit,
-returnProduct
+returnProduct,
+loadInvoice
 }

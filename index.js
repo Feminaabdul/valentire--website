@@ -14,7 +14,7 @@ var morgan = require('morgan')
 
 const nocache = require("nocache")
 app.use(nocache())
-
+// app.use(morgan('dev'));
 app.use(cors())
 app.use(express.static('public'));
 app.use(methodOverride('_method'));

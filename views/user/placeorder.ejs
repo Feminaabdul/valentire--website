@@ -84,6 +84,8 @@
                                           <% if (status) { %>
                                             <% orders.forEach((order) => { %>
                                               <% order.products.forEach((product)=> { %> 
+                                                <% console.log('Quantity:', product.quantity); %>
+                                                <% console.log('First Product Quantity:', products[0].quantity); %>
                                                 <div class="d-flex flex-column flex-md-row border p-3 mb-3"  style="background-color: black;">
                                                   <div class="col-md-3 col-12 d-flex justify-content-center mb-5">
                                                     <% if (product.productId.image && product.productId.image.length > 0) { %>
@@ -97,11 +99,14 @@
                                                   <div class="col-md-6" style="color: white;">
                                                     <span class="d-block text-primary h6 text-uppercase">
                                                       <%= product.productId.productname %>,<br>
+                                                     
                                                     </span>
                                                     <p>
                                                       Price: ₹<%=order.totalAmount  %>,<br>
                                                      
-                                                      Quantity: <%= product.productId.stockquantity %>,<br>
+                                                      Quantity: <%=product.quantity%>,<br>
+                                                      <p> <%=product.quantity%></p><br>
+                                                      <p> <%=product%></p><br>
                                                       Payment Method: <%= order.paymentMethod %><br>
                                                       Delivery Address:<%= order.Address.state %>,
                                                       <%= order.Address.building %>,
@@ -132,8 +137,12 @@
                                                                   <button type="submit" class="btn btn-danger">Cancel Order</button>
                                                                 </form>
                                                               <% } %>
-                                                               
-                                                         
+                                                              <div class="text-end">
+                                                              <form action="/order/Invoice" method="post">
+                                                                <input type="hidden" name="id" value="<%= order._id %>">
+                                                                <button type="submit" class="btn-primary">Invoice</button>
+                                                            </form>
+                                                          </div>
                                                             <% } %> </strong>
                                                           <% } %>
                                                         </p>
@@ -164,7 +173,7 @@
                                               <p>
                                                 Price: ₹<%=order.totalAmount  %>,<br>
                                                
-                                                Quantity: <%= product.productId.stockquantity %>,<br>
+                                                Quantity: <%=product.quantity %>,<br>
                                                 Payment Method: <%= order.paymentMethod %><br>
                                                 Delivery Address:<%= order.Address.state %>,
                                                 <%= order.Address.building %>,
@@ -195,8 +204,14 @@
                                                             <button type="submit" class="btn btn-danger">Cancel Order</button>
                                                           </form>
                                                         <% } %>
-                                                         
-                                                   
+                                                       
+                                                        
+                                                        <form action="/order/Invoice" method="post">
+                                                          <input type="hidden" name="id" value="<%= order._id %>">
+                                                          <button type="submit" class="btn-primary">Invoice</button>
+                                                      </form>
+                                                     
+                                                      </div>
                                                       <% } %> </strong>
                                                     <% } %>
                                                   </p>

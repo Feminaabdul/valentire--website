@@ -68,5 +68,5 @@ userroute.post('/update-address/:id',usercontroller.postedit)
 userroute.get('/deleteaddress/:id',usercontroller.deleteEdit)
 
 
-
+userroute.post("/order/Invoice", usercontroller.loadInvoice)
 module.exports = userroute;

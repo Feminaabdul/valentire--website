@@ -14,7 +14,7 @@ const postAddCategory = async (req,res) => {
     try {
         const category = req.body.category;
         const upperCat = category.toUpperCase();
-        console.log(upperCat)
+       
         const categorydata = await Category.findOne({categoryName:upperCat});
         if(categorydata){                                                                                               
             res.render('addCatagory',{message:"This category is already added"})

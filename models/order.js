@@ -24,9 +24,7 @@ const orderSchema = new mongoose.Schema({
             ref:"product",
             required:true
         },
-        count:{
-            type:Number,
-        },
+        quantity: { type: Number, default: 1 },
         productPrice:{
             type:Number,
             required:true
