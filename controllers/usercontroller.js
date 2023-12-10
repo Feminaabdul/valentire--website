@@ -525,13 +525,6 @@ const lodplaceorder = async (req, res) => {
 
 
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
-        for (const item of currentUser.cart) {
-            const foundProduct = await products.findById(item.product._id);
-            let quantity=item.quantity  
-           
-            console.log("wersdtfyquantityguhi",quantity);
-            console.log(" foundProduct.quantity", foundProduct);
-        
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
 
         
@@ -554,7 +547,6 @@ const lodplaceorder = async (req, res) => {
             user,
             addorder,
             count,
-            foundProduct,
             status,
             cus,
             addDays: function (date, days) {
@@ -562,16 +554,10 @@ const lodplaceorder = async (req, res) => {
                 result.setDate(result.getDate() + days);
                 return result;
              },
-             quantity
-              ,
-              
              orders,
              currentPage: page || 1,
             totalPages: totalPages || 1,
-        
         })
-        console.log("789456fF@",quantity);
-    }
     } catch (error) {
         console.log(error.message);
     }
@@ -579,9 +565,6 @@ const lodplaceorder = async (req, res) => {
 
 const placeorder = async (req, res) => {
     try {
-        for (const item of currentUser.cart) {
-            const foundProduct = await products.findById(item.product._id);
-            let quantity=item.quantity 
         const paymentMethod = req.body.paymentMethod
         const user = req.session.user_id
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
@@ -590,7 +573,7 @@ const placeorder = async (req, res) => {
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
         }, 0);
-       
+        console.log('Before map:', currentUser.cart.length);
         // Create a new order for each product in the cart
         const orders = await Promise.all(
 
@@ -599,8 +582,7 @@ const placeorder = async (req, res) => {
                     user: user,
                     paymentMethod: paymentMethod,
                     Address: Delivery,
-                   
-                   products: [
+                    products: [
                         {
                             productId: item.product._id,
                             quantity: item.quantity,
@@ -608,19 +590,19 @@ const placeorder = async (req, res) => {
                             status: "Pending",
                         },
                     ],
-                    
                     totalAmount: grandTotal + 10,
                 });
 
                 if (req.body.paymentMethod === 'cod') {
                     await orderedProduct.save();
-                 console.log("quardgfhjkntity",orderedProduct.quantity);
+                 
 
                 } else if (req.body.paymentMethod === 'razorpay') {
 
                     // const amountInPaise = Math.max(parseInt(grandTotal * 100), 100); // Set a minimum of 100 paise
                     const amountInPaise = Math.max(parseInt((grandTotal + 10) * 100), 100); 
-
+console.log("amountInPaise",amountInPaise);
+                   
 
                     // Create a Razorpay order
                     const razorpayOrder = await new Promise((resolve, reject) => {
@@ -660,7 +642,7 @@ const placeorder = async (req, res) => {
                     currentUser.cart = updatedCart;
                     await currentUser.save();
                     orderedProduct.razorpayOrderId = razorpayOrder.id;
-
+                    console.log("  orderedProduct.razorpayOrderId ",  orderedProduct.razorpayOrderId );
                     return res.render('rzp',   {
                         isLoggedIn: isLoggedIn(req, res),
                         order: razorpayOrder,
@@ -719,7 +701,7 @@ const placeorder = async (req, res) => {
 
         );
         
-        }
+
         res.redirect('/ordersuccess')
     } catch (error) {
         console.log(error.message);
@@ -744,7 +726,7 @@ const saveRzpOrder = async (req, res, next) => {
         
         const amount = parseInt(req.body.amount / 100)
 
-     
+     console.log("lkhujyh",amount);
 
         if (transactionId && orderId && signature) {
             // stock update
@@ -781,7 +763,7 @@ const saveRzpOrder = async (req, res, next) => {
                     ],
                     totalAmount: amount,
                 });
-                console.log("orderedProduct.quantity()",orderedProduct.products.quantity);
+                console.log("orderedProduct.save()",orderedProduct);
                 orderedProduct.save()
                 // stock update
                 const updatedCart = [];
@@ -815,7 +797,6 @@ const saveRzpOrder = async (req, res, next) => {
 };
 
 
-
 const cancelOrder = async (req, res) => {
     try {
       const orderId = req.params.orderId;
@@ -825,7 +806,7 @@ const cancelOrder = async (req, res) => {
 
       // Add logic to update the order status to 'cancelled' in the database
       await Order.findByIdAndUpdate(orderId, { status: 'cancelled' });
-      
+
         // Add the cancelled order amount to the user's wallet
         const user = await User.findById(req.session.user_id);
         const walletTransaction = {
@@ -839,7 +820,7 @@ const cancelOrder = async (req, res) => {
         user.wallet.balance += cancelledAmount;
         await user.save();
 
-  
+
       res.redirect('/placeorder/1'); // Redirect back to the order page
     } catch (error) {
       console.error(error.message);
@@ -1019,16 +1000,9 @@ const getWallet = async (req, res, next) => {
         // fix sorting 
          const user = req.session.user_id
          console.log("user",user); 
-        const currentUser = await User.findById(req.session.user_id).populate({
-            path: 'wallet',
-            populate: {
-                path: 'transactions',
-            },
-        });
-        
-        console.log("wallet",currentUser.wallet);
-        console.log("trantaction",currentUser.wallet.transactions);
-        console.log("details",currentUser);
+        const currentUser = await User.findById(req.session.user_id).populate('wallet.transactions');
+
+        console.log("qwe",currentUser);
         if (!currentUser.wallet) {
             currentUser.wallet = { transactions: [] };
             await currentUser.save();
@@ -1038,14 +1012,13 @@ const getWallet = async (req, res, next) => {
             isLoggedIn: isLoggedIn(req, res),
             user,
             currentUser,
-           
+
         });
     } catch (error) {
         res.status(500).send('Internal Server Error');
         next(error);
     }
 };
-
 
 
 const editaddress=async(req,res)=>{
