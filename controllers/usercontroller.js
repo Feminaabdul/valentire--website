@@ -802,7 +802,8 @@ const cancelOrder = async (req, res) => {
       const orderId = req.params.orderId;
    // Find the order and get the order details
    const cancelledOrder = await Order.findById(orderId);
-   const cancelledAmount = cancelledOrder.totalAmount;
+   console.log("cancelledOrder.products.productPrice",cancelledOrder.products.productPrice);
+   const cancelledAmount = cancelledOrder.totalAmount-10
 
       // Add logic to update the order status to 'cancelled' in the database
       await Order.findByIdAndUpdate(orderId, { status: 'cancelled' });
