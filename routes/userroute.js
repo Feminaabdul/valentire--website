@@ -69,5 +69,4 @@ userroute.get('/deleteaddress/:id',usercontroller.deleteEdit)
 
 
 
-
 module.exports = userroute;

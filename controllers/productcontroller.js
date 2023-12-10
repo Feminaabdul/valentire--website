@@ -103,40 +103,49 @@ const postAddProduct = async (req, res) => {
 
 const postEditProduct = async (req, res) => {
     try {
-        console.log("********")
+        // console.log("********")
 
-        console.log(req.body)
-        console.log("********")
+        // console.log(req.body)
+        // console.log("********")
         
         const id = req.query.id;
-        const deletedImages = JSON.parse(req.body.deletedImages);
+        // const deletedImages = JSON.parse(req.body.deletedImages);
         
-        const stringIndices = deletedImages.map(index => index.toString());
-        Product.updateOne(
-            { _id: id }, // Replace 'your-product-id' with the actual ID of your product
-            { $pull: { image: { $in: stringIndices } } },
-            (err, result) => {
-                if (err) {
-                    console.error(err);
-                    // Handle the error
-                } else {
-                    console.log('Images deleted successfully');
-                    // Handle success, if needed
-                }
-            }
-        );
-        if (!req.files || req.files.length === 0) {
-            throw new Error("Please upload at least one image for the product.");
-        }
-        let image = []
-        for (let i = 0; i < req.files.length; i++) {
-            image[i] = req.files[i].filename;
-        }
+        // const stringIndices = deletedImages.map(index => index.toString());
+        // Product.updateOne(
+        //     { _id: id }, // Replace 'your-product-id' with the actual ID of your product
+        //     { $pull: { image: { $in: stringIndices } } },
+        //     (err, result) => {
+        //         if (err) {
+        //             console.error(err);
+        //             // Handle the error
+        //         } else {
+        //             console.log('Images deleted successfully');
+        //             // Handle success, if needed
+        //         }
+        //     }
+        // );
+    
+        // let image = []
+        // for (let i = 0; i < req.files.length; i++) {
+        //     image[i] = req.files[i].filename;
+        // }
 
 
         const newprice = Number(req.body.price)
         const Data = await Product.findById(req.query.id);
         const offer = req.body.offer
+
+
+
+
+
+        
+        let existingImages=Data.image|| [];
+        console.log("lhlkhgftydytes",existingImages);
+        let newImages = req.files ? req.files.map(file => file.filename) : [];
+        
+        let updatedImages = newImages.length > 0 ? newImages : existingImages;
 
         const schema = Joi.object({
             productName: Joi.string().min(3).required(),
@@ -192,14 +201,14 @@ const postEditProduct = async (req, res) => {
         Data.category = req.body.category
         Data.stockquantity = req.body.stockquantity
 
-        Data.image = image
+        Data.image = updatedImages;
         Data.description = req.body.description
         Data.material = req.body.material
         Data.offer = null;
         // }
-
+console.log("Data.image",Data.image);
         const saved = await Data.save()
-
+console.log("saved",saved);
         res.redirect('/admin/product');
 
     } catch (error) {

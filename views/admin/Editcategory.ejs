@@ -44,6 +44,11 @@
                                         </div>
                                     </div>
                                     <div>
+                                        <% if(messages.error){ %>
+                                            <p id="roll" style="color: red;">
+                                                <%= messages.error %>
+                                            </p>
+                                        <% } %>
                                         <% if(typeof message !='undefined' ){ %>
                                             <p id="roll" style="color: red;">
                                                 <%=message%>

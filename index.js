@@ -8,6 +8,7 @@ const razorpay = require('razorpay');
 const methodOverride = require('method-override');
 
 const cookieParser = require('cookie-parser');
+const flash = require('connect-flash');
 const session = require('express-session');
 var morgan = require('morgan')
 
@@ -28,6 +29,7 @@ app.use(session({
         expires: 60000 * 60 * 24 * 7
     }
 }));
+app.use(flash());
 
 
 

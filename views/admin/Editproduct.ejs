@@ -61,7 +61,7 @@
                                                                         class="preview" 
                                                                         data-img-index="<%= i + 1 %>"
                                                                         style="width: 100px; height: 100px; object-fit: cover; margin-right: 10px; border: 1px solid #ccc;" />
-                                                                        <a href="#" class="delete-btn" data-imageNum="<%= i %>">Delete</a>
+                                                                        <!-- <a href="#" class="delete-btn" data-imageNum="<%= i %>">Delete</a> -->
                                                                     </div>
                                                             <% } %>
                                                         </div>
@@ -180,43 +180,43 @@
             })
         });
     </script>
-    <script>
-    $(document).ready(function () {
-        $(".delete-btn").on("click", function (event) {
-            event.preventDefault();
+//     <script>
+//     $(document).ready(function () {
+//         $(".delete-btn").on("click", function (event) {
+//             event.preventDefault();
 
-            var imageNum = $(this).attr("data-imagenum");
+//             var imageNum = $(this).attr("data-imagenum");
 
-            // Change the appearance of the image (e.g., make it red border)
-            $(`.preview[data-imagenum="${imageNum}"]`).css("border-color", "red");
+//             // Change the appearance of the image (e.g., make it red border)
+//             $(`.preview[data-imagenum="${imageNum}"]`).css("border-color", "red");
 
-            // Update the hidden input field with the information about deleted images
-            updateDeletedImagesField();
-        });
+//             // Update the hidden input field with the information about deleted images
+//             updateDeletedImagesField();
+//         });
 
-        // Function to update the hidden input field with the information about deleted images
-        function updateDeletedImagesField() {
-            var deletedImages = [];
+//         // Function to update the hidden input field with the information about deleted images
+//         function updateDeletedImagesField() {
+//             var deletedImages = [];
 
-            // Iterate through images and check if they are marked for deletion
-            $(".preview").each(function () {
-                var imageNum = $(this).data("imagenum");
-                if ($(this).css("border-color") === "rgb(255, 0, 0)") {
-                    deletedImages.push(imageNum);
-                }
-            });
+//             // Iterate through images and check if they are marked for deletion
+//             $(".preview").each(function () {
+//                 var imageNum = $(this).data("imagenum");
+//                 if ($(this).css("border-color") === "rgb(255, 0, 0)") {
+//                     deletedImages.push(imageNum);
+//                 }
+//             });
 
-            // Update the value of the hidden input field
-            $("#deletedImages").val(JSON.stringify(deletedImages));
-        }
+//             // Update the value of the hidden input field
+//             $("#deletedImages").val(JSON.stringify(deletedImages));
+//         }
 
-        // Submit the form
-        $("#productForm").submit(function () {
-            // Before submitting, update the hidden input field with the information about deleted images
-            updateDeletedImagesField();
-        });
-    });
-</script>
+//         // Submit the form
+//         $("#productForm").submit(function () {
+//             // Before submitting, update the hidden input field with the information about deleted images
+//             updateDeletedImagesField();
+//         });
+//     });
+// </script>
 
 
 
