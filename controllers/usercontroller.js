@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env
 const Razorpay = require('razorpay');
+const { body, validationResult } = require('express-validator');
 
 
 const razorpay = new Razorpay({
@@ -412,16 +413,39 @@ const loadprofle = async (req, res) => {
     }
 }
 const postprofile = async (req, res) => {
-    const user = req.session.user_id
-    const currentUser = await User.findById(user)
-    await address.find({ user })
-    const { name, email, phone } = req.body;
-    currentUser.name = name;
-    currentUser.email = email;
-    currentUser.phone = phone;
-    await currentUser.save()
-    res.redirect("/profile");
-}
+    try {
+        const user = req.session.user_id;
+        const currentUser = await User.findById(user);
+        const { name, email, phone, currentPassword, newPassword, confirmPassword } = req.body;
+
+        currentUser.name = name;
+        currentUser.email = email;
+        currentUser.phone = phone;
+
+        // Validate the current password
+        const passwordMatch = await bcrypt.compare(currentPassword, currentUser.password);
+        if (!passwordMatch) {
+            // Handle incorrect current password
+            return res.redirect('/profile');
+        }
+
+        // Check if the new password and confirm password match
+        if (newPassword !== confirmPassword) {
+            // Handle password mismatch
+            return res.redirect('/profile');
+        }
+
+        // Update the user's password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        currentUser.password = hashedPassword;
+
+        await currentUser.save();
+        res.redirect("/profile");
+    } catch (error) {
+        console.log(error.message);
+        res.redirect('/profile?error=Something went wrong');
+    }
+};
 
 const loadaddress = async (req, res) => {
     try {
@@ -507,18 +531,29 @@ const lodplaceorder = async (req, res) => {
         const status = req.query.status;
 
         let orders;
- if (status) {
-            orders = await Order.find({ user, status }).populate([
-                { path: 'user', model: 'User' },
-                { path: 'Address', model: 'Address' },
-                { path: 'products.productId', model: 'product' }
-            ]) .skip(skip)
-            .limit(pageSize);
-            console.log("ordersfilter",orders);
-          } else {
-            orders = await Order.find({ user });
-             
-          }
+        if (status) {
+            orders = await Order.find({ user, status })
+                .sort({ createdAt: -1 })
+                .populate([
+                    { path: 'user', model: 'User' },
+                    { path: 'Address', model: 'Address' },
+                    { path: 'products.productId', model: 'product' }
+                ]).skip(skip)
+                .limit(pageSize);
+            console.log("ordersfilter", orders);
+        } else {
+            orders = await Order.find({ user })
+                .sort({ createdAt: -1 })
+                .populate([
+                    { path: 'user', model: 'User' },
+                    { path: 'Address', model: 'Address' },
+                    { path: 'products.productId', model: 'product' }
+                ])
+                .skip(skip)
+                .limit(pageSize);
+
+
+        }
 
 
 
@@ -527,19 +562,21 @@ const lodplaceorder = async (req, res) => {
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
 
-        
+
 
         const addorder = await Order.find({ user: req.session.user_id })
+            .sort({ createdAt: -1 })
             .populate([
                 { path: 'user', model: 'User' },
                 { path: 'Address', model: 'Address' },
                 { path: 'products.productId', model: 'product' }
-            ]) .skip(skip)
+            ])
+            .skip(skip)
             .limit(pageSize);
 
         const count = addorder.length
-      
-     
+
+
         res.render('placeorder', {
             isLoggedIn: isLoggedIn(req, res),
             currentUser,
@@ -553,9 +590,9 @@ const lodplaceorder = async (req, res) => {
                 var result = new Date(date);
                 result.setDate(result.getDate() + days);
                 return result;
-             },
-             orders,
-             currentPage: page || 1,
+            },
+            orders,
+            currentPage: page || 1,
             totalPages: totalPages || 1,
         })
     } catch (error) {
@@ -595,21 +632,21 @@ const placeorder = async (req, res) => {
 
                 if (req.body.paymentMethod === 'cod') {
                     await orderedProduct.save();
-                 
+
 
                 } else if (req.body.paymentMethod === 'razorpay') {
 
                     // const amountInPaise = Math.max(parseInt(grandTotal * 100), 100); // Set a minimum of 100 paise
-                    const amountInPaise = Math.max(parseInt((grandTotal + 10) * 100), 100); 
-console.log("amountInPaise",amountInPaise);
-                   
+                    const amountInPaise = Math.max(parseInt((grandTotal + 10) * 100), 100);
+                    console.log("amountInPaise", amountInPaise);
+
 
                     // Create a Razorpay order
                     const razorpayOrder = await new Promise((resolve, reject) => {
                         const razorpayOrder = razorpay.orders.create({
 
                             amount: amountInPaise,
-                          
+
                             currency: 'INR', // Currency code (change as needed)
                             receipt: `${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}${Date.now()}`, // Provide a unique receipt ID
                         }, (error, order) => {
@@ -618,7 +655,7 @@ console.log("amountInPaise",amountInPaise);
                                 reject(error);
                             } else {
                                 resolve(order);
-                                console.log("amount",order.amount);
+                                console.log("amount", order.amount);
                             }
                         });
                     });
@@ -642,15 +679,15 @@ console.log("amountInPaise",amountInPaise);
                     currentUser.cart = updatedCart;
                     await currentUser.save();
                     orderedProduct.razorpayOrderId = razorpayOrder.id;
-                    console.log("  orderedProduct.razorpayOrderId ",  orderedProduct.razorpayOrderId );
-                    return res.render('rzp',   {
+                    console.log("  orderedProduct.razorpayOrderId ", orderedProduct.razorpayOrderId);
+                    return res.render('rzp', {
                         isLoggedIn: isLoggedIn(req, res),
                         order: razorpayOrder,
                         key_id: process.env.RAZORPAY_ID_KEY,
                         user: currentUser,
-                       
+
                     });
-                 }else {
+                } else {
                     if (currentUser.wallet.balance < grandTotal) {
                         return res.render("checkout", {
                             isLoggedIn: isLoggedIn(req, res),
@@ -700,7 +737,7 @@ console.log("amountInPaise",amountInPaise);
 
 
         );
-        
+
 
         res.redirect('/ordersuccess')
     } catch (error) {
@@ -723,10 +760,10 @@ const saveRzpOrder = async (req, res, next) => {
         }, 0);
 
         const { transactionId, orderId, signature } = req.body;
-        
+
         const amount = parseInt(req.body.amount / 100)
 
-     console.log("lkhujyh",amount);
+        console.log("lkhujyh", amount);
 
         if (transactionId && orderId && signature) {
             // stock update
@@ -763,7 +800,7 @@ const saveRzpOrder = async (req, res, next) => {
                     ],
                     totalAmount: amount,
                 });
-                console.log("orderedProduct.save()",orderedProduct);
+                console.log("orderedProduct.save()", orderedProduct);
                 orderedProduct.save()
                 // stock update
                 const updatedCart = [];
@@ -799,14 +836,14 @@ const saveRzpOrder = async (req, res, next) => {
 
 const cancelOrder = async (req, res) => {
     try {
-      const orderId = req.params.orderId;
-   // Find the order and get the order details
-   const cancelledOrder = await Order.findById(orderId);
-   console.log("cancelledOrder.products.productPrice",cancelledOrder.products.productPrice);
-   const cancelledAmount = cancelledOrder.totalAmount-10
+        const orderId = req.params.orderId;
+        // Find the order and get the order details
+        const cancelledOrder = await Order.findById(orderId);
+        console.log("cancelledOrder.products.productPrice", cancelledOrder.products.productPrice);
+        const cancelledAmount = cancelledOrder.totalAmount - 10
 
-      // Add logic to update the order status to 'cancelled' in the database
-      await Order.findByIdAndUpdate(orderId, { status: 'cancelled' });
+        // Add logic to update the order status to 'cancelled' in the database
+        await Order.findByIdAndUpdate(orderId, { status: 'cancelled' });
 
         // Add the cancelled order amount to the user's wallet
         const user = await User.findById(req.session.user_id);
@@ -822,12 +859,12 @@ const cancelOrder = async (req, res) => {
         await user.save();
 
 
-      res.redirect('/placeorder/1'); // Redirect back to the order page
+        res.redirect('/placeorder/1'); // Redirect back to the order page
     } catch (error) {
-      console.error(error.message);
-      res.status(500).send('Internal Server Error');
+        console.error(error.message);
+        res.status(500).send('Internal Server Error');
     }
-  };
+};
 
 
 
@@ -872,11 +909,11 @@ const lodreset = async (req, res) => {
     try {
         const user = req.session.user_id
         const token = req.query.token
-console.log("token",token);
-        const userData = await User.findOne({token:token})
-console.log("userData",userData);
+        console.log("token", token);
+        const userData = await User.findOne({ token: token })
+        console.log("userData", userData);
         const tokenOg = userData.token
-console.log("tokenOg",tokenOg);
+        console.log("tokenOg", tokenOg);
         if (token == tokenOg) {
             res.render("reset", { user_id: userData._id })
         } else {
@@ -892,7 +929,7 @@ const postreset = async (req, res) => {
         const user_id = req.body.user_id
         const secure_password = await secure(password)
         const updatedData = await User.findByIdAndUpdate({ _id: user_id }, { $set: { password: secure_password, token: "" } })
-        console.log("updatedData",updatedData);
+        console.log("updatedData", updatedData);
         res.redirect("/login")
     } catch (error) {
         console.log(error.message);
@@ -999,11 +1036,11 @@ const orderSuccess = async (req, res) => {
 const getWallet = async (req, res, next) => {
     try {
         // fix sorting 
-         const user = req.session.user_id
-         console.log("user",user); 
+        const user = req.session.user_id
+        console.log("user", user);
         const currentUser = await User.findById(req.session.user_id).populate('wallet.transactions');
 
-        console.log("qwe",currentUser);
+        console.log("qwe", currentUser);
         if (!currentUser.wallet) {
             currentUser.wallet = { transactions: [] };
             await currentUser.save();
@@ -1022,7 +1059,7 @@ const getWallet = async (req, res, next) => {
 };
 
 
-const editaddress=async(req,res)=>{
+const editaddress = async (req, res) => {
     try {
         const user = req.session.user_id
         const addressToEdit = await address.findById(req.params.id);
@@ -1038,7 +1075,7 @@ const editaddress=async(req,res)=>{
 
 }
 
-const postedit=async(req,res)=>{
+const postedit = async (req, res) => {
     try {
         const { name, state, building, area, city, pincode } = req.body;
         await address.findByIdAndUpdate(req.params.id, {
@@ -1057,7 +1094,7 @@ const postedit=async(req,res)=>{
 
 }
 
-const  deleteEdit= async (req, res) => {
+const deleteEdit = async (req, res) => {
     try {
         await address.findByIdAndRemove(req.params.id);
         res.redirect('/profile');
@@ -1076,8 +1113,8 @@ const returnProduct = async (req, res) => {
         const productId = req.params.productId;
 
         // Find the order and product
-        const order = await Order.findById(orderId) 
-          
+        const order = await Order.findById(orderId)
+
         const product = order.products.find(p => p.productId.toString() === productId);
 
         if (!order || !product || order.status !== 'Delivered') {
@@ -1095,8 +1132,8 @@ const returnProduct = async (req, res) => {
         // order.products = order.products.filter(p => p.productId.toString() !== productId);
 
 
-         // Update the status of the returned product to 'Pending Return'
-         order.status = 'Pending';
+        // Update the status of the returned product to 'Pending Return'
+        order.status = 'Pending';
 
 
         // Add the return product transaction to the user's wallet
@@ -1121,25 +1158,39 @@ const returnProduct = async (req, res) => {
 };
 
 
-
+const postprofileValidationRules = () => {
+    return [
+        body('name').trim().notEmpty().withMessage('Name is required'),
+        body('email').isEmail().withMessage('Invalid email address'),
+        body('phone').isMobilePhone().withMessage('Invalid phone number'),
+        body('currentPassword').notEmpty().withMessage('Current password is required'),
+        body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
+        body('confirmPassword').custom((value, { req }) => {
+            if (value !== req.body.newPassword) {
+                throw new Error('Passwords do not match');
+            }
+            return true;
+        }),
+    ];
+};
 const loadInvoice = async (req, res) => {
     try {
-      const orderId = req.body.id
-      if (orderId) {
-        const userOrder = await Order.findById(orderId).populate([
-            { path: 'user', model: 'User' },
-            { path: 'Address', model: 'Address' },
-            { path: 'products.productId', model: 'product' }
-        ]) 
-        return res.render("invoice", {
-          order: userOrder
-        })
-      }
+        const orderId = req.body.id
+        if (orderId) {
+            const userOrder = await Order.findById(orderId).populate([
+                { path: 'user', model: 'User' },
+                { path: 'Address', model: 'Address' },
+                { path: 'products.productId', model: 'product' }
+            ])
+            return res.render("invoice", {
+                order: userOrder
+            })
+        }
     } catch (error) {
-      res.render("404", { message: "An error occurred. Please try again later." });
+        res.render("404", { message: "An error occurred. Please try again later." });
     }
-  }
-  
+}
+
 
 module.exports = {
     loadHome,
@@ -1162,18 +1213,19 @@ module.exports = {
     loadpassword,
     forgetverify,
     lodreset,
-    lodplaceorder
-    , postreset,
+    lodplaceorder,
+    postreset,
     loadpost,
     removewish,
     cartpost,
     orderSuccess,
-     saveRzpOrder,
+    saveRzpOrder,
     getWallet,
     deleteEdit,
-cancelOrder,
-editaddress,
-postedit,
-returnProduct,
-loadInvoice
+    cancelOrder,
+    editaddress,
+    postedit,
+    returnProduct,
+    loadInvoice,
+    postprofileValidationRules
 }

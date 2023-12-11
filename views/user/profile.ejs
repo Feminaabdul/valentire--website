@@ -34,6 +34,25 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
+    <div class="form-group">
+        <label for="currentPassword">Current Password</label>
+        <input type="password" class="form-control" name="currentPassword" placeholder="">
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="form-group">
+        <label for="newPassword">New Password</label>
+        <input type="password" class="form-control" name="newPassword" placeholder="">
+    </div>
+</div>
+<div class="col-md-6">
+    <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" class="form-control" name="confirmPassword" placeholder="">
+    </div>
+</div>
+
+                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="phone">Phone</label>
                                     <input type="number" class="form-control" name="phone"
@@ -46,6 +65,16 @@
                             </div>
 
                         </div>
+                        <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+                            <div class="alert alert-danger">
+                                <ul>
+                                    <% errors.forEach(error => { %>
+                                        <li><%= error.msg %></li>
+                                    <% }); %>
+                                </ul>
+                            </div>
+                        <% } %>
+                        
                     </form><!-- END -->
                     <div class="col-lg-4 mt-1 mb-1">
                     <a   href="/placeorder/1" class="btn btn-primary">orders</a>

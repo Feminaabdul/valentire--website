@@ -84,8 +84,7 @@
                                           <% if (status) { %>
                                             <% orders.forEach((order) => { %>
                                               <% order.products.forEach((product)=> { %> 
-                                                <% console.log('Quantity:', product.quantity); %>
-                                                <% console.log('First Product Quantity:', products[0].quantity); %>
+                                               
                                                 <div class="d-flex flex-column flex-md-row border p-3 mb-3"  style="background-color: black;">
                                                   <div class="col-md-3 col-12 d-flex justify-content-center mb-5">
                                                     <% if (product.productId.image && product.productId.image.length > 0) { %>
@@ -105,8 +104,8 @@
                                                       Price: ₹<%=order.totalAmount  %>,<br>
                                                      
                                                       Quantity: <%=product.quantity%>,<br>
-                                                      <p> <%=product.quantity%></p><br>
-                                                      <p> <%=product%></p><br>
+                                                     
+                                                     
                                                       Payment Method: <%= order.paymentMethod %><br>
                                                       Delivery Address:<%= order.Address.state %>,
                                                       <%= order.Address.building %>,
@@ -175,10 +174,10 @@
                                                
                                                 Quantity: <%=product.quantity %>,<br>
                                                 Payment Method: <%= order.paymentMethod %><br>
-                                                Delivery Address:<%= order.Address.state %>,
-                                                <%= order.Address.building %>,
-                                                <%= order.Address.city %>,
-                                                <%= order.Address.area %>,
+                                                Delivery Address:<%= order.Address.state %>,<br>
+                                                <%= order.Address.building %>,<br>
+                                                <%= order.Address.city %>,<br>
+                                                <%= order.Address.area %>,<br>
                                                 <%= order.Address.pincode %>
                                               </p>
                                               <div class="d-flex" style="color: white;">
