@@ -37,7 +37,7 @@ userroute.post('/add-cart',auth.checkToBlock, auth.isLogin, usercontroller.cartp
 userroute.get('/add-to-wishlist', auth.checkToBlock,auth.isLogin, usercontroller.loadpost)
 userroute.get('/checkout',auth.checkToBlock,auth.isLogin, usercontroller.loadcheckout)
 userroute.get('/profile',auth.checkToBlock,auth.isLogin, usercontroller.loadprofle)
-userroute.post('/profile-update',auth.checkToBlock,auth.isLogin ,usercontroller. postprofileValidationRules(),usercontroller.postprofile)
+userroute.post('/profile-update',auth.checkToBlock,auth.isLogin,usercontroller.postprofile)
 userroute.get('/AddAddress',auth.checkToBlock,auth.isLogin, usercontroller.loadaddress)
 
 userroute.post('/AddAddress',auth.checkToBlock,auth.isLogin, usercontroller.postAddress)

@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt")
 const nodemailer = require('nodemailer');
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env
 const Razorpay = require('razorpay');
-const { body, validationResult } = require('express-validator');
 
 
 const razorpay = new Razorpay({
@@ -414,6 +413,7 @@ const loadprofle = async (req, res) => {
 }
 const postprofile = async (req, res) => {
     try {
+        console.log("asdwefrt5h",req.body)
         const user = req.session.user_id;
         const currentUser = await User.findById(user);
         const { name, email, phone, currentPassword, newPassword, confirmPassword } = req.body;
@@ -421,6 +421,8 @@ const postprofile = async (req, res) => {
         currentUser.name = name;
         currentUser.email = email;
         currentUser.phone = phone;
+
+        await currentUser.save();
 
         // Validate the current password
         const passwordMatch = await bcrypt.compare(currentPassword, currentUser.password);
@@ -443,7 +445,7 @@ const postprofile = async (req, res) => {
         res.redirect("/profile");
     } catch (error) {
         console.log(error.message);
-        res.redirect('/profile?error=Something went wrong');
+        res.redirect('/profile');
     }
 };
 
@@ -637,9 +639,10 @@ const placeorder = async (req, res) => {
                         const foundProduct = await products.findById(item.product._id);
                         if (item.quantity > foundProduct.stockquantity) {
                             console.error(`Product "${foundProduct.productname}" is out of stock.`);
+                            alert(`Product "${foundProduct.productname}" is out of stock.`);
                             // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
                             // For example:
-                            return res.status(400).json({ error: `Product bcvx"${foundProduct.productname}" is out of stock.` });
+                            return res.redirect('/checkout');
                         } else {
                             foundProduct.stockquantity -= item.quantity;
                             await foundProduct.save();
@@ -1123,21 +1126,7 @@ const returnProduct = async (req, res) => {
 };
 
 
-const postprofileValidationRules = () => {
-    return [
-        body('name').trim().notEmpty().withMessage('Name is required'),
-        body('email').isEmail().withMessage('Invalid email address'),
-        body('phone').isMobilePhone().withMessage('Invalid phone number'),
-        body('currentPassword').notEmpty().withMessage('Current password is required'),
-        body('newPassword').isLength({ min: 6 }).withMessage('New password must be at least 6 characters'),
-        body('confirmPassword').custom((value, { req }) => {
-            if (value !== req.body.newPassword) {
-                throw new Error('Passwords do not match');
-            }
-            return true;
-        }),
-    ];
-};
+
 const loadInvoice = async (req, res) => {
     try {
         const orderId = req.body.id
@@ -1192,5 +1181,5 @@ module.exports = {
     postedit,
     returnProduct,
     loadInvoice,
-    postprofileValidationRules
+   
 }
