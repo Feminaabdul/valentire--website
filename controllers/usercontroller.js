@@ -4,7 +4,6 @@ const nodemailer = require('nodemailer');
 const { RAZORPAY_ID_KEY, RAZORPAY_SECRET_KEY } = process.env
 const Razorpay = require('razorpay');
 
-
 const razorpay = new Razorpay({
     key_id: RAZORPAY_ID_KEY,
     key_secret: RAZORPAY_SECRET_KEY,
@@ -420,7 +419,7 @@ const postprofile = async (req, res) => {
 
         currentUser.name = name;
         currentUser.email = email;
-        currentUser.phone = phone;
+        currentUser.mobile = phone;
 
         await currentUser.save();
 
