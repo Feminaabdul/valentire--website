@@ -4,6 +4,8 @@ const Product = require('../models/productmodel')
 const Offer = require("../models/offermodel")
 const Order = require("../models/order")
 const Joi = require('joi');
+const path = require('path')
+const fs = require('fs');
 const postAddProduct = async (req, res) => {
     try {
 
@@ -108,7 +110,7 @@ const postEditProduct = async (req, res) => {
         // console.log(req.body)
         // console.log("********")
         
-        const id = req.query.id;
+        const id = req.params.id;
         // const deletedImages = JSON.parse(req.body.deletedImages);
         
         // const stringIndices = deletedImages.map(index => index.toString());
@@ -133,7 +135,7 @@ const postEditProduct = async (req, res) => {
 
 
         const newprice = Number(req.body.price)
-        const Data = await Product.findById(req.query.id);
+        const Data = await Product.findById(req.params.id);
         const offer = req.body.offer
 
 
@@ -141,12 +143,7 @@ const postEditProduct = async (req, res) => {
 
 
         
-        let existingImages=Data.image|| [];
-        console.log("lhlkhgftydytes",existingImages);
-        let newImages = req.files ? req.files.map(file => file.filename) : [];
-        
-        let updatedImages = newImages.length > 0 ? newImages : existingImages;
-
+       
         const schema = Joi.object({
             productName: Joi.string().min(3).required(),
             price: Joi.number().min(1).required(),
@@ -201,7 +198,7 @@ const postEditProduct = async (req, res) => {
         Data.category = req.body.category
         Data.stockquantity = req.body.stockquantity
 
-        Data.image = updatedImages;
+       
         Data.description = req.body.description
         Data.material = req.body.material
         Data.offer = null;
@@ -232,7 +229,7 @@ const Editproduct = async (req, res) => {
     try {
         const offerdata = await Offer.find({});
         const categorydata = await Category.find({});
-        let id = req.query.id
+        let id = req.params.id
         const productdata = await productmodel.findById(id)
         console.log(productdata)
         if (productdata) {
@@ -276,6 +273,42 @@ const listproduct = async (req, res) => {
         console.log(error.message);
     }
 }
+const deleteImage = async (req, res, next) => {
+    const { id } = req.params;
+    const { image } = req.body;
+    console.log("imagrw",image);
+    try {
+        await Product.findByIdAndUpdate(id, { $pull: { image: image } }, { new: true });
+
+        fs.unlink(path.join(__dirname,'../public/Admins/productImages', image), (err) => {
+            if (err) console.log(err);
+        });
+
+        res.redirect(`/admin/Editproduct/${id}`);
+    } catch (error) {
+        next(error);
+    }
+};
+const addImage = async (req, res, next) => {
+    const { id } = req.params;
+    const images = req.files;
+
+    console.log("req.images", images);
+
+    let imagesWithPath;
+    if (images && images.length) {
+        imagesWithPath = images.map(image => image.filename);
+    }
+    const imagesWith = imagesWithPath.join('\n');
+    console.log("imagesWithPath", imagesWith);
+
+    try {
+        await Product.findByIdAndUpdate(id, { $push: { image: imagesWith } }, { new: true });
+        res.redirect(`/admin/Editproduct/${id}`);
+    } catch (error) {
+        next(error);
+    }
+};
 
 module.exports = {
     postAddProduct,
@@ -284,6 +317,8 @@ module.exports = {
     unlistproduct,
     listproduct,
     Editproduct,
-    postEditProduct
+    postEditProduct,
+    deleteImage,
+    addImage
 
 }

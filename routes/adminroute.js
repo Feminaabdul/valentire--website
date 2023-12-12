@@ -66,7 +66,7 @@ adminroute.get("/listbro", adminauth.isadminLogin, offer.listbro)
 adminroute.get("/unlistcategory", adminauth.isadminLogin, categorycontroller.unlistcategory)
 adminroute.get("/listcategorybutton", adminauth.isadminLogin, categorycontroller.listcategorybutton)
 
-adminroute.get("/Editproduct", adminauth.isadminLogin, productcontroller.Editproduct)
+adminroute.get("/Editproduct/:id", adminauth.isadminLogin, productcontroller.Editproduct)
 adminroute.get("/editoffer", adminauth.isadminLogin, offer.editoffer)
 adminroute.get("/Editcategory", adminauth.isadminLogin, categorycontroller.Editcategory)
 
@@ -82,12 +82,13 @@ adminroute.post("/addoffer", offer.postAddOffer)
 
 
 adminroute.post("/addproduct", upload.array("image",3),imageauth.resizeProductImages, productcontroller.postAddProduct)
-adminroute.post("/Editcategory", categorycontroller.postEdit)
+adminroute.post("/Editcategory/:id", categorycontroller.postEdit)
+adminroute.delete("/products/img-delete/:id",productcontroller.deleteImage);
+adminroute.patch("/products/img-add/:id", upload.array("images",3), productcontroller.addImage);
 
 
 
-
-adminroute.post("/Editproduct", upload.array("image",3),imageauth.resizeProductImages, productcontroller.postEditProduct)
+adminroute.post("/Editproduct/:id", upload.array("images",3),imageauth.resizeProductImages, productcontroller.postEditProduct)
 
 adminroute.post("/editoffer",offer.posteditoffer)
 adminroute.post("/editoffer",offer.posteditoffer)
