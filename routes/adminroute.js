@@ -84,7 +84,7 @@ adminroute.post("/addoffer", offer.postAddOffer)
 adminroute.post("/addproduct", upload.array("image",3),imageauth.resizeProductImages, productcontroller.postAddProduct)
 adminroute.post("/Editcategory/:id", categorycontroller.postEdit)
 adminroute.delete("/products/img-delete/:id",productcontroller.deleteImage);
-adminroute.patch("/products/img-add/:id", upload.array("images",3), productcontroller.addImage);
+adminroute.patch("/products/img-add/:id", upload.array("images",3), imageauth.resizeProductImages,productcontroller.addImage);
 
 
 
