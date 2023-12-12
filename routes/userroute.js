@@ -11,6 +11,7 @@ userroute.set('views', './views/user')
 userroute.use(express.static('public/Users'))
 
 userroute.get('/',auth.checkToBlock, usercontroller.loadHome)
+userroute.get('/changepassword',auth.checkToBlock, usercontroller.changepassord)
 userroute.get('/login', auth.isLogout, usercontroller.loadlogin)
 userroute.get('/wishlist',auth.checkToBlock, auth.isLogin, usercontroller.loadwish)
 userroute.route('/shop',auth.checkToBlock, auth.isLogin)
@@ -38,6 +39,9 @@ userroute.get('/add-to-wishlist', auth.checkToBlock,auth.isLogin, usercontroller
 userroute.get('/checkout',auth.checkToBlock,auth.isLogin, usercontroller.loadcheckout)
 userroute.get('/profile',auth.checkToBlock,auth.isLogin, usercontroller.loadprofle)
 userroute.post('/profile-update',auth.checkToBlock,auth.isLogin,usercontroller.postprofile)
+userroute.post('/changepassord-update',auth.checkToBlock,auth.isLogin,usercontroller.changeprofilepassword)
+
+
 userroute.get('/AddAddress',auth.checkToBlock,auth.isLogin, usercontroller.loadaddress)
 
 userroute.post('/AddAddress',auth.checkToBlock,auth.isLogin, usercontroller.postAddress)

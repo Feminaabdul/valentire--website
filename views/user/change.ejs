@@ -4,126 +4,73 @@
             color: red;
         }
     </style>
+    <style>
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+            border-radius: 4px;
+        }
+        .alert-danger {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+    </style>
     <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
         <div class="container">
             <div class="row no-gutters slider-text align-items-center justify-content-center">
                 <div class="col-md-9 ftco-animate text-center">
                     <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>Checkout</span>
                     </p>
-                    <h1 class="mb-0 bread">profile</h1>
+                    <h1 class="mb-0 bread">Change Password</h1>
                 </div>
             </div>
         </div>
     </div>
+    <section class="ftco-section ftco-no-pb ftco-no-pt bg-light">
+		<div class="container">
+			<div class="row">
 
-    <section class="ftco-section">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-xl-6 ftco-animate">
-                    <form id="profile-form" action="/profile-update" method="post" class="billing-form">
-                        <h3 class="mb-4 billing-heading">profile</h3>
-                        <div class="row align-items-end">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="firstname"> Name</label>
-                                    <input type="text" class="form-control" name="name" value="<%=currentUser.name %>"
-                                        placeholder="">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="emailaddress">Email Address</label>
-                                    <input type="text" class="form-control" name="email" value="<%=currentUser.email %>"
-                                        placeholder="">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="phone">Phone</label>
-                                    <input type="text" class="form-control" id="phone" name="phone"
-                                        value="<%=currentUser.mobile %>" placeholder="">
-                                </div>
-                            </div>
-
-
-
-
-                            <div class="text-right"> <button type="submit" class="btn btn-primary px-2 mt-">Update
-                                    Profile</button>
-                            </div>
-
-                            <div class="text-right"> <button class="btn btn  px-2 mt-"><a href="/changepassword">changepassord</a>
-                               </button>
+				<div class="col-md-7 py-md-5 wrap-about pb-md-5 ftco-animate">
+					<div class="heading-section-bold mb-4 mt-md-5">
+						<div class="ml-md-0">
+							<h2 class="mb-4">change password</h2>
+						</div>
+						<form  id="password-form" action="/changepassord-update" method="post">
+							<div class="form-group">
+								<label for="currentPassword">Current Password</label>
+                                    <input type="password" class="form-control"style="display: flex; width: 280px;" name="currentPassword" placeholder="Enter currentPassword">
+							</div>
+							<div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" class="form-control" style="display: flex; width: 280px;"name="newPassword" placeholder="Enter newPassword">
+							</div>
+                            <div class="form-group">
+                                <label for="confirmPassword">Confirm Password</label>
+                                <input type="password" class="form-control" style="display: flex; width: 280px;" name="confirmPassword" placeholder="Enter confirmPassword">
+                             </div>
+								
+							
+							
+                             <div class=""> <button type="submit" class="btn btn-primary px-2 mt-">Update
+                                password</button>
                         </div>
-                           
-                        </div>
-                        <% if (typeof errors !=='undefined' && errors.length> 0) { %>
-                            <div class="alert alert-danger">
-                                <ul>
-                                    <% errors.forEach(error=> { %>
-                                        <li>
-                                            <%= error.msg %>
-                                        </li>
-                                        <% }); %>
-                                </ul>
-                            </div>
-                            <% } %>
+						</form>
+                        
+                        <div id="error-message" class=""></div>
+                        <% if (errorMessage) { %>
+                            <div class="alert alert-danger"><%= errorMessage %></div>
+                        <% } %>
+                        <!-- <div id="error-message" class="error-message"></div> -->
 
-                    </form><!-- END -->
+					</div>
 
-                    <div id="error-message" class="error-message"></div>
-
-                    <div class="col-lg-4 mt-1 mb-1">
-                        <a href="/placeorder/1" class="btn btn-primary">orders</a>
-                    </div>
-                    <div class="col-lg-4 mt-1 mb-1">
-                        <a href="/wallet" class="btn btn-primary">
-                            Wallet
-                        </a>
-                    </div>
-                    <div class="cart-detail bg-light p-1 p-md-4 my-2">
-                        <h3 class="billing-heading mb-4">saved address</h3>
-                        <%=Address.length%>
-                            <div>
-                                <% Address.forEach((Address)=> { %>
-                                    <div class="col-lg-12 p-4 border mb-3">
-                                        <span class="d-block text-primary h6 text-uppercase">
-                                            <%= Address.name%>
-                                        </span>
-                                        <p class="mb-0">
-
-                                            <%= Address.building %>,
-
-
-                                                <%= Address.area %>,
-                                                    <%= Address.city %>,
-                                                        <%= Address.state %>,
-                                                            <%= Address.pincode %>
-                                        </p>
-                                        <a href="/editaddress/<%=Address._id%>" class="btn-outline">edit</a>
-                                        <a href="/deleteaddress/<%= Address._id %>" class="btn-outline">delete</a>
-
-                                    </div>
-                                    <% }) %>
-
-                            </div>
-
-                            <div class="text-right"> <a class="btn btn-primary px-2 mt-2 " href="/AddAddress">Add New
-                                    Address</a>
-                            </div>
-                    </div>
-                </div>
-
-
-
-                <div class="row mt-5 pt-3 d-flex">
-
-
-                </div>
-            </div> <!-- .col-md-8 -->
-        </div>
-        </div>
-    </section> <!-- .section -->
+				</div>
+			</div>
+		</div>
+	</section>
+    
 
 
     <footer class="ftco-footer ftco-section">
@@ -273,53 +220,35 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.getElementById('profile-form').addEventListener('submit', function (event) {
+            document.getElementById('password-form').addEventListener('submit', function (event) {
                 // Reset previous error messages
                 document.getElementById('error-message').innerHTML = '';
 
                 // Validate each field
-                const name = document.getElementsByName('name')[0].value.trim();
-                const email = document.getElementsByName('email')[0].value.trim();
-                const phone = document.getElementsByName('phone')[0].value.trim();
-                
+            
+                const currentPassword = document.getElementsByName('currentPassword')[0].value.trim();
+                const newPassword = document.getElementsByName('newPassword')[0].value.trim();
+                const confirmPassword = document.getElementsByName('confirmPassword')[0].value.trim();
 
-                // Validate name (for example, allow only letters)
-                if (!name || !/^[a-zA-Z]+$/.test(name)) {
-                    // Display error message if the name field is empty or contains invalid characters
-                    document.getElementById('error-message').innerHTML = 'Please enter a valid name.';
-                    event.preventDefault(); // Prevent form submission
-                }
 
-                // Validate email (simple validation, there are more advanced methods)
-                if (!email || !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
-                    // Display error message if the email field is empty or invalid
-                    document.getElementById('error-message').innerHTML = 'Please enter a valid email address.';
-                    event.preventDefault(); // Prevent form submission
-                }
-                // Validate phone number (simple validation, there are more advanced methods)
-                if (!phone || !/^\d{10}$/.test(phone)) {
-                    // Display error message if the phone number field is empty or invalid
-                    document.getElementById('error-message').innerHTML = 'Please enter a valid phone number.';
-                    event.preventDefault(); // Prevent form submission
-                }
                 const passwordRegex = /^(?=.*\d)(?=.*[a-zA-Z]).{8,}$/;
                 // Validate current password
-                // if (!currentPassword) {
-                //     // Display error message if the current password field is empty
-                //     document.getElementById('error-message').innerHTML = 'Please enter your current password.';
-                //     event.preventDefault(); // Prevent form submission
-                // }
-                // if (!newPassword || !passwordRegex.test(newPassword)) {
-                //     // Display error message if the new password field is empty or invalid
-                //     document.getElementById('error-message').innerHTML = 'Please enter a valid new password.';
-                //     event.preventDefault(); // Prevent form submission
-                // }
+                if (!currentPassword) {
+                    // Display error message if the current password field is empty
+                    document.getElementById('error-message').innerHTML = 'Please enter your current password.';
+                    event.preventDefault(); // Prevent form submission
+                }
+                if (!newPassword || !passwordRegex.test(newPassword)) {
+                    // Display error message if the new password field is empty or invalid
+                    document.getElementById('error-message').innerHTML = 'Please enter a valid new password.';
+                    event.preventDefault(); // Prevent form submission
+                }
 
-                // if (!confirmPassword || newPassword !== confirmPassword) {
-                //     // Display error message if the confirm password field is empty or does not match the new password
-                //     document.getElementById('error-message').innerHTML = 'Please enter a valid confirm password.';
-                //     event.preventDefault(); // Prevent form submission
-                // }
+                if (!confirmPassword || newPassword !== confirmPassword) {
+                    // Display error message if the confirm password field is empty or does not match the new password
+                    document.getElementById('error-message').innerHTML = 'Please enter a valid confirm password.';
+                    event.preventDefault(); // Prevent form submission
+                }
 
             });
         });

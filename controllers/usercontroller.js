@@ -39,6 +39,16 @@ const loadHome = async (req, res) => {
         console.log(error.message);
     }
 }
+const changepassord = async (req, res) => {
+    try {
+
+        const user = await User.findById(req.session.user_id)
+
+        res.render('change', { isLoggedIn: isLoggedIn(req, res), user: user,errorMessage: "" })
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 const loadlogin = async (req, res) => {
     try {
@@ -401,7 +411,9 @@ const loadprofle = async (req, res) => {
             isLoggedIn: isLoggedIn(req, res),
             currentUser,
             Address,
-            user
+            user,
+            message: ''
+
         })
 
 
@@ -412,7 +424,7 @@ const loadprofle = async (req, res) => {
 }
 const postprofile = async (req, res) => {
     try {
-        console.log("asdwefrt5h",req.body)
+        console.log("asdwefrt5h", req.body)
         const user = req.session.user_id;
         const currentUser = await User.findById(user);
         const { name, email, phone, currentPassword, newPassword, confirmPassword } = req.body;
@@ -423,18 +435,38 @@ const postprofile = async (req, res) => {
 
         await currentUser.save();
 
+
+        await currentUser.save();
+        res.redirect("/profile");
+    } catch (error) {
+        console.log(error.message);
+        res.redirect('/profile');
+    }
+};
+const changeprofilepassword = async (req, res) => {
+    try {
+        console.log("asdwefrt5h", req.body)
+        const user = req.session.user_id;
+        const currentUser = await User.findById(user);
+        const { currentPassword, newPassword, confirmPassword } = req.body;
+
+
+
         // Validate the current password
-        const passwordMatch = await bcrypt.compare(currentPassword, currentUser.password);
-        if (!passwordMatch) {
-            // Handle incorrect current password
-            return res.redirect('/profile');
+       
+
+        const currentPasswordMatch = await bcrypt.compare(currentPassword, currentUser.password);
+        if (!currentPasswordMatch) {
+            res.render('changepassword', { errorMessage: 'Please enter a valid currentPassword .' });
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            // Display error message if the confirm password field is empty or does not match the new password
+            res.render('changepassword', { errorMessage: 'Please enter a valid confirm password.' });
+            return;
         }
 
         // Check if the new password and confirm password match
-        if (newPassword !== confirmPassword) {
-            // Handle password mismatch
-            return res.redirect('/profile');
-        }
 
         // Update the user's password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -444,10 +476,9 @@ const postprofile = async (req, res) => {
         res.redirect("/profile");
     } catch (error) {
         console.log(error.message);
-        res.redirect('/profile');
+        res.redirect('/changepassword');
     }
 };
-
 const loadaddress = async (req, res) => {
     try {
         const currentUser = await User.findById(req.session.user_id)
@@ -648,7 +679,7 @@ const placeorder = async (req, res) => {
                             updatedCart.push(item);
                         }
                     };
-    
+
                     // Update the user's cart with the items that are still in stock
                     currentUser.cart = updatedCart;
                     await currentUser.save();
@@ -680,7 +711,7 @@ const placeorder = async (req, res) => {
                             }
                         });
                     });
-                   
+
                     orderedProduct.razorpayOrderId = razorpayOrder.id;
                     console.log("  orderedProduct.razorpayOrderId ", orderedProduct.razorpayOrderId);
                     return res.render('rzp', {
@@ -716,7 +747,7 @@ const placeorder = async (req, res) => {
                 }
 
                 // stock update
-               
+
 
                 return orderedProduct
             })
@@ -788,7 +819,7 @@ const saveRzpOrder = async (req, res, next) => {
                 });
                 console.log("orderedProduct.save()", orderedProduct);
                 orderedProduct.save()
-               
+
                 return orderedProduct
             })
         }
@@ -1180,5 +1211,7 @@ module.exports = {
     postedit,
     returnProduct,
     loadInvoice,
-   
+    changepassord,
+    changeprofilepassword
+
 }
