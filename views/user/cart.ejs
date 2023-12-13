@@ -1,15 +1,15 @@
 <%-include("../layouts/userlayout/header.ejs")%>
 
-    <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
-        <div class="container">
-            <div class="row no-gutters slider-text align-items-center justify-content-center">
-                <div class="col-md-9 ftco-animate text-center">
-                    <p class="breadcrumbs"><span class="mr-2"><a href="/">Home</a></span> <span>Cart</span></p>
-                    <h1 class="mb-0 bread">CART</h1>
-                </div>
+<div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
+    <div class="container">
+        <div class="row no-gutters slider-text align-items-center justify-content-center">
+            <div class="col-md-9 ftco-animate text-center">
+                <p class="breadcrumbs"><span class="mr-2"><a href="/">Home</a></span> <span>Cart</span></p>
+                <h1 class="mb-0 bread">CART</h1>
             </div>
         </div>
     </div>
+</div>
 
     <section class="ftco-section ftco-cart">
         <div class="container">
@@ -103,9 +103,7 @@
                                                 <%= cus.cart[i].product.productname %>.
                                             </td>
                                         <% } else { %>
-                                            <!-- Display other information for the item -->
-                                            <td class="price">$<%= cus.cart[i].product.price %></td>
-                                            <!-- ... (your existing code) ... -->
+                                         
                                         <% } %>
                                         <% }) %>
                                         <% } %>
@@ -118,7 +116,7 @@
                             </tbody>
 
                         </table>
-                        <!-- Add this button with left alignment -->
+                      
 
                     </div>
 
@@ -133,9 +131,9 @@
                 </p>
                 <% } %> -->
             
-            <div            
-            class="text-right"> <a class="btn btn-primary px-2 mt-2 "id="proceedBtn" href="/checkout">proceed to checkout</a>
-            </div>
+                <div class="text-right">
+                    <a class="btn btn-primary px-2 mt-2" id="proceedBtn" href="/checkout">Proceed to Checkout</a>
+                </div>
         </div>
 
     </section>

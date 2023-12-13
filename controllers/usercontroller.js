@@ -667,12 +667,22 @@ const placeorder = async (req, res) => {
     try {
         const paymentMethod = req.body.paymentMethod
         const user = req.session.user_id
-        const currentUser = await User.findById(req.session.user_id).populate("cart.product")
+        const currentUser = await User.findById(req.session.user_id)
+        .populate({
+            path: 'wallet.transactions',
+            // Specify additional options if needed
+          })
+          .populate({
+            path: 'cart.product',
+            // Specify additional options if needed
+          });
+          console.log("currentuserr",currentUser);
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
 
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
         }, 0);
+        console.log("grandTotal",grandTotal);
       
         // Create a new order for each product in the cart
         const orders = await Promise.all(
@@ -756,6 +766,37 @@ const placeorder = async (req, res) => {
                         user: currentUser,
 
                     });
+                }else if(req.body.paymentMethod === 'Wallet'){
+                    const updatedCart = [];
+                    let outOfStockMessage = '';
+                    for (const item of currentUser.cart) {
+                        const foundProduct = await products.findById(item.product._id);
+                        if (item.quantity > foundProduct.stockquantity) {
+                            console.error(`Product "${foundProduct.productname}" is out of stock.`);
+                            outOfStockMessage = `Product "${foundProduct.productname}" is out of stock.`;
+                          
+                          ;
+                        } else {
+                            foundProduct.stockquantity -= item.quantity;
+                            await foundProduct.save();
+                            updatedCart.push(item);
+                        }
+                    };
+
+                    if (outOfStockMessage) {
+                        // If there's an out-of-stock message, reload the cart page with the message
+                        return res.render('cart', { error: outOfStockMessage,isLoggedIn: isLoggedIn(req, res),user, cus: currentUser, cartProducts: updatedCart });
+                    }
+                    // Update the user's cart with the items that are still in stock
+                    currentUser.cart = updatedCart;
+                    await currentUser.save();
+                    await orderedProduct.save();
+                    console.log("amoikujyhgf",grandTotal)
+                    currentUser.wallet.balance -= grandTotal;
+                    console.log("gvhjbkn", currentUser.wallet.balance);
+                    await currentUser.save();
+
+
                 } else {
                     if (currentUser.wallet.balance < grandTotal) {
                         return res.render("checkout", {
@@ -822,19 +863,23 @@ const saveRzpOrder = async (req, res, next) => {
         if (transactionId && orderId && signature) {
             // stock update
             const updatedCart = [];
+            let outOfStockMessage = '';
             for (const item of currentUser.cart) {
                 const foundProduct = await products.findById(item.product._id);
                 if (item.quantity > foundProduct.stockquantity) {
                     console.error(`Product "${foundProduct.productname}" is out of stock.`);
-                    // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
-                    // For example:
-                    return res.status(400).json({ error: `Product bcvx"${foundProduct.productname}" is out of stock.` });
+                    outOfStockMessage = `Product "${foundProduct.productname}" is out of stock.`;
                 } else {
                     foundProduct.stockquantity -= item.quantity;
                     await foundProduct.save();
                     updatedCart.push(item);
                 }
             };
+            
+            if (outOfStockMessage) {
+                // If there's an out-of-stock message, reload the cart page with the message
+                return res.render('cart', { error: outOfStockMessage,isLoggedIn: isLoggedIn(req, res),user, cus: currentUser, cartProducts: updatedCart });
+            }
 
             // Update the user's cart with the items that are still in stock
             currentUser.cart = updatedCart;
