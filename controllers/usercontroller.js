@@ -450,23 +450,18 @@ const changeprofilepassword = async (req, res) => {
         const currentUser = await User.findById(user);
         const { currentPassword, newPassword, confirmPassword } = req.body;
 
-
-
         // Validate the current password
-       
-
         const currentPasswordMatch = await bcrypt.compare(currentPassword, currentUser.password);
         if (!currentPasswordMatch) {
-            res.render('changepassword', { errorMessage: 'Please enter a valid currentPassword .' });
-            return;
-        }
-        if (newPassword !== confirmPassword) {
-            // Display error message if the confirm password field is empty or does not match the new password
-            res.render('changepassword', { errorMessage: 'Please enter a valid confirm password.' });
+            res.render('change', { isLoggedIn: isLoggedIn(req, res),user, errorMessage: 'Please enter a valid currentPassword.' });
             return;
         }
 
-        // Check if the new password and confirm password match
+        if (newPassword !== confirmPassword) {
+            // Display error message if the confirm password field is empty or does not match the new password
+            res.render('change', { isLoggedIn: isLoggedIn(req, res),user, errorMessage: 'Please enter a valid confirm password.' });
+            return;
+        }
 
         // Update the user's password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -479,6 +474,7 @@ const changeprofilepassword = async (req, res) => {
         res.redirect('/changepassword');
     }
 };
+
 const loadaddress = async (req, res) => {
     try {
         const currentUser = await User.findById(req.session.user_id)
@@ -1188,8 +1184,8 @@ module.exports = {
     loadshopdetail,
     loadresend,
     loadlogout,
-    loadcheckout
-    , loadprofle,
+    loadcheckout,
+    loadprofle,
     loadaddress,
     postAddress,
     placeorder,

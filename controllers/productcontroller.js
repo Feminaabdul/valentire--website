@@ -5,6 +5,7 @@ const Offer = require("../models/offermodel")
 const Order = require("../models/order")
 const Joi = require('joi');
 const path = require('path')
+const sharp = require('sharp');
 const fs = require('fs');
 const postAddProduct = async (req, res) => {
     try {
@@ -16,9 +17,31 @@ const postAddProduct = async (req, res) => {
             const categorydata = await Category.find({});
             return res.render('addproduct', { category: categorydata, message: "Please upload at least one image for the product." });
         }
-        let image = []
+        let image = [];
+
         for (let i = 0; i < req.files.length; i++) {
             image[i] = req.files[i].filename;
+        }
+        const croppedImages = [];
+        for (let i = 0; i < req.files.length; i++) {
+            const imagePath = path.join(__dirname, '../public/Admins/productImages', image[i]);
+
+            const cropOptions = {
+                left: 0,
+                top: 0,
+                width: 900, // Specify the desired width
+                height: 900, // Specify the desired height
+            }; try {
+                const buffer = await sharp(imagePath).extract(cropOptions).toBuffer();
+                await sharp(buffer).toFile(imagePath);
+                croppedImages.push(image[i]);
+            } catch (err) {
+                console.error('Error cropping image:', err);
+                // Handle the error as needed, you might want to return an error response to the client
+            }
+
+
+
         }
 
         // Check if the price is greater than 1 and not 0 or a negative number
@@ -71,7 +94,7 @@ const postAddProduct = async (req, res) => {
 
             description: description,
             category: category,
-            image: image,
+            image: croppedImages,
             material: material,
 
         })
@@ -109,10 +132,10 @@ const postEditProduct = async (req, res) => {
 
         // console.log(req.body)
         // console.log("********")
-        
+
         const id = req.params.id;
         // const deletedImages = JSON.parse(req.body.deletedImages);
-        
+
         // const stringIndices = deletedImages.map(index => index.toString());
         // Product.updateOne(
         //     { _id: id }, // Replace 'your-product-id' with the actual ID of your product
@@ -127,7 +150,7 @@ const postEditProduct = async (req, res) => {
         //         }
         //     }
         // );
-    
+
         // let image = []
         // for (let i = 0; i < req.files.length; i++) {
         //     image[i] = req.files[i].filename;
@@ -142,8 +165,8 @@ const postEditProduct = async (req, res) => {
 
 
 
-        
-       
+
+
         const schema = Joi.object({
             productName: Joi.string().min(3).required(),
             price: Joi.number().min(1).required(),
@@ -198,14 +221,14 @@ const postEditProduct = async (req, res) => {
         Data.category = req.body.category
         Data.stockquantity = req.body.stockquantity
 
-       
+
         Data.description = req.body.description
         Data.material = req.body.material
         Data.offer = null;
         // }
-console.log("Data.image",Data.image);
+        console.log("Data.image", Data.image);
         const saved = await Data.save()
-console.log("saved",saved);
+        console.log("saved", saved);
         res.redirect('/admin/product');
 
     } catch (error) {
@@ -276,11 +299,11 @@ const listproduct = async (req, res) => {
 const deleteImage = async (req, res, next) => {
     const { id } = req.params;
     const { image } = req.body;
-    console.log("imagrw",image);
+    console.log("imagrw", image);
     try {
         await Product.findByIdAndUpdate(id, { $pull: { image: image } }, { new: true });
 
-        fs.unlink(path.join(__dirname,'../public/Admins/productImages', image), (err) => {
+        fs.unlink(path.join(__dirname, '../public/Admins/productImages', image), (err) => {
             if (err) console.log(err);
         });
 
@@ -289,6 +312,7 @@ const deleteImage = async (req, res, next) => {
         next(error);
     }
 };
+
 const addImage = async (req, res, next) => {
     const { id } = req.params;
     const images = req.files;
@@ -297,9 +321,37 @@ const addImage = async (req, res, next) => {
 
     let imagesWithPath;
     if (images && images.length) {
-        imagesWithPath = images.map(image => image.filename);
+        imagesWithPath = await Promise.all(
+            images.map(async (image) => {
+                const imagePath = path.join(__dirname, '../public/Admins/productImages', image.filename);
+                const imageInfo = await sharp(imagePath).metadata();
+                console.log('Image Dimensions:', imageInfo.width, 'x', imageInfo.height);
+                const aspectRatio = imageInfo.width / imageInfo.height;
+                // Specify your crop options (e.g., width, height, position)
+                const cropOptions = {
+                    left: 0,
+                    top: 0,
+                    width: Math.min(1000, imageInfo.width),
+                    height: Math.round(1000 / aspectRatio),
+                };
+
+                try {
+                    // Example: Specify the output format (e.g., jpeg)
+                    const buffer = await sharp(imagePath).extract(cropOptions).toFormat('jpeg').toBuffer();
+
+                    await sharp(buffer).toFile(imagePath);
+                    return image.filename;
+                } catch (err) {
+                    console.error('Error cropping image:', err);
+                    // Handle the error as needed, you might want to return an error response to the client
+                    return null;
+                }
+            })
+        );
     }
-    const imagesWith = imagesWithPath.join('\n');
+
+    const validImages = imagesWithPath.filter((image) => image !== null);
+    const imagesWith = validImages.join('\n');
     console.log("imagesWithPath", imagesWith);
 
     try {

@@ -8,7 +8,8 @@ const productcontroller = require('../controllers/productcontroller');
 const categorycontroller = require('../controllers/categorycontroller');
 const offer=require("../controllers/Offercontroller")
 const Order = require("../models/order")
-const { upload } = require('../Config/multer');
+const { upload,cropImage } = require('../Config/multer');
+
 
 adminroute.set('view engine', 'ejs');
 adminroute.set('views', './views/admin')
@@ -81,14 +82,14 @@ adminroute.post("/addCatagory", categorycontroller.postAddCategory)
 adminroute.post("/addoffer", offer.postAddOffer)
 
 
-adminroute.post("/addproduct", upload.array("image",3),imageauth.resizeProductImages, productcontroller.postAddProduct)
-adminroute.post("/Editcategory/:id", categorycontroller.postEdit)
+adminroute.post("/addproduct", upload.array("image",3),cropImage, productcontroller.postAddProduct)
+adminroute.post("/Editcategory", categorycontroller.postEdit)
 adminroute.delete("/products/img-delete/:id",productcontroller.deleteImage);
-adminroute.patch("/products/img-add/:id", upload.array("images",3), imageauth.resizeProductImages,productcontroller.addImage);
+adminroute.patch("/products/img-add/:id", upload.array("images",3),cropImage,productcontroller.addImage);
 
 
 
-adminroute.post("/Editproduct/:id", upload.array("images",3),imageauth.resizeProductImages, productcontroller.postEditProduct)
+adminroute.post("/Editproduct/:id", upload.array("images",3), cropImage, productcontroller.postEditProduct)
 
 adminroute.post("/editoffer",offer.posteditoffer)
 adminroute.post("/editoffer",offer.posteditoffer)
