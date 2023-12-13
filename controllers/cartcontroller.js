@@ -17,11 +17,14 @@ const loadcart = async (req, res) => {
     try {
         const user = req.session.user_id
         const cus = await User.findById(req.session.user_id).populate("cart.product")
+        const currentUser = await User.findById(req.session.user_id)
 
+
+        const cartProducts = cus.cart;
         const total = cus.cart.reduce((total, item) => {
             total + item.total
         }, 0)
-        res.render('cart', { isLoggedIn: isLoggedIn(req, res),user, cus, total })
+        res.render('cart', { isLoggedIn: isLoggedIn(req, res),user, cus, total,cartProducts,currentUser ,  insufficientStockProduct: '',})
     } catch (error) {
         console.log(error.message);
     }
@@ -47,10 +50,11 @@ const loadcartpost = async (req, res) => {
 
 const updateCart = async (req, res, next) => {
     try {
-        console.log(req.body+"this is my body");
+        
         const currentUser = await User.findById(req.session.user_id);
         console.log(currentUser);
         const cartItem = currentUser.cart.find(item => item.product.equals(new mongoose.Types.ObjectId(req.params.id)));
+        console.log("cartItem",cartItem);
         if (cartItem) {
             const product = await products.findById({_id: cartItem.product});
             if (req.body.type === "increment") {

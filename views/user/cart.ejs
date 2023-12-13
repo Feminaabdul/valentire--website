@@ -32,6 +32,8 @@
                             <tbody>
                                 <% if (cus.cart) { %>
                                     <% for (let i=0; i < cus.cart.length; i++) { %>
+                                        <% cartProducts.forEach((cartItem)=> { %>
+                                          
                                         <tr class="text-center">
 
                                             <td class="image-prod">
@@ -49,9 +51,23 @@
                                                     <%= cus.cart[i].product.description %>
                                                 </p>
                                             </td>
+                                            <p>Stock: <%= cartItem.product.stockquantity %>
+                                            </p>
+                                            <p class="text-danger" id="stock_<%= cartItem._id %>" style="display: none;">
+                                              Insufficient stock
+                                            </p>
 
-                                            <td class="price">$<%= cus.cart[i].product.price %>
-                                            </td>
+
+
+
+
+
+
+
+
+
+
+                                           
 
                                             <td class="quantity">
                                                 <div class="input-group mb-3">
@@ -71,13 +87,27 @@
                                                 <span id="totalPrice_<%= cus.cart[i].product._id %>">
                                                     <%= (cus.cart[i].product.price * cus.cart[i].quantity).toFixed(2) %>
                                                 </span>
-                                            </td>z
+                                            </td>
                                             <td class="product-remove">
                                                 <a href="/remove-from-cart/<%= cus.cart[i].product._id %>"><span
                                                         class="ion-ios-close"></span></a>
                                             </td>
 
+
+
                                         </tr>
+                                        
+                                        <% if (cartItem.product.stockquantity < cus.cart[i].quantity) { %>
+                                            <td colspan="6" class="text-danger">
+                                                Insufficient stock for
+                                                <%= cus.cart[i].product.productname %>.
+                                            </td>
+                                        <% } else { %>
+                                            <!-- Display other information for the item -->
+                                            <td class="price">$<%= cus.cart[i].product.price %></td>
+                                            <!-- ... (your existing code) ... -->
+                                        <% } %>
+                                        <% }) %>
                                         <% } %>
                                             <% } else { %>
                                                 <tr>
@@ -95,9 +125,16 @@
                 </div>
 
             </div>
+
+            <!-- <% if (insufficientStockProduct) { %>
+                <p class="col-md-12 text-danger">
+                  Insufficient stocks. Please check your cart item's
+                  quantities
+                </p>
+                <% } %> -->
             
             <div            
-            class="text-right"> <a class="btn btn-primary px-2 mt-2 " href="/checkout">proceed to checkout</a>
+            class="text-right"> <a class="btn btn-primary px-2 mt-2 "id="proceedBtn" href="/checkout">proceed to checkout</a>
             </div>
         </div>
 

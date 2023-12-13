@@ -74,16 +74,16 @@
                             </li>
                             <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span <% if
                                     (order.paymentMethod==="razorpay" ) { %>
-                                    class="me-1 fw-bold">Status:</span><span
-                                    class="badge bg-warning text-black fw-bold">
-                                    paid</span></li>
+                                    class="me-1 fw-bold"></span><span
+                                    class="">
+                                    </span></li>
                             <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span
                                     class="fw-bold">payment ID : </span>
                                 <%= order.payment_id%>
                             </li>
                             <% }else if(order.paymentMethod==="cod" ){ %>
-                                class="me-1 fw-bold">Status:</span><span class="badge bg-warning text-black fw-bold">
-                                    Unpaid</span></li>
+                                class="me-1 fw-bold"></span><span class="">
+                                    </span></li>
                                 <% } %>
 
                         </ul>
@@ -148,7 +148,7 @@
                         
                        
                         <p class="text-black float-start"><span class="text-black me-3"> Total
-                                Amount</span><span style="font-size: 25px;">&#8377; <%= order.totalAmount %>
+                                Amount</span><span style="font-size: 14px;">&#8377; <%= order.totalAmount %>
                             </span></p>
                     </div>
                 </div>

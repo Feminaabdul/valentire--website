@@ -29,8 +29,8 @@ const postAddProduct = async (req, res) => {
             const cropOptions = {
                 left: 0,
                 top: 0,
-                width: 900, // Specify the desired width
-                height: 900, // Specify the desired height
+                width: 1000, // Specify the desired width
+                height: 1000, // Specify the desired height
             }; try {
                 const buffer = await sharp(imagePath).extract(cropOptions).toBuffer();
                 await sharp(buffer).toFile(imagePath);

@@ -369,8 +369,22 @@ const loadcheckout = async (req, res) => {
 
         const Address1 = await address.find({ user: req.session.user_id, default: false })
 
-        const currentUser = await User.findById(req.session.user_id)
+        const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const user = req.session.user_id
+        const newuser =  await User.findById(req.session.user_id)
+        const cartProducts = currentUser.cart;
+        console.log("cartProducts",cartProducts);
+
+        let insufficientStockProduct;
+        cartProducts.forEach((cartProduct) => {
+            if (cartProduct.product.stockquantity < cartProduct.quantity) {
+                insufficientStockProduct = cartProduct._id;
+            }
+        });
+
+
+
+
         if (currentUser) {
             await currentUser.populate("cart.product")
             await catagories.find({})
@@ -380,7 +394,7 @@ const loadcheckout = async (req, res) => {
 
             }, 0)
             console.log(total);
-
+            if (!insufficientStockProduct) {
             res.render('checkout', {
                 isLoggedIn: isLoggedIn(req, res),
                 currentUser,
@@ -390,7 +404,28 @@ const loadcheckout = async (req, res) => {
                 total,
                 user
             })
+        }else {
+            res.render("cart", {
+                isLoggedIn: isLoggedIn(req, res),
+               cus: currentUser,
+                user,
+                cartProducts:cartproducts,
+                total,
+                insufficientStockProduct,
+               
+            });
         }
+       
+    
+    
+    
+    
+    }
+
+
+
+
+
 
 
     } catch (error) {
@@ -638,7 +673,7 @@ const placeorder = async (req, res) => {
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
         }, 0);
-        console.log('Before map:', currentUser.cart.length);
+      
         // Create a new order for each product in the cart
         const orders = await Promise.all(
 
@@ -661,14 +696,14 @@ const placeorder = async (req, res) => {
                 if (req.body.paymentMethod === 'cod') {
 
                     const updatedCart = [];
+                    let outOfStockMessage = '';
                     for (const item of currentUser.cart) {
                         const foundProduct = await products.findById(item.product._id);
                         if (item.quantity > foundProduct.stockquantity) {
                             console.error(`Product "${foundProduct.productname}" is out of stock.`);
-                            alert(`Product "${foundProduct.productname}" is out of stock.`);
-                            // You can handle the out of stock scenario here, such as removing the item from the cart or notifying the user.
-                            // For example:
-                            return res.redirect('/checkout');
+                            outOfStockMessage = `Product "${foundProduct.productname}" is out of stock.`;
+                          
+                          ;
                         } else {
                             foundProduct.stockquantity -= item.quantity;
                             await foundProduct.save();
@@ -676,6 +711,10 @@ const placeorder = async (req, res) => {
                         }
                     };
 
+                    if (outOfStockMessage) {
+                        // If there's an out-of-stock message, reload the cart page with the message
+                        return res.render('cart', { error: outOfStockMessage,isLoggedIn: isLoggedIn(req, res),user, cus: currentUser, cartProducts: updatedCart });
+                    }
                     // Update the user's cart with the items that are still in stock
                     currentUser.cart = updatedCart;
                     await currentUser.save();
@@ -767,6 +806,8 @@ const saveRzpOrder = async (req, res, next) => {
         const user = req.session.user_id
         const currentUser = await User.findById(req.session.user_id).populate("cart.product")
         const Delivery = await address.findOne({ user: req.session.user_id, default: true })
+        const newuser =  await User.findById(req.session.user_id)
+        const cartProducts = newuser.cart;
 
         const grandTotal = currentUser.cart.reduce((total, element) => {
             return total + (element.quantity * element.product.price);
