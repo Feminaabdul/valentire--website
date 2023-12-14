@@ -94,18 +94,28 @@ const loadLogout = async (req,res)=>{
 }
 const loadorder = async (req, res) => {
     try {
-        
+        const page = parseInt(req.params.page) || 1;
+        const pageSize = 3;
+        const skip = (page - 1) * pageSize;
+        const totalOrders = await Order.countDocuments();
+        const totalPages = Math.ceil(totalOrders / pageSize);
         const odd = await Order.find({ })
+        .sort({ createdAt: -1 })
             .populate([
                 { path: 'user', model: 'User' },
                 { path: 'Address', model: 'Address' },
                 { path: 'products.productId', model: 'product' }
-            ]);
+            ])
+            .skip(skip)
+            .limit(pageSize);
 
          
-        res.render('order', { odd });
+        res.render('order', { odd , 
+            currentPage: page || 1,
+            totalPages: totalPages || 1,});
     } catch (error) {
         console.log(error.message);
+        res.status(500).send('Internal Server Error');
     }
 }
 
@@ -120,10 +130,14 @@ const update=async(req,res)=>{
         );
     
         if (!order) {
-          return res.status(404).redirect('/order');
+            // res.redirect(`/order/${req.params.page}`);
+            return res.redirect(`/admin/order/1`);
         }
+        return res.redirect(`/admin/order/1`);
+
   } catch(error){
   console.log(error.message);
+  res.status(500).json({ error: 'Internal Server Error' });
   }
 }
 

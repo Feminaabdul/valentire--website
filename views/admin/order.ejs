@@ -1,5 +1,9 @@
 <%-include('../layouts/adminlayout/header.ejs')%>
-
+<style>
+    .card-header {
+        margin-bottom: -113px;  
+    }
+</style>
 
     <!--**********************************
             Sidebar end
@@ -8,35 +12,29 @@
     <!--**********************************
             Content body start
         ***********************************-->
-    <div class="content-body">
-        <div class="container-fluid">
-            <div class="row page-titles mx-0">
-                <div class="col-sm-6 p-md-0">
-                    <div class="welcome-text">
-                        <h4>Hi, welcome back!</h4>
-                        <p class="mb-0">Your business dashboard template</p>
+        <div class="content-body">
+            <div class="container-fluid">
+                <div class="row page-titles mx-0">
+                    <div class="col-sm-6 p-md-0">
+                        <div class="welcome-text">
+                            <h4>Hi, welcome back!</h4>
+                            <p class="mb-0">Your business dashboard template</p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="javascript:void(0)">Table</a></li>
+                            <li class="breadcrumb-item active"><a href="javascript:void(0)">Bootstrap</a></li>
+                        </ol>
                     </div>
                 </div>
-                <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="javascript:void(0)">Table</a></li>
-                        <li class="breadcrumb-item active"><a href="javascript:void(0)">Bootstrap</a></li>
-                    </ol>
-                </div>
-            </div>
             <!-- row -->
 
             <div class="row">
-
-
-
-
-
-
                 <div class="col-lg-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4 class="card-title">Responsive Table</h4>
+                            <h4 class="card-title">Orders</h4>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
@@ -58,10 +56,10 @@
                                                     <td><p href="javascript:void(0)">
                                                             <%= product.productId.productname %> <br>
                                                             <%= product.productId.category%>,<br>
-
                                                             <%= product.productId.description%></td><br>
                         
-                                                    </p></td>
+                                                    </p>
+                                                   </td>
                                                     <td>
                                                         <%= order.Address.name %><br>
                                                             <%= order.Address.building %>, <%= order.Address.area %><br>
@@ -117,6 +115,57 @@
     <!--**********************************
             Content body end
         ***********************************-->
+        odd
+
+
+        <% if (odd.length) { %>
+            <div class="container">
+              <div class="d-flex justify-content-end">
+                <nav aria-label="Page navigation">
+                  <ul class="pagination">
+                    <% if (currentPage > 1) { %>
+                    <li class="page-item">
+                        <a class="page-link" href="/order/<%= currentPage - 1 %>" aria-label="Previous">
+
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                      </a>
+                    </li>
+                    <% } %>
+                    <% for (let i=1; i <= totalPages; i++) { %>
+                    <% if (i === currentPage) { %>
+                    <li class="page-item">
+                      <a class="page-link bg-primary text-light" href="/admin/order/<%= i %>"><%= i %></a>
+                    </li>
+                    <% } else { %>
+                    <li class="page-item">
+                      <a class="page-link" href="/admin/order/<%= i %>"><%= i %></a>
+                    </li>
+                    <% } %>
+                    <% } %>
+                    <% if (currentPage < totalPages) { %>
+                    <li class="page-item">
+                      <a class="page-link" href="/admin/order/<%= currentPage + 1 %>" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                      </a>
+                    </li>
+                    <% } %>
+                  </ul>
+                </nav>
+              </div>
+            </div>
+            <% } %>
+
+
+
+
+
+
+
+
+
+
 
 
     <!--**********************************
@@ -149,9 +198,9 @@
         Scripts
     ***********************************-->
     <!-- Required vendors -->
-    <script src="./vendor/global/global.min.js"></script>
-    <script src="./js/quixnav-init.js"></script>
-    <script src="./js/custom.min.js"></script>
+    <script src="/Admins/vendor/global/global.min.js"></script>
+    <script src="/Admins/js/quixnav-init.js"></script>
+    <script src="/Admins/js/custom.min.js"></script>
 
 
     </body>
