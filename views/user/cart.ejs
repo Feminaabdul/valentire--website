@@ -1,289 +1,269 @@
 <%-include("../layouts/userlayout/header.ejs")%>
 
-<div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
+<style>
+  .card {
+  overflow: hidden; /* This removes the scroll and overflow */
+}
+
+    .card-body {
+      width: 566px;
+      padding-left: 8px;
+    }
+    .oval {
+        border-radius: 100%;
+        border: 1rem solid #fff;
+    }
+    .card-img {
+      width: 266px;
+    }
+   
+    .container {
+      max-width: 1044px;
+  }    .ml-2, .mx-2 {
+    margin-left: 5.5rem 
+}
+  .form-control {
+    width: 46%;
+
+  }
+  .no-gutters {
+    margin-right: 60px;
+    margin-left: 47px;
+}
+.row{
+  width: 895px;
+}
+.card-text {
+    max-width: 500px; /* Adjust the maximum width as needed */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  p {
+    margin-top: -5px;
+    margin-bottom: 0rem;}
+  </style>
+  <div class="hero-wrap hero-bread" style="background-image: url('images/bg_6.jpg');">
     <div class="container">
-        <div class="row no-gutters slider-text align-items-center justify-content-center">
-            <div class="col-md-9 ftco-animate text-center">
-                <p class="breadcrumbs"><span class="mr-2"><a href="/">Home</a></span> <span>Cart</span></p>
-                <h1 class="mb-0 bread">CART</h1>
-            </div>
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-9 ftco-animate text-center">
+          <p class="breadcrumbs"><span class="mr-2"><a href="/">Home</a></span> <span>Cart</span></p>
+          <h1 class="mb-0 bread">CART</h1>
         </div>
+      </div>
     </div>
-</div>
-
-    <section class="ftco-section ftco-cart">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12 ftco-animate">
-                    <div class="cart-list">
-                        <table class="table">
-                            <thead class="thead-primary">
-                                <tr class="text-center">
-                                    <th>image</th>
-                                    <th>Product</th>
-                                    <th>Price</th>
-                                    <th>Quantity</th>
-                                    <th>Total</th>
-                                    <th>remove</th>
-                                </tr>
-                            </thead>
+  </div>
+  <section class="ftco-section ftco-cart">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12 ftco-animate">
+          <div class="cart-list">
+           
 
 
-                            <tbody>
-                                <% if (cus.cart) { %>
-                                    <% for (let i=0; i < cus.cart.length; i++) { %>
-                                        <% cartProducts.forEach((cartItem)=> { %>
-                                          
-                                        <tr class="text-center">
-
-                                            <td class="image-prod">
-                                                <img class="image"
-                                                    src="/Admins/productImages/<%= cus.cart[i].product.image[0] %>"
-                                                    alt="<%= cus.cart[i].product.productname %>" height="100px"
-                                                    width="100px">
-                                            </td>
-
-                                            <td class="product-name">
-                                                <h3>
-                                                    <%= cus.cart[i].product.productname %>
-                                                </h3>
-                                                <p>
-                                                    <%= cus.cart[i].product.description %>
-                                                </p>
-                                            </td>
-                                            <p>Stock: <%= cartItem.product.stockquantity %>
-                                            </p>
-                                            <p class="text-danger" id="stock_<%= cartItem._id %>" style="display: none;">
-                                              Insufficient stock
-                                            </p>
-
-
-
-
-
-
-
-
-
-
-
-                                           
-
-                                            <td class="quantity">
-                                                <div class="input-group mb-3">
-                                                    <button class="btn btn-outline-primary p-2" type="button"
-                                                        onclick="updateCartItem('<%= cus.cart[i].product._id %>', 'decrement')">&minus;</button>
-                                                    <input type="text" name="quantity"
-                                                        class="quantity form-control input-number mx-2"
-                                                        value="<%= cus.cart[i].quantity %>"
-                                                        id="quantityElement_<%= cus.cart[i].product._id %>" min="1"
-                                                        max="100" readonly>
-                                                    <button class="btn btn-outline-primary p-2" type="button"
-                                                        onclick="updateCartItem('<%=cus.cart[i].product._id %>', 'increment')">&plus;</button>
-                                                </div>
-                                            </td>
-
-                                            <td class="total">
-                                                <span id="totalPrice_<%= cus.cart[i].product._id %>">
-                                                    <%= (cus.cart[i].product.price * cus.cart[i].quantity).toFixed(2) %>
-                                                </span>
-                                            </td>
-                                            <td class="product-remove">
-                                                <a href="/remove-from-cart/<%= cus.cart[i].product._id %>"><span
-                                                        class="ion-ios-close"></span></a>
-                                            </td>
-
-
-
-                                        </tr>
-                                        
-                                        <% if (cartItem.product.stockquantity < cus.cart[i].quantity) { %>
-                                            <td colspan="6" class="text-danger">
-                                                Insufficient stock for
-                                                <%= cus.cart[i].product.productname %>.
-                                            </td>
-                                        <% } else { %>
-                                         
-                                        <% } %>
-                                        <% }) %>
-                                        <% } %>
-                                            <% } else { %>
-                                                <tr>
-                                                    <td colspan="6">Cart is empty</td>
-                                                </tr>
-                                                <% } %>
-
-                            </tbody>
-
-                        </table>
-                      
-
+            <% if (cus.cart.length) { %>
+              <% for (let i=0; i < cus.cart.length; i++) { %>
+                <div class="card mb-3">
+                  <div class="row no-gutters">
+                    <div class="col-md-4">
+                      <img src="/Admins/productImages/<%= cus.cart[i].product.image[0] %>" class="card-img oval" alt="<%= cus.cart[i].product.productname %>">
                     </div>
-
+                    <div class="col-md-8">
+                      <div class="card-body">
+                        <h5 class="card-title"><%= cus.cart[i].product.productname %></h5>
+                        <p class="card-text"><%= cus.cart[i].product.description %></p>
+                        <p class="card-text">Price: <%= cus.cart[i].product.price.toFixed(2) %></p>
+                        <p class="card-text">Quantity:
+                          <button class="btn btn-outline-primary p-2" type="button" onclick="updateCartItem('<%= cus.cart[i].product._id %>', 'decrement')">&minus;</button>
+                          <input type="text" name="quantity" class="quantity text-center input-number mx-2" value="<%= cus.cart[i].quantity %>" id="quantityElement_<%= cus.cart[i].product._id %>" min="1" max="100" readonly>
+                          <button class="btn btn-outline-primary p-2" type="button" onclick="updateCartItem('<%= cus.cart[i].product._id %>', 'increment')">&plus;</button>
+                        </p>
+                        <p class="card-text">Total: <span id="totalPrice_<%= cus.cart[i].product._id %>"><%= (cus.cart[i].product.price * cus.cart[i].quantity).toFixed(2) %></span></p>
+                        <a href="/remove-from-cart/<%= cus.cart[i].product._id %>" class="btn btn-danger">Remove</a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-
-            </div>
-
-            <!-- <% if (insufficientStockProduct) { %>
-                <p class="col-md-12 text-danger">
-                  Insufficient stocks. Please check your cart item's
-                  quantities
-                </p>
-                <% } %> -->
-            
-                <div class="text-right">
-                    <a class="btn btn-primary px-2 mt-2" id="proceedBtn" href="/checkout">Proceed to Checkout</a>
-                </div>
+              <% } %>
+            <% } else { %>
+              <div class="alert alert-info" role="alert">
+                Cart is empty
+              </div>
+            <% } %>
+          </div>
         </div>
+      </div>
+  
+      <% if (insufficientStockProduct) { %>
+        <p class="col-md-12 text-danger">
+          Insufficient stocks. Please check your cart item's quantities
+        </p>
+      <% } %>
+  <div>
 
-    </section>
 
-
-    <footer class="ftco-footer ftco-section">
-        <div class="container">
-            <div class="row">
-                <div class="mouse">
-                    <a href="#" class="mouse-icon">
-                        <div class="mouse-wheel"><span class="ion-ios-arrow-up"></span></div>
-                    </a>
-                </div>
-            </div>
-            <div class="row mb-5">
-                <div class="col-md">
-                    <div class="ftco-footer-widget mb-4">
-                        <h2 class="ftco-heading-2">Minishop</h2>
-                        <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
-                        <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
-                            <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
-                            <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
-                            <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md">
-                    <div class="ftco-footer-widget mb-4 ml-md-5">
-                        <h2 class="ftco-heading-2">Menu</h2>
-                        <ul class="list-unstyled">
-                            <li><a href="#" class="py-2 d-block">Shop</a></li>
-                            <li><a href="#" class="py-2 d-block">About</a></li>
-                            <li><a href="#" class="py-2 d-block">Journal</a></li>
-                            <li><a href="#" class="py-2 d-block">Contact Us</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="ftco-footer-widget mb-4">
-                        <h2 class="ftco-heading-2">Help</h2>
-                        <div class="d-flex">
-                            <ul class="list-unstyled mr-l-5 pr-l-3 mr-4">
-                                <li><a href="#" class="py-2 d-block">Shipping Information</a></li>
-                                <li><a href="#" class="py-2 d-block">Returns &amp; Exchange</a></li>
-                                <li><a href="#" class="py-2 d-block">Terms &amp; Conditions</a></li>
-                                <li><a href="#" class="py-2 d-block">Privacy Policy</a></li>
-                            </ul>
-                            <ul class="list-unstyled">
-                                <li><a href="#" class="py-2 d-block">FAQs</a></li>
-                                <li><a href="#" class="py-2 d-block">Contact</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md">
-                    <div class="ftco-footer-widget mb-4">
-                        <h2 class="ftco-heading-2">Have a Questions?</h2>
-                        <div class="block-23 mb-3">
-                            <ul>
-                                <li><span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain
-                                        View, San Francisco, California, USA</span></li>
-                                <li><a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929
-                                            210</span></a></li>
-                                <li><a href="#"><span class="icon icon-envelope"></span><span
-                                            class="text">info@yourdomain.com</span></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12 text-center">
-
-                    <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy;
-                        <script>document.write(new Date().getFullYear());</script> All rights reserved | This template
-                        is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a
-                            href="https://colorlib.com" target="_blank">Colorlib</a>
-                        <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                    </p>
-                </div>
-            </div>
+    <h2>Total Amount: <p id="totalAmount"><%=totals %></p>
+    </h2>
+  </div>
+      <div class="">
+        <a class="btn btn-primary  px-2 mt-2" id="proceedBtn" href="/checkout">Proceed to Checkout</a>
+      </div>
+      
+    </div>
+  </section>
+  
+  
+  <footer class="ftco-footer ftco-section">
+    <div class="container">
+      <div class="row">
+        <div class="mouse">
+          <a href="#" class="mouse-icon">
+            <div class="mouse-wheel"><span class="ion-ios-arrow-up"></span></div>
+          </a>
         </div>
-    </footer>
+      </div>
+      <div class="row mb-5">
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4">
+            <h2 class="ftco-heading-2">Minishop</h2>
+            <p>Far far away, behind the word mountains, far from the countries Vokalia and Consonantia.</p>
+            <ul class="ftco-footer-social list-unstyled float-md-left float-lft mt-5">
+              <li class="ftco-animate"><a href="#"><span class="icon-twitter"></span></a></li>
+              <li class="ftco-animate"><a href="#"><span class="icon-facebook"></span></a></li>
+              <li class="ftco-animate"><a href="#"><span class="icon-instagram"></span></a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4 ml-md-5">
+            <h2 class="ftco-heading-2">Menu</h2>
+            <ul class="list-unstyled">
+              <li><a href="#" class="py-2 d-block">Shop</a></li>
+              <li><a href="#" class="py-2 d-block">About</a></li>
+              <li><a href="#" class="py-2 d-block">Journal</a></li>
+              <li><a href="#" class="py-2 d-block">Contact Us</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="ftco-footer-widget mb-4">
+            <h2 class="ftco-heading-2">Help</h2>
+            <div class="d-flex">
+              <ul class="list-unstyled mr-l-5 pr-l-3 mr-4">
+                <li><a href="#" class="py-2 d-block">Shipping Information</a></li>
+                <li><a href="#" class="py-2 d-block">Returns &amp; Exchange</a></li>
+                <li><a href="#" class="py-2 d-block">Terms &amp; Conditions</a></li>
+                <li><a href="#" class="py-2 d-block">Privacy Policy</a></li>
+              </ul>
+              <ul class="list-unstyled">
+                <li><a href="#" class="py-2 d-block">FAQs</a></li>
+                <li><a href="#" class="py-2 d-block">Contact</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md">
+          <div class="ftco-footer-widget mb-4">
+            <h2 class="ftco-heading-2">Have a Questions?</h2>
+            <div class="block-23 mb-3">
+              <ul>
+                <li><span class="icon icon-map-marker"></span><span class="text">203 Fake St. Mountain
+                    View, San Francisco, California, USA</span></li>
+                <li><a href="#"><span class="icon icon-phone"></span><span class="text">+2 392 3929
+                      210</span></a></li>
+                <li><a href="#"><span class="icon icon-envelope"></span><span class="text">info@yourdomain.com</span></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12 text-center">
+  
+          <p>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+            Copyright &copy;
+            <script>
+              document.write(new Date().getFullYear());
+            </script> All rights reserved | This template
+            is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib</a>
+            <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  
+  
+  
+  <!-- loader -->
+  <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
+      <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
+      <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10" stroke="#F96D00" />
+    </svg></div>
+  
+  
+  <script src="js/jquery.min.js"></script>
+  <script src="js/jquery-migrate-3.0.1.min.js"></script>
+  <script src="js/popper.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/jquery.easing.1.3.js"></script>
+  <script src="js/jquery.waypoints.min.js"></script>
+  <script src="js/jquery.stellar.min.js"></script>
+  <script src="js/owl.carousel.min.js"></script>
+  <script src="js/jquery.magnific-popup.min.js"></script>
+  <script src="js/aos.js"></script>
+  <script src="js/jquery.animateNumber.min.js"></script>
+  <script src="js/bootstrap-datepicker.js"></script>
+  <script src="js/scrollax.min.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
+  <script src="js/google-map.js"></script>
+  <script src="js/main.js"></script>
+  
+  <script>
+    // update cart
+    function updateCartItem(cartItemId, incOrDec) {
+      console.log(cartItemId);
+      const data = {
+        type: incOrDec
+      };
+      $.ajax({
+        url: '/update-cart/' + cartItemId,
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        success: function(response) {
+          if (response.message === "Insufficient stock.") {
+            const stockErrorElement = document.getElementById(`stock_${cartItemId}`);
+            stockErrorElement.style.display = 'block';
+          } else {
+            $('#totalPrice_' + cartItemId).text(response.totalPrice.toFixed(2));
+            $('#grandTotalPrice').text(response.grandTotal.toFixed(2));
+            $('#quantityElement_' + cartItemId).val(response.quantity);
+
+            const totalAmountElement = document.getElementById('totalAmount');
+          totalAmountElement.textContent = response.totals.toFixed(2);
 
 
 
-    <!-- loader -->
-    <div id="ftco-loader" class="show fullscreen"><svg class="circular" width="48px" height="48px">
-            <circle class="path-bg" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke="#eeeeee" />
-            <circle class="path" cx="24" cy="24" r="22" fill="none" stroke-width="4" stroke-miterlimit="10"
-                stroke="#F96D00" />
-        </svg></div>
-
-
-    <script src="js/jquery.min.js"></script>
-    <script src="js/jquery-migrate-3.0.1.min.js"></script>
-    <script src="js/popper.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/jquery.easing.1.3.js"></script>
-    <script src="js/jquery.waypoints.min.js"></script>
-    <script src="js/jquery.stellar.min.js"></script>
-    <script src="js/owl.carousel.min.js"></script>
-    <script src="js/jquery.magnific-popup.min.js"></script>
-    <script src="js/aos.js"></script>
-    <script src="js/jquery.animateNumber.min.js"></script>
-    <script src="js/bootstrap-datepicker.js"></script>
-    <script src="js/scrollax.min.js"></script>
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBVWaKrjvy3MaE7SQ74_uJiULgl1JY0H2s&sensor=false"></script>
-    <script src="js/google-map.js"></script>
-    <script src="js/main.js"></script>
-
-    <script>
-        // update cart
-        function updateCartItem(cartItemId, incOrDec) {
-            console.log(cartItemId);
-            const data = {
-                type: incOrDec
-            };
-            $.ajax({
-                url: '/update-cart/' + cartItemId,
-                type: 'POST',
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                success: function (response) {
-                    if (response.message === "Insufficient stock.") {
-                        const stockErrorElement = document.getElementById(`stock_${cartItemId}`);
-                        stockErrorElement.style.display = 'block';
-                    } else {
-                        $('#totalPrice_' + cartItemId).text(response.totalPrice.toFixed(2));
-                        $('#grandTotalPrice').text(response.grandTotal.toFixed(2));
-                        $('#quantityElement_' + cartItemId).val(response.quantity);
-                        const stockErrorElement = document.getElementById(`stock_${cartItemId}`);
-                        if (response.insufficientStock) {
-                            stockErrorElement.style.display = 'block';
-                            proceedBtn.classList.add('disabled-link');
-                        } else {
-                            stockErrorElement.style.display = 'none';
-                            proceedBtn.classList.remove('disabled-link');
-                        }
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.log(status);
-                }
-            });
+            const stockErrorElement = document.getElementById(`stock_${cartItemId}`);
+            if (response.insufficientStock) {
+              stockErrorElement.style.display = 'block';
+              proceedBtn.classList.add('disabled-link');
+            } else {
+              stockErrorElement.style.display = 'none';
+              proceedBtn.classList.remove('disabled-link');
+            }
+          }
+        },
+        error: function(xhr, status, error) {
+          console.log(status);
         }
-    </script>
-
-    </body>
-
-    </html>
+      });
+    }
+  </script>
+  
+  
+  </body>
+  
+  </html>

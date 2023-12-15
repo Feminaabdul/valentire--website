@@ -24,7 +24,13 @@ const loadcart = async (req, res) => {
         const total = cus.cart.reduce((total, item) => {
             total + item.total
         }, 0)
-        res.render('cart', { isLoggedIn: isLoggedIn(req, res),user, cus, total,cartProducts,currentUser ,  insufficientStockProduct: '',})
+
+        const totals =cus.cart.reduce((total, item) => {
+            return total + (item.product.price * item.quantity)
+
+        }, 0)
+
+        res.render('cart', { isLoggedIn: isLoggedIn(req, res),user, cus, total,totals,cartProducts,currentUser ,  insufficientStockProduct: '',})
     } catch (error) {
         console.log(error.message);
     }

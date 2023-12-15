@@ -1,8 +1,28 @@
 <%-include('../layouts/adminlayout/header.ejs')%>
 <style>
-    .card-header {
-        margin-bottom: -113px;  
+  .btn-info {
+    background-color:#464d74;
+    border-color:rgb(106, 122, 214);
+    color: #ffffff;
+    
+  }
+
+  .oval {
+        border-radius: 100%;
+        border: 1rem solid #fff;
     }
+    .card-body {
+    padding: 20px;
+  }
+  .btn-info:hover {
+    color: #212529;
+    background-color:rgb(89, 103, 176);
+    border-color: rgb(57, 66, 115);
+    color: #ffffff;
+}
+  .card {
+    margin-bottom: 20px;
+  }
 </style>
 
     <!--**********************************
@@ -17,105 +37,64 @@
                 <div class="row page-titles mx-0">
                     <div class="col-sm-6 p-md-0">
                         <div class="welcome-text">
-                            <h4>Hi, welcome back!</h4>
-                            <p class="mb-0">Your business dashboard template</p>
+                            <h4>ORDERS</h4>
+                            
                         </div>
                     </div>
                     <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
-                        <ol class="breadcrumb">
+                        <!-- <ol class="breadcrumb">
                             <li class="breadcrumb-item"><a href="javascript:void(0)">Table</a></li>
                             <li class="breadcrumb-item active"><a href="javascript:void(0)">Bootstrap</a></li>
-                        </ol>
+                        </ol> -->
                     </div>
                 </div>
-            <!-- row -->
+           
 
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="card">
-                        <div class="card-header">
-                            <h4 class="card-title">Orders</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table header-border table-responsive-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>product</th>
-                                            <th>Delivery Address</th>
-                                            <th>payment type</th>
-                                            <th>date</th>
-                                            <th>total</th>
-                                            <th>status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% odd.forEach(order=> { %>
-                                            <% order.products.forEach((product)=> { %>
-                                                <tr>
-                                                    <td><p href="javascript:void(0)">
-                                                            <%= product.productId.productname %> <br>
-                                                            <%= product.productId.category%>,<br>
-                                                            <%= product.productId.description%></td><br>
-                        
-                                                    </p>
-                                                   </td>
-                                                    <td>
-                                                        <%= order.Address.name %><br>
-                                                            <%= order.Address.building %>, <%= order.Address.area %><br>
-                                                                    <%= order.Address.city %>, <%= order.Address.state
-                                                                            %><br>
-                                                                            <%= order.Address.pincode %>
-                                                    </td>
-                                                    <td>
-                                                        <%= order.paymentMethod %>
-                                                    </td>
-                                                    <td>
-                                                        <%= order.createdAt.toDateString() %>
-                                                    </td>
-                                                    <td>&#8377;<%= order.totalAmount %>
-                                                    </td>
-                                                    <td>
-                                                        <div class="btn-container">
-                                                            <form action="/admin/order/<%= order._id %>/change-status" method="POST">
-                                                                <select name="newStatus">
-
-                                                                  <option value="<%=order.status%>"><%=order.status%></option>
-
-                                                                  <option value="Order Pending" <% if (order.status === "Order Pending") { %> selected <% } %>>Order Pending</option>
-                                                                  <option value="Delivered" <% if (order.status === "Delivered") { %> selected <% } %>>Delivered</option>
-                                                                  <option value="Cancelled" <% if (order.status === "Cancelled") { %> selected <% } %>>Cancelled</option>
-                                                                  <option value="shipped" <% if (order.status === "shipped") { %> selected <% } %>>shipped</option>
-                                                                  <option value="shipped" <% if (order.status === "return") { %> selected <% } %>>return</option>
-                                                                  <!-- Add more status options as needed -->
-                                                                </select>
-                                                                <button type="submit" class="btn btn-info">Update Status</button>
-                                                              </form>
-                                                              
-                                                        </div>
-                                                    </td>
-
-                                                </tr>
-                                                <% }) %>
-                                                    <% }) %>
-
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-
+            
+    <div class="row">
+        <% odd.forEach(order => { %>
+          <% order.products.forEach((product)=> { %> 
+          
+          <div class="col-lg-4">
+            <div class="card">
+              <div class="card-header">
+               
+              </div>
+              <div class="card-body">
+                <ul class="list-group list-group-flush">
+                  <img class="oval" style="height: 100px; width: 100px;"  src="/Admins/productImages/<%= product.productId.image[0] %>" alt="<%= product.productId.productname %>">
+                  <li class="list-group-item"><strong>Product:</strong> <%= order.products[0].productId.productname %></li>
+                  <li class="list-group-item"><strong>Delivery Address:</strong> <%= order.Address.name %>, <%= order.Address.building %>, <%= order.Address.area %>, <%= order.Address.city %>, <%= order.Address.state %>, <%= order.Address.pincode %></li>
+                  <li class="list-group-item"><strong>Payment Type:</strong> <%= order.paymentMethod %></li>
+                  <li class="list-group-item"><strong>Date:</strong> <%= order.createdAt.toDateString() %></li>
+                  <li class="list-group-item"><strong>Total:</strong> &#8377;<%= order.totalAmount %></li>
+                  <li class="list-group-item">
+                    <strong>Status:</strong>
+                    <form action="/admin/order/<%= order._id %>/change-status" method="POST">
+                      <select name="newStatus">
+                        <option value="<%= order.status %>"><%= order.status %></option>
+                        <option value="Order Pending" <% if (order.status === "Order Pending") { %> selected <% } %>>Order Pending</option>
+                        <option value="Delivered" <% if (order.status === "Delivered") { %> selected <% } %>>Delivered</option>
+                        <option value="Cancelled" <% if (order.status === "Cancelled") { %> selected <% } %>>Cancelled</option>
+                        <option value="shipped" <% if (order.status === "shipped") { %> selected <% } %>>Shipped</option>
+                        <option value="return" <% if (order.status === "return") { %> selected <% } %>>Return</option>
+                        <!-- Add more status options as needed -->
+                      </select>
+                      <button type="submit" class="btn btn-info">Update Status</button>
+                    </form>
+                  </li>
+                </ul>
+              </div>
             </div>
-        </div>
-    </div>
+          </div>
+          <% }) %> 
+        <% }) %>
+      </div>
+  
     <!--**********************************
             Content body end
         ***********************************-->
-        odd
+
 
 
         <% if (odd.length) { %>
