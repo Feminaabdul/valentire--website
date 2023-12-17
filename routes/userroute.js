@@ -14,7 +14,7 @@ userroute.get('/',auth.checkToBlock, usercontroller.loadHome)
 userroute.get('/changepassword',auth.checkToBlock, usercontroller.changepassord)
 userroute.get('/login', auth.isLogout, usercontroller.loadlogin)
 userroute.get('/wishlist',auth.checkToBlock, auth.isLogin, usercontroller.loadwish)
-userroute.route('/shop',auth.checkToBlock, auth.isLogin)
+userroute.route('/shop/:page',auth.checkToBlock, auth.isLogin)
     .get(usercontroller.loadshop) // Handle GET requests to /shop
     .post(usercontroller.loadshop); // Handle POST requests to /shop
 

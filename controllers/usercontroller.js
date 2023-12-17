@@ -61,21 +61,30 @@ const loadlogin = async (req, res) => {
 
 const loadshop = async (req, res) => {
     try {
+        const page = parseInt(req.params.page) || 1;
+        const pageSize = 3;
+        const skip = (page - 1) * pageSize;
+        const totalOrders = await Order.countDocuments();
+        const totalPages = Math.ceil(totalOrders / pageSize);
         const user = await User.findById(req.session.user_id)
 
         let product
         if (req.query.material) {
-            product = await products.find({ status: true, material: req.query.material })
+            product = await products.find({ status: true, material: req.query.material }).skip(skip)
+            .limit(pageSize);
         } else {
-            product = await products.find({ status: true })
+            product = await products.find({ status: true }).skip(skip)
+            .limit(pageSize);
         }
 
         let category
         if (req.query.category) {
 
-            product = await products.find({ status: true, category: req.query.category })
+            product = await products.find({ status: true, category: req.query.category }).skip(skip)
+            .limit(pageSize);
         } else {
-            category = await catagories.find({})
+            category = await catagories.find({}).skip(skip)
+            .limit(pageSize);
         }
 
         if (req.query.filtered) {
@@ -113,14 +122,18 @@ const loadshop = async (req, res) => {
             }
 
             if (data.desc === 'true') {
-                product = await products.find(query).sort({ price: 1 });
+                product = await products.find(query).sort({ price: 1 }).skip(skip)
+                .limit(pageSize);
             } else if (data.desc === 'false') {
-                product = await products.find(query).sort({ price: -1 });
+                product = await products.find(query).sort({ price: -1 }).skip(skip)
+                .limit(pageSize);
             } else {
-                product = await products.find(query);
+                product = await products.find(query).skip(skip)
+                .limit(pageSize);
             }
         }
-        res.render('shop', { isLoggedIn: isLoggedIn(req, res), user, product: product, category: category })
+        res.render('shop', { isLoggedIn: isLoggedIn(req, res), user, product: product, category: category, currentPage: page || 1,
+            totalPages: totalPages || 1, })
     } catch (error) {
         console.log(error.message);
     }
@@ -831,7 +844,8 @@ const placeorder = async (req, res) => {
 
         );
 
-
+       
+    
         res.redirect('/ordersuccess')
     } catch (error) {
         console.log(error.message);
