@@ -4,7 +4,10 @@
   .card {
   overflow: hidden; /* This removes the scroll and overflow */
 }
-
+.cart-detail {
+    width: 58%;
+    display: block;
+}
     .card-body {
       width: 566px;
       padding-left: 8px;
@@ -84,6 +87,30 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-md-10 d-flex">
+                  <div class="cart-detail cart-total bg-light p-3 p-md-4">
+                    <h3 class=" text-center mb-4">Cart Total</h3>
+                    <p class= "form-group text-center d-flex">
+                      
+                      <span>Subtotal  </span>
+                      <span>  &#8377;<%= totals %></span>
+                    </p>
+                    <p class="d-flex text-center">
+                      <span>Delivery</span>
+                      <span>&#8377;10.00</span>
+                    </p>
+                    <p class="d-flex text-center">
+                      <span>Discount</span>
+                      <span>&#8377;0.00</span>
+                    </p>
+                    <hr>
+                    <p class="d-flex text-center total-price">
+                      <span>Total</span>
+                      <span>&#8377;<%= totals+10 %><span>
+              
+                    </p>
+                  </div>
+                </div>
               <% } %>
             <% } else { %>
               <div class="alert alert-info" role="alert">
@@ -91,8 +118,10 @@
               </div>
             <% } %>
           </div>
+         
         </div>
-      </div>
+      </div> 
+      
   
       <% if (insufficientStockProduct) { %>
         <p class="col-md-12 text-danger">
@@ -104,6 +133,7 @@
 
     </h2>
   </div>
+
       <div class="">
         <a class="btn btn-primary  px-2 mt-2" id="proceedBtn" href="/checkout">Proceed to Checkout</a>
       </div>

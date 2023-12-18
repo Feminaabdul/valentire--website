@@ -14,11 +14,17 @@ userroute.get('/',auth.checkToBlock, usercontroller.loadHome)
 userroute.get('/changepassword',auth.checkToBlock, usercontroller.changepassord)
 userroute.get('/login', auth.isLogout, usercontroller.loadlogin)
 userroute.get('/wishlist',auth.checkToBlock, auth.isLogin, usercontroller.loadwish)
-userroute.route('/shop/:page',auth.checkToBlock, auth.isLogin)
-    .get(usercontroller.loadshop) // Handle GET requests to /shop
-    .post(usercontroller.loadshop); // Handle POST requests to /shop
+// userroute.route('/shop/:page',auth.checkToBlock, auth.isLogin)
+//     .get(usercontroller.loadshop) // Handle GET requests to /shop
+//     .post(usercontroller.loadshop); // Handle POST requests to /shop
+
+userroute.get('/shop/:page',auth.checkToBlock,usercontroller.loadshop)
+userroute.post('/shop/:page',auth.checkToBlock,usercontroller.loadshop)
+
 
 userroute.get('/shopdetail/:id',auth.checkToBlock, usercontroller.loadshopdetail)
+
+
 userroute.get('/forget-password', usercontroller.loadpassword)
 userroute.post('/forget-password', usercontroller.forgetverify)
 userroute.get('/reset-password', usercontroller.lodreset)

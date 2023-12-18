@@ -62,7 +62,7 @@ const loadlogin = async (req, res) => {
 const loadshop = async (req, res) => {
     try {
         const page = parseInt(req.params.page) || 1;
-        const pageSize = 3;
+        const pageSize = 5;
         const skip = (page - 1) * pageSize;
         const totalOrders = await Order.countDocuments();
         const totalPages = Math.ceil(totalOrders / pageSize);
@@ -106,7 +106,7 @@ const loadshop = async (req, res) => {
 
             const query = {
                 status: true,
-            };
+            }
 
             if (!isNaN(min) && !isNaN(max)) {
                 query.price = { $gte: min, $lte: max }
@@ -117,7 +117,7 @@ const loadshop = async (req, res) => {
                     { productname: { $regex: data.search, $options: 'i' } },
                     { description: { $regex: `\\b${data.search}\\b`, $options: 'i' } }
 
-                ];
+                ]
 
             }
 
@@ -428,17 +428,9 @@ const loadcheckout = async (req, res) => {
                
             });
         }
-       
-    
-    
-    
+   
     
     }
-
-
-
-
-
 
 
     } catch (error) {
@@ -740,6 +732,9 @@ const placeorder = async (req, res) => {
                     }
                     // Update the user's cart with the items that are still in stock
                     currentUser.cart = updatedCart;
+                      // Update the user's cart after processing the order
+                currentUser.cart = currentUser.cart.filter(cartItem => cartItem.product._id.toString() !== item.product._id.toString());
+                
                     await currentUser.save();
                     await orderedProduct.save();
 
@@ -802,6 +797,8 @@ const placeorder = async (req, res) => {
                     }
                     // Update the user's cart with the items that are still in stock
                     currentUser.cart = updatedCart;
+                    currentUser.cart = currentUser.cart.filter(cartItem => cartItem.product._id.toString() !== item.product._id.toString());
+                
                     await currentUser.save();
                     await orderedProduct.save();
                     console.log("amoikujyhgf",grandTotal)
@@ -886,6 +883,7 @@ const saveRzpOrder = async (req, res, next) => {
                 } else {
                     foundProduct.stockquantity -= item.quantity;
                     await foundProduct.save();
+                   
                     updatedCart.push(item);
                 }
             };
@@ -897,7 +895,8 @@ const saveRzpOrder = async (req, res, next) => {
 
             // Update the user's cart with the items that are still in stock
             currentUser.cart = updatedCart;
-            await currentUser.save();
+              
+           
             currentUser.cart.map(async (item) => {
                 const orderedProduct = new Order({
                     user: user,
@@ -914,6 +913,8 @@ const saveRzpOrder = async (req, res, next) => {
                     totalAmount: amount,
                 });
                 console.log("orderedProduct.save()", orderedProduct);
+                currentUser.cart = currentUser.cart.filter(cartItem => cartItem.product._id.toString() !== item.product._id.toString());
+                await currentUser.save();
                 orderedProduct.save()
 
                 return orderedProduct
@@ -927,38 +928,52 @@ const saveRzpOrder = async (req, res, next) => {
     }
 };
 
-
 const cancelOrder = async (req, res) => {
     try {
         const orderId = req.params.orderId;
         // Find the order and get the order details
         const cancelledOrder = await Order.findById(orderId);
-        console.log("cancelledOrder.products.productPrice", cancelledOrder.products.productPrice);
-        const cancelledAmount = cancelledOrder.totalAmount - 10
 
-        // Add logic to update the order status to 'cancelled' in the database
-        await Order.findByIdAndUpdate(orderId, { status: 'cancelled' });
+        // Check if there are products in the order
+        if (cancelledOrder.products && cancelledOrder.products.length > 0) {
+            // Assuming you want to access the first product in the array
+            const firstProduct = cancelledOrder.products[0];
+            
+            // Check if the product has the productPrice property
+            if (firstProduct.productPrice !== undefined) {
+                const cancelledAmount = cancelledOrder.totalAmount - 10;
 
-        // Add the cancelled order amount to the user's wallet
-        const user = await User.findById(req.session.user_id);
-        const walletTransaction = {
-            description: `Cancelled order #${orderId}`,
-            amount: cancelledAmount,
-            type: 'Credit', // Credit the wallet with the cancelled amount
-            timestamp: new Date(),
-        };
+                // Add logic to update the order status to 'cancelled' in the database
+                await Order.findByIdAndUpdate(orderId, { status: 'cancelled' });
 
-        user.wallet.transactions.push(walletTransaction);
-        user.wallet.balance += cancelledAmount;
-        await user.save();
+                // Add the cancelled order amount to the user's wallet
+                const user = await User.findById(req.session.user_id);
+                const walletTransaction = {
+                    description: `Cancelled order #${orderId}`,
+                    amount: cancelledAmount,
+                    type: 'Credit', // Credit the wallet with the cancelled amount
+                    timestamp: new Date(),
+                };
 
+                user.wallet.transactions.push(walletTransaction);
+                user.wallet.balance += cancelledAmount;
+                await user.save();
 
-        res.redirect('/placeorder/1'); // Redirect back to the order page
+                res.redirect('/placeorder/1'); // Redirect back to the order page
+            } else {
+                console.error('ProductPrice is undefined for the first product in the order.');
+                res.status(500).send('Internal Server Error');
+            }
+        } else {
+            console.error('No products found in the cancelled order.');
+            res.status(500).send('Internal Server Error');
+        }
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Internal Server Error');
     }
 };
+
 
 
 

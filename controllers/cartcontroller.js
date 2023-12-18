@@ -47,7 +47,7 @@ const loadcartpost = async (req, res) => {
             }
             currentUser.cart.push(newCartItem);
             await currentUser.save();
-            res.redirect('shop')
+            res.redirect('shop/1')
         }
     } catch (error) {
         console.log(error.message);
