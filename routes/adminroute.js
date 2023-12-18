@@ -20,6 +20,10 @@ adminroute.get("/dashboard", adminauth.isadminLogin, admincontroller.loaddashboa
 adminroute.get("/users", adminauth.isadminLogin, admincontroller.loadusers)
 adminroute.get("/order/:page", adminauth.isadminLogin, admincontroller.loadorder);
 
+adminroute.get("/download-report",admincontroller.downloadSalesReport);
+
+
+adminroute.get("/sales/:page", adminauth.isadminLogin, admincontroller.getSalesReport);
 adminroute.post("/order/:orderId/change-status", adminauth.isadminLogin,admincontroller.update)
 
 

@@ -1,0 +1,193 @@
+<%-include('../layouts/adminlayout/header.ejs')%>
+<style>
+  .btn-info {
+    background-color: #464d74;
+    border-color: rgb(106, 122, 214);
+    color: #ffffff;
+  }
+
+  .oval {
+    border-radius: 100%;
+    border: 1rem solid #fff;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  .btn-info:hover {
+    color: #212529;
+    background-color: rgb(89, 103, 176);
+    border-color: rgb(57, 66, 115);
+    color: #ffffff;
+  }
+
+  .card {
+    margin-bottom: 20px;
+  }
+</style>
+
+<!--**********************************
+            Sidebar end
+        ***********************************-->
+
+<!--**********************************
+            Content body start
+        ***********************************-->
+<div class="content-body">
+  <div class="container-fluid">
+    <div class="row page-titles mx-0">
+      <div class="col-sm-6 p-md-0">
+        <div class="welcome-text">
+          <h4>ORDERS</h4>
+        </div>
+      </div>
+      <div class="col-sm-6 p-md-0 justify-content-sm-end mt-2 mt-sm-0 d-flex">
+        <!-- Breadcrumb goes here if needed -->
+      </div>
+    </div>
+    <!-- Add this button/link wherever you want it in your HTML -->
+ 
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-header">
+            <!-- Optional header content goes here -->
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>user</th>
+                    <th>Delivery Address</th>
+                    <th> Order Details</th>
+                   
+                  </tr>
+                </thead>
+                <tbody>
+                    <% if (!salesReport.length) { %>
+                        <tr>
+                          <td colspan="6">
+                            No data found.
+                          </td>
+                        </tr>
+                        <% } else { %>
+                            <% if (salesReport.length) { %>
+                                <div class="col-md-3 col-12 p-4">
+                                  <a href="/admin/download-report?salesReport=<%= JSON.stringify(salesReport) %>" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-download"></i>
+                                  </a>
+                                </div>
+                              <% } %>
+                        
+                        <% salesReport.forEach((report) => { %>
+                            <% report.products.forEach((product)=> { %> 
+                        <tr class=" border-bottom">
+                          <td>
+                            <%= report.user.name %><br>
+                            <p class="text-dark"><%= report.user.email %></p><br>
+                            <%= report.user.mobile %>
+                          </td>
+                          <td>
+                            <%= report.Address.state %>,
+                            <%= report.Address.city %><br>
+                            <%= report.Address.area %>,
+                            Pincode: <%= report.Address.pincode %><br>
+                            House No.: <%= report.Address.building %>
+                          </td>
+                          <td>
+                            <div>
+                              <div class="border-bottom mb-3">
+                                <span class="text-primary h6 text-uppercase">
+                                  <%= report.products[0].productId.productname %>
+                                </span><br>
+                              
+                                Quantity: <%=product.quantity %>
+                              </div>
+                              <span>
+                                <strong>
+                                  Payment Method: <%= report.paymentMethod %>
+                                </strong>
+                              </span>
+                          </td>
+                         
+                        </tr>
+                        <% }) %>
+                        <% }) %> 
+                        <% } %>
+
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination code goes here -->
+   
+
+    <% if (salesReport.length) { %>
+        <div class="container">
+          <div class="d-flex justify-content-end">
+            <nav aria-label="Page navigation">
+              <ul class="pagination">
+                <% if (currentPage > 1) { %>
+                <li class="page-item">
+                    <a class="page-link" href="/admin/sales/<%= currentPage - 1 %>" aria-label="Previous">
+
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                  </a>
+                </li>
+                <% } %>
+                <% for (let i=1; i <= totalPages; i++) { %>
+                <% if (i === currentPage) { %>
+                <li class="page-item">
+                  <a class="page-link bg-primary text-light" href="/admin/sales/<%= i %>"><%= i %></a>
+                </li>
+                <% } else { %>
+                <li class="page-item">
+                  <a class="page-link" href="/admin/sales/<%= i %>"><%= i %></a>
+                </li>
+                <% } %>
+                <% } %>
+                <% if (currentPage < totalPages) { %>
+                <li class="page-item">
+                  <a class="page-link" href="/admin/sales/<%= currentPage + 1 %>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                  </a>
+                </li>
+                <% } %>
+              </ul>
+            </nav>
+          </div>
+        </div>
+        <% } %>
+
+
+
+
+
+
+
+
+
+
+  </div>
+</div>
+<div class="footer">
+    <div class="copyright">
+        <p>Copyright © Designed &amp; Developed by <a href="#" target="_blank">Quixkit</a> 2019</p>
+    </div>
+</div>
+<!-- Footer and other content goes here -->
+<script src="/Admins/vendor/global/global.min.js"></script>
+<script src="/Admins/js/quixnav-init.js"></script>
+<script src="/Admins/js/custom.min.js"></script>
+
+</body>
+
+</html>

@@ -5,6 +5,7 @@ const orderSchema = new mongoose.Schema({
         ref: 'Address',
         required:true
     },
+
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -17,6 +18,13 @@ const orderSchema = new mongoose.Schema({
     paymentId:{
         type:String
     },
+    users:[{
+        user: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
+        },
+    }],
     products:[{
         
         productId:{
