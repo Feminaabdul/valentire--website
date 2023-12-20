@@ -62,6 +62,7 @@
                     <th>user</th>
                     <th>Delivery Address</th>
                     <th> Order Details</th>
+                    <th> Order Date</th>
                    
                   </tr>
                 </thead>
@@ -103,15 +104,45 @@
                                   <%= report.products[0].productId.productname %>
                                 </span><br>
                               
-                                Quantity: <%=product.quantity %>
-                              </div>
+                                Quantity: <%= product.quantity %>,<br>
+                                Price: <%= product.productId.price %>,<br>
+                                <%
+                                  let totalOrderPrice = product.quantity * product.productId.price ;
+                                %>
+                                Total Order Price: <%= totalOrderPrice %>
+                                
                               <span>
                                 <strong>
                                   Payment Method: <%= report.paymentMethod %>
                                 </strong>
                               </span>
                           </td>
-                         
+                          <td>
+                            <div>
+                              <div class="border-bottom mb-3">
+                                <span class="text-primary h6 text-uppercase">
+                                  Order Date
+                               
+                                </span><br>
+                              
+                                Order Confirmed:<%= report.createdAt.toDateString() %>
+                              </div>
+                              <span>
+                                <% if(report.status=="cancelled") { %>
+                                  Order cancelled: <%= report.createdAt.toDateString() %>
+                                  <% } else if(report.status=="Pending") { %>
+                              
+                                    Order return:  <%= addDays(report.createdAt, 7).toDateString() %>
+                              
+                                  <% } else { %>
+                                  <strong>
+                                      Delivery: <%= addDays(report.createdAt, 7).toDateString() %><br>
+                                    
+                                  </strong>
+                              <% } %>
+                              
+                              </span>
+                          </td>
                         </tr>
                         <% }) %>
                         <% }) %> 

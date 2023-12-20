@@ -7,31 +7,152 @@ const Joi = require('joi');
 const path = require('path')
 const sharp = require('sharp');
 const fs = require('fs');
+// const postAddProduct = async (req, res) => {
+//     try {
+
+//         const { productname, stockquantity, price, description, category, material, offer } = req.body;
+
+
+//         if (!req.files || req.files.length === 0) {
+//             const categorydata = await Category.find({});
+//             return res.render('addproduct', { category: categorydata, message: "Please upload at least one image for the product." });
+//         }
+//         let image = [];
+
+//         for (let i = 0; i < req.files.length; i++) {
+//             image[i] = req.files[i].filename;
+//         }
+//         const croppedImages = [];
+//         for (let i = 0; i < req.files.length; i++) {
+//             const imagePath = path.join(__dirname, '../public/Admins/productImages', image[i]);
+
+//             const cropOptions = {
+//                 left: 0,
+//                 top: 0,
+//                 width: 1000, // Specify the desired width
+//                 height: 1000, // Specify the desired height
+//             }; try {
+//                 const buffer = await sharp(imagePath).extract(cropOptions).toBuffer();
+//                 await sharp(buffer).toFile(imagePath);
+//                 croppedImages.push(image[i]);
+//             } catch (err) {
+//                 console.error('Error cropping image:', err);
+//                 // Handle the error as needed, you might want to return an error response to the client
+//             }
+
+
+
+//         }
+
+//         // Check if the price is greater than 1 and not 0 or a negative number
+//         if (price <= 1) {
+//             const categorydata = await Category.find({});
+//             return res.render('addproduct', { category: categorydata, message: "Please enter a  valid price " });
+//         }
+
+
+//         //    if(offer){
+//         //     const offers = await Offer.findById(offer)
+//         //     const newprice=Number(price)
+//         //     const calculator = newprice * (1 - offers.discount / 100);
+
+
+
+
+//         //     const product = new Product({
+//         //         mrp: newprice,
+//         //         productname: productname,
+//         //         stockquantity: stockquantity,
+//         //         price: calculator,
+
+//         //         description: description,
+//         //         category: category,
+//         //         image: image,
+//         //         material: material,
+//         //         offer: offer
+//         //     })
+//         //     const save1Product = await product.save();
+
+//         //     if (save1Product) {
+//         //         res.redirect("/admin/listproduct");
+//         //     } else {
+//         //         if(!image){
+//         //             const categorydata = await Category.find({});
+//         //             res.render('addproduct', { category: categorydata, message: "image not inserted" })
+//         //         }
+//         //         const categorydata = await Category.find({});
+//         //         res.render('addproduct', { category: categorydata, message: "Something went wrong" })
+//         //     }
+//         //    }else{
+//         const newprice = Number(price)
+
+//         const product = new Product({
+
+//             productname: productname,
+//             stockquantity: stockquantity,
+//             price: newprice,
+
+//             description: description,
+//             category: category,
+//             image: croppedImages,
+//             material: material,
+
+//         })
+//         const saveProduct = await product.save();
+
+//         console.log(product)
+//         if (saveProduct) {
+//             res.redirect("/admin/listproduct");
+//         } else {
+
+//             const categorydata = await Category.find({});
+//             res.render('addproduct', { category: categorydata, message: "Something went wrong", })
+//         }
+
+
+//         //    }
+
+
+
+
+
+
+
+
+
+//     } catch (error) {
+//         console.log(error.message)
+//     }
+// }
+
 const postAddProduct = async (req, res) => {
     try {
-
         const { productname, stockquantity, price, description, category, material, offer } = req.body;
-
 
         if (!req.files || req.files.length === 0) {
             const categorydata = await Category.find({});
             return res.render('addproduct', { category: categorydata, message: "Please upload at least one image for the product." });
         }
+
         let image = [];
 
         for (let i = 0; i < req.files.length; i++) {
             image[i] = req.files[i].filename;
         }
+
         const croppedImages = [];
+
         for (let i = 0; i < req.files.length; i++) {
             const imagePath = path.join(__dirname, '../public/Admins/productImages', image[i]);
 
             const cropOptions = {
                 left: 0,
                 top: 0,
-                width: 1000, // Specify the desired width
-                height: 1000, // Specify the desired height
-            }; try {
+                width: 1000,
+                height: 1000,
+            };
+
+            try {
                 const buffer = await sharp(imagePath).extract(cropOptions).toBuffer();
                 await sharp(buffer).toFile(imagePath);
                 croppedImages.push(image[i]);
@@ -39,92 +160,74 @@ const postAddProduct = async (req, res) => {
                 console.error('Error cropping image:', err);
                 // Handle the error as needed, you might want to return an error response to the client
             }
-
-
-
         }
 
         // Check if the price is greater than 1 and not 0 or a negative number
         if (price <= 1) {
             const categorydata = await Category.find({});
-            return res.render('addproduct', { category: categorydata, message: "Please enter a  valid price " });
+            return res.render('addproduct', { category: categorydata, message: "Please enter a valid price." });
         }
 
+        if (offer) {
+            const selectedOffer = await Offer.findById(offer);
+        
 
-        //    if(offer){
-        //     const offers = await Offer.findById(offer)
-        //     const newprice=Number(price)
-        //     const calculator = newprice * (1 - offers.discount / 100);
+            if (!selectedOffer) {
+                const categorydata = await Category.find({});
+                return res.render('addproduct', { category: categorydata, message: "Selected offer not found." });
+            }
 
+            const newprice = Number(price);
+            const discountedPrice = newprice * (1 - selectedOffer.discount / 100);
+console.log("discount",discountedPrice);
+            const product = new Product({
+                mrp: newprice,
+                productname: productname,
+                stockquantity: stockquantity,
+                price: discountedPrice,
+                description: description,
+                category: category,
+                image: croppedImages,
+                material: material,
+                offer: offer
+            });
 
+            const saveProduct = await product.save();
 
-
-        //     const product = new Product({
-        //         mrp: newprice,
-        //         productname: productname,
-        //         stockquantity: stockquantity,
-        //         price: calculator,
-
-        //         description: description,
-        //         category: category,
-        //         image: image,
-        //         material: material,
-        //         offer: offer
-        //     })
-        //     const save1Product = await product.save();
-
-        //     if (save1Product) {
-        //         res.redirect("/admin/listproduct");
-        //     } else {
-        //         if(!image){
-        //             const categorydata = await Category.find({});
-        //             res.render('addproduct', { category: categorydata, message: "image not inserted" })
-        //         }
-        //         const categorydata = await Category.find({});
-        //         res.render('addproduct', { category: categorydata, message: "Something went wrong" })
-        //     }
-        //    }else{
-        const newprice = Number(price)
-
-        const product = new Product({
-
-            productname: productname,
-            stockquantity: stockquantity,
-            price: newprice,
-
-            description: description,
-            category: category,
-            image: croppedImages,
-            material: material,
-
-        })
-        const saveProduct = await product.save();
-
-        console.log(product)
-        if (saveProduct) {
-            res.redirect("/admin/listproduct");
+            if (saveProduct) {
+                res.redirect("/admin/listproduct");
+            } else {
+                const categorydata = await Category.find({});
+                res.render('addproduct', { category: categorydata, message: "Something went wrong." });
+            }
         } else {
+            // If no offer is selected, proceed without discount
+            const newprice = Number(price);
 
-            const categorydata = await Category.find({});
-            res.render('addproduct', { category: categorydata, message: "Something went wrong", })
+            const product = new Product({
+                productname: productname,
+                stockquantity: stockquantity,
+                price: newprice,
+                description: description,
+                category: category,
+                image: croppedImages,
+                material: material,
+            });
+
+            const saveProduct = await product.save();
+
+            if (saveProduct) {
+                res.redirect("/admin/listproduct");
+            } else {
+                const categorydata = await Category.find({});
+                res.render('addproduct', { category: categorydata, message: "Something went wrong." });
+            }
         }
-
-
-        //    }
-
-
-
-
-
-
-
-
-
     } catch (error) {
-        console.log(error.message)
+        console.log(error.message);
+        // Handle the error as needed, you might want to return an error response to the client
     }
-}
-
+};
 
 const postEditProduct = async (req, res) => {
     try {
@@ -267,7 +370,13 @@ const Editproduct = async (req, res) => {
 const loadproduct = async (req, res) => {
     try {
         const productdata = await Product.find({}).populate("offer");
-
+        console.log("productdata",productdata);
+        productdata.forEach(product => {
+            if (product.offer && product.offer.status === true) {
+               const discount = product.offer.discount;
+               console.log('Offer discount for product:', product.productname, 'is:', discount);
+            }
+           });
 
 
         res.render('product', { product: productdata });

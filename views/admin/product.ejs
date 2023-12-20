@@ -104,8 +104,13 @@
                                                         </span>
                                                     </td>
                                                     <td><span class="text-muted">
-                                                            <% if (product[i].offer) { %>
-                                                                <%=product[i].offer.discount%>
+                                                          
+                                                            <% if (product[i].offer && product[i].offer.status === true) { %>
+                                                                
+                                                               
+                                                                <%= product[i].offer.discount%>
+                                                                <%=  console.log("bhnvgbcf",product[i].offer.discount)%>
+                                                               
                                                                     <% } else { %>
 
                                                                         <p style="margin-top: 16px; color: brown;">No

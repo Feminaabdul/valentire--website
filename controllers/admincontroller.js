@@ -4,9 +4,16 @@ const bcrypt = require("bcrypt")
 const Order = require("../models/order")
 const fs = require('fs');
 const csv = require('csv-parser');
-const PDFDocument =require ('pdfkit')
+const PDFDocument = require('pdfkit')
 const loaddashboard = async (req, res) => {
     try {
+        const odd = await Order.find({}) 
+        .populate([
+            { path: 'user', model: 'User' },
+            { path: 'Address', model: 'Address' },
+            { path: 'products.productId', model: 'product' }
+        ])
+        
         res.render('dashboard')
 
     } catch (error) {
@@ -26,14 +33,14 @@ const loadusers = async (req, res) => {
 
 
 
-const loadlogin = async (req,res)=>{
-    try{
-        if(req.session.admin_id){
+const loadlogin = async (req, res) => {
+    try {
+        if (req.session.admin_id) {
             res.redirect('/admin/dashboard')
-        }else{
+        } else {
             res.render('login');
         }
-    }catch(error){  
+    } catch (error) {
         console.log(error.message);
     }
 }
@@ -59,23 +66,23 @@ const postlogin = async (req, res) => {
     }
 }
 
-const blockuser = async (req,res) => {
+const blockuser = async (req, res) => {
     try {
         const id = req.query.id;
-        const updatedata = await User.updateOne({_id:id},{$set:{block:true, status: true}});
-        const users = await User.find({is_admin:0})
-        res.render('users',{users:users})
+        const updatedata = await User.updateOne({ _id: id }, { $set: { block: true, status: true } });
+        const users = await User.find({ is_admin: 0 })
+        res.render('users', { users: users })
     } catch (error) {
         console.log(error.message);
     }
 }
 
-const unblockuser = async (req,res) => {
+const unblockuser = async (req, res) => {
     try {
         const id = req.query.id;
-        const updatedata = await User.updateOne({_id:id},{$set:{block:false, status: false}});
-        const users = await User.find({is_admin:0})
-        res.render('users',{users:users})
+        const updatedata = await User.updateOne({ _id: id }, { $set: { block: false, status: false } });
+        const users = await User.find({ is_admin: 0 })
+        res.render('users', { users: users })
     } catch (error) {
         console.log(error.message);
     }
@@ -83,79 +90,20 @@ const unblockuser = async (req,res) => {
 
 
 
-const loadLogout = async (req,res)=>{
-    try{
-        if(req.session.admin_id){
+const loadLogout = async (req, res) => {
+    try {
+        if (req.session.admin_id) {
             req.session.admin_id = false;
             res.redirect('/admin');
-        }else{
+        } else {
             res.redirect('/admin');
         }
-    }catch(error){
+    } catch (error) {
         console.log(error.message);
     }
 }
-const downloadSalesReport = (req, res, next) => {
-    try {
-        console.log("Sales Report String:", req.query.salesReport);
-    const salesReportString = req.query.salesReport || '';
-    const decodedSalesReportString = decodeURIComponent(salesReportString);
-const salesReport = JSON.parse(decodedSalesReportString);
-        // Create a new PDF document
-        salesReport.forEach((report) => {
-            report.products.forEach((product) => {
-        const doc = new PDFDocument();
 
-        // Set the PDF response headers
-        res.setHeader('Content-Type', 'application/pdf');
-        res.setHeader('Content-Disposition', 'attachment; filename=sales-report.pdf');
-
-        // Pipe the PDF document to the response
-        doc.pipe(res);
-
-        // Add content to the PDF
-        doc.fontSize(16).text('Sales Report', { align: 'center' });
-        doc.moveDown();
-        doc.fontSize(12);
-
-        // Iterate over the salesReport data and add it to the PDF
-        salesReport.forEach((report) => {
-            doc.text(`User: ${report.user.name}`);
-            doc.text(`Email: ${report.user.email}`);
-            doc.text(`Phone: ${report.user.mobile}`);
-            doc.moveDown();
-
-            // Iterate over the products for each report
-            doc.text(`Product Name: ${product.productId.productname}`);
-            // doc.text(`Price: ${product.price}`);
-            doc.text(`Quantity: ${product.quantity}`);
-            doc.text(`Payment Method: ${report.paymentMethod}`);
-            doc.moveDown();
-
-            // doc.text(`Order Date: ${report.orderDate}`);
-            // doc.text(`Delivery Date: ${report.deliveryDate}`);
-            doc.text(`Delivery Address: ${report.Address.state}, ${report.Address.city}, ${report.Address.area}`);
-            doc.text(`Pincode: ${report.Address.pincode}`);
-            doc.text(`House No.: ${report.Address.building}`);
-            doc.moveDown();
-        });
-
-        // Add total statistics
-        doc.text(`Total orders done: ${salesReport.length}`);
-        // doc.text(`Total products sold: ${req.query.productsCount}`);
-        // doc.text(`Total Revenue: ₹${req.query.revenue}`);
-        doc.moveDown();
-
-        // Finalize and end the PDF document
-        doc.end();
-    });
-});
-    } catch (error) {
-        console.error("Error parsing salesReport JSON:", error);
-        next(error);
-    }
-};
-   const getSalesReport = async (req, res, next) => {
+const getSalesReport = async (req, res, next) => {
     try {
         const page = parseInt(req.params.page) || 1;
         const pageSize = 3;
@@ -175,24 +123,95 @@ const salesReport = JSON.parse(decodedSalesReportString);
         }
 
 
-        const filteredOrders = await Order.find({ }) .sort({ createdAt: -1 })
-      
+        const filteredOrders = await Order.find({}).sort({ createdAt: -1 })
+
             .populate([
                 { path: 'user', model: 'User' },
                 { path: 'Address', model: 'Address' },
                 { path: 'products.productId', model: 'product' }
-            ])  .skip(skip)
+            ]).skip(skip)
             .limit(pageSize);
-       
 
+            const totalOrderPrice = filteredOrders.reduce((total, order) => {
+                const orderTotal = order.products.productId.reduce((orderTotal, product) => {
+                    // Handle undefined or missing totalPrice
+                    const productTotalPrice = product.totalPrice || 0;
+                    return orderTotal + productTotalPrice;
+                }, 0);
+            
+                return total + orderTotal;
+            }, 0);
+            
+            console.log('Total Price of All Orders:', totalOrderPrice);
         res.render('sales', {
             salesReport: filteredOrders,
             activePage: 'SalesReport',
+            addDays: function (date, days) {
+                var result = new Date(date);
+                result.setDate(result.getDate() + days);
+                return result;
+            },
             currentPage: page || 1,
             totalPages: totalPages || 1,
+            totalOrderPrice
         })
 
     } catch (error) {
+        next(error);
+    }
+};
+const downloadSalesReport = (req, res, next) => {
+    try {
+        console.log("Sales Report String:", req.query.salesReport);
+        const salesReportString = req.query.salesReport || '';
+        const decodedSalesReportString = decodeURIComponent(salesReportString);
+        console.log("Decoded Sales Report String:", decodedSalesReportString);
+
+        // Attempt to parse the string
+        const salesReport = JSON.parse(decodedSalesReportString);
+
+        // Create a new PDF document
+        salesReport.forEach((report) => {
+            const doc = new PDFDocument();
+
+            // Set the PDF response headers
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `attachment; filename=sales-report-${report.user.email}.pdf`);
+
+            // Pipe the PDF document to the response
+            doc.pipe(res);
+
+            // Add content to the PDF
+            doc.fontSize(16).text('Sales Report', { align: 'center' });
+            doc.moveDown();
+            doc.fontSize(12);
+
+            // Iterate over the salesReport data and add it to the PDF
+            doc.text(`User: ${report.user.name}`);
+            doc.text(`Email: ${report.user.email}`);
+            doc.text(`Phone: ${report.user.mobile}`);
+            doc.moveDown();
+
+            // Iterate over the products for each report
+            report.products.forEach((product) => {
+                doc.text(`Product Name: ${product.productId.productname}`);
+                doc.text(`Price: ${product.price}`);
+                doc.text(`Quantity: ${product.quantity}`);
+                doc.moveDown();
+            });
+
+            // Add total statistics
+            doc.text(`Total orders done: ${salesReport.length}`);
+            doc.text(`Total products sold: ${req.query.productsCount}`);
+            doc.text(`Total Revenue: ₹${req.query.revenue}`);
+            doc.moveDown();
+
+            // Finalize and end the PDF document
+            doc.end();
+        });
+    } catch (error) {
+        console.error("Error parsing salesReport JSON:", error);
+        console.error("Error position:", error.at); 
         next(error);
     }
 };
@@ -214,7 +233,7 @@ const salesReport = JSON.parse(decodedSalesReportString);
 //             .skip(skip)
 //             .limit(pageSize);
 
-         
+
 //         res.render('sales', { odd , users:userdata,
 //             currentPage: page || 1,
 //             totalPages: totalPages || 1,});
@@ -230,8 +249,8 @@ const loadorder = async (req, res) => {
         const skip = (page - 1) * pageSize;
         const totalOrders = await Order.countDocuments();
         const totalPages = Math.ceil(totalOrders / pageSize);
-        const odd = await Order.find({ })
-        .sort({ createdAt: -1 })
+        const odd = await Order.find({})
+            .sort({ createdAt: -1 })
             .populate([
                 { path: 'user', model: 'User' },
                 { path: 'Address', model: 'Address' },
@@ -240,36 +259,38 @@ const loadorder = async (req, res) => {
             .skip(skip)
             .limit(pageSize);
 
-         
-        res.render('order', { odd , 
+
+        res.render('order', {
+            odd,
             currentPage: page || 1,
-            totalPages: totalPages || 1,});
+            totalPages: totalPages || 1,
+        });
     } catch (error) {
         console.log(error.message);
         res.status(500).send('Internal Server Error');
     }
 }
 
-const update=async(req,res)=>{
+const update = async (req, res) => {
     const { orderId } = req.params;
     const { newStatus } = req.body;
     try {
         const order = await Order.findOneAndUpdate(
-          { _id: orderId },
-          { status: newStatus },
-          { new: true }
+            { _id: orderId },
+            { status: newStatus },
+            { new: true }
         );
-    
+
         if (!order) {
             // res.redirect(`/order/${req.params.page}`);
             return res.redirect(`/admin/order/1`);
         }
         return res.redirect(`/admin/order/1`);
 
-  } catch(error){
-  console.log(error.message);
-  res.status(500).json({ error: 'Internal Server Error' });
-  }
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 }
 
 
@@ -282,7 +303,7 @@ module.exports = {
     unblockuser,
     loadLogout,
     loadorder,
-   update
-   ,getSalesReport,
-   downloadSalesReport
+    update
+    , getSalesReport,
+    downloadSalesReport
 }
