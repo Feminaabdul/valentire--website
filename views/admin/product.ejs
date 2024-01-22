@@ -1,15 +1,16 @@
 <%-include('../layouts/adminlayout/header.ejs')%>
-<style>
-    .table-responsive {
-        max-height: 800px; /* Set your desired maximum height */
-        overflow-y: auto;
-    }
+    <style>
+        .table-responsive {
+            max-height: 800px;
+            /* Set your desired maximum height */
+            overflow-y: auto;
+        }
 
-    .oval {
-        border-radius: 100%;
-        border: 1rem solid #fff;
-    }
-</style>
+        .oval {
+            border-radius: 100%;
+            border: 1rem solid #fff;
+        }
+    </style>
 
 
     <div class="content-body">
@@ -41,7 +42,8 @@
                             <div class="table-responsive">
                                 <table class="table header-border table-responsive-sm">
                                     <thead>
-                                        <tr> <th>Image</th>
+                                        <tr>
+                                            <th>Image</th>
                                             <th>Name</th>
                                             <th>Price</th>
                                             <th>Category</th>
@@ -49,8 +51,8 @@
                                             <th>Offer</th>
                                             <th>Stock Quantity</th>
                                             <th>Status</th>
-                                           
-                                           
+
+
                                             <th>Action</th>
                                             <th>Description</th>
                                         </tr>
@@ -59,16 +61,18 @@
                                         <% if(product.length>0){
                                             for(let i=0;i<product.length;i++){ %>
                                                 <tr>
-                                                      <td>
-                                                        <div >
-                                                         <%   for (let j = 0; j <  product[i].image.length; j++) {%>
-                          
-                                                            <img class="oval" style="padding-bottom: 5px;" src="/Admins/productImages/<%= product[i].image[j] %>"width="80px" height="80px">
+                                                    <td>
+                                                        <div>
+                                                            <% for (let j=0; j < product[i].image.length; j++) {%>
 
-                                                            <%}%>
+                                                                <img class="oval" style="padding-bottom: 5px;"
+                                                                    src="/Admins/productImages/<%= product[i].image[j] %>"
+                                                                    width="80px" height="80px">
+
+                                                                <%}%>
                                                         </div>
-                                                 
-                                                        
+
+
                                                     </td>
 
                                                     <td>
@@ -85,18 +89,24 @@
 
 
 
-                                                        <% if (product[i].offer) { %>
+                                                        <% if (product[i].productOffer) { %>
                                                             <div><del>
                                                                     <%=product[i].mrp%>
                                                                 </del></div>
-                                                           <div> <%=product[i].price%></div>
+                                                            <div>
+                                                                <%=product[i].price%>
+                                                            </div>
 
-                                                                <% } else { %>
-                                                                    <%=product[i].price%>
-                                                                        <% } %>
+                                                            <% } else { %>
+                                                                <%=product[i].price%>
+                                                                    <% } %>
                                                     </td>
-                                                    <td><span class="text-muted">
-                                                            <%=product[i].category%>
+                                                    <td>
+                                                        <span class="text-muted">
+                                                            <%= console.log("product[i].category:", product[i].category)
+                                                                %>
+                                                                <%= product[i].category &&
+                                                                    product[i].category.categoryName %>
                                                         </span>
                                                     </td>
                                                     <td><span class="text-muted">
@@ -104,20 +114,66 @@
                                                         </span>
                                                     </td>
                                                     <td><span class="text-muted">
-                                                          
-                                                            <% if (product[i].offer && product[i].offer.status === true) { %>
-                                                                
-                                                               
-                                                                <%= product[i].offer.discount%>
-                                                                <%=  console.log("bhnvgbcf",product[i].offer.discount)%>
-                                                               
-                                                                    <% } else { %>
-
-                                                                        <p style="margin-top: 16px; color: brown;">No
-                                                                            Offer</p>
 
 
-                                                                        <% }%>
+
+
+                                                            <p>
+                                                                <% if (product[i].productOffer &&
+                                                                    product[i].productOffer.status===true||product[i].category
+                                                                    && product[i].category?.offer &&
+                                                                    product[i].category?.status===true) { %>
+                                                                    <% if (product[i].category &&
+                                                                        product[i].category?.offer &&
+                                                                        product[i].category?.status===true) { %>
+                                                                        <% if (product[i].productOffer.discount>
+                                                                            product[i].category?.offer.discount) { %>
+                                                                            <%= product[i].productOffer.discount %>
+                                                                                <% } else { %>
+                                                                                    <%= product[i].category?.offer.discount
+                                                                                        %>
+                                                                                        <% } %>
+                                                                                            <% } else { %>
+                                                                                                <%= product[i].productOffer.discount
+                                                                                                    %>
+                                                                                                    <% } %>
+                                                                                                        <% } else if
+                                                                                                            (product[i].productOffer
+                                                                                                            &&
+                                                                                                            product[i].productOffer.status===true)
+                                                                                                            { %>
+                                                                                                            <%= product[i].productOffer.discount
+                                                                                                                %>
+                                                                                                                <% } else
+                                                                                                                    { %>
+                                                                                                                    <p
+                                                                                                                        style="color: rebeccapurple;">
+                                                                                                                        no
+                                                                                                                        offer
+                                                                                                                    </p>
+                                                                                                                    <% }
+                                                                                                                        %>
+                                                            </p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                                         </span>
                                                     </td>
                                                     <td>
@@ -131,7 +187,7 @@
                                                         </span>
                                                     </td>
 
-                                                  
+
 
                                                     <td><span class="badge badge-success"></span>
                                                         <% if(product[i].status){ %>

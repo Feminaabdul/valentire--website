@@ -47,6 +47,18 @@
                                                 <div id="categoryError" style="color: red;"></div>
                                         </div>
                                     </div>
+                                    <div class="form-group col-md-4">
+                                        <label>offer</label>
+                                        <label>Avaliable Offer</label>
+                                        <select id="offer" class="form-control" name="offer">
+                                            <option></option>
+                                            <% for(let i=0;i<offers.length;i++){ %>
+                                                <option value="<%= offers[i]._id %>">
+                                                    <%=offers[i].name%>
+                                                </option>
+                                                <% } %>
+                                        </select>
+                                    </div>
                                     <div>
                                         <% if(typeof message !='undefined' ){ %>
                                             <p style="color: red;">

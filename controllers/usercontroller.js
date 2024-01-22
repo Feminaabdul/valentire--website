@@ -71,17 +71,17 @@ const loadshop = async (req, res) => {
         let product
         if (req.query.material) {
             product = await products.find({ status: true, material: req.query.material }).skip(skip)
-            .limit(pageSize);
+            .limit(pageSize)
         } else {
             product = await products.find({ status: true }).skip(skip)
-            .limit(pageSize);
+            .limit(pageSize).populate("category")
         }
 
         let category
         if (req.query.category) {
 
             product = await products.find({ status: true, category: req.query.category }).skip(skip)
-            .limit(pageSize);
+            .limit(pageSize)
         } else {
             category = await catagories.find({}).skip(skip)
             .limit(pageSize);
@@ -146,7 +146,7 @@ const loadshopdetail = async (req, res) => {
         const user = await User.findById(req.session.user_id)
         const product = await products.findById(req.params.id)
         const wis = await User.findById(req.session.user_id).populate("cart.product")
-        console.log("cart", wis);
+       
         res.render('shopdetail', { isLoggedIn: isLoggedIn(req, res), user, product })
     } catch (error) {
         console.log(error.message);

@@ -15,11 +15,12 @@ const productSchema = new mongoose.Schema({
     },
     mrp:{
         type:Number,
-       
+        
       
     },
     category:{
-        type:String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref:"category"  
         
     },
     description:{

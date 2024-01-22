@@ -7,6 +7,7 @@ const Joi = require('joi');
 const path = require('path')
 const sharp = require('sharp');
 const fs = require('fs');
+const categoryModel = require('../models/category');
 // const postAddProduct = async (req, res) => {
 //     try {
 
@@ -128,6 +129,7 @@ const fs = require('fs');
 const postAddProduct = async (req, res) => {
     try {
         const { productname, stockquantity, price, description, category, material, offer } = req.body;
+        console.log("req.body",req.body);
 
         if (!req.files || req.files.length === 0) {
             const categorydata = await Category.find({});
@@ -170,7 +172,7 @@ const postAddProduct = async (req, res) => {
 
         if (offer) {
             const selectedOffer = await Offer.findById(offer);
-        
+
 
             if (!selectedOffer) {
                 const categorydata = await Category.find({});
@@ -179,7 +181,8 @@ const postAddProduct = async (req, res) => {
 
             const newprice = Number(price);
             const discountedPrice = newprice * (1 - selectedOffer.discount / 100);
-console.log("discount",discountedPrice);
+           
+
             const product = new Product({
                 mrp: newprice,
                 productname: productname,
@@ -193,9 +196,10 @@ console.log("discount",discountedPrice);
             });
 
             const saveProduct = await product.save();
-
+console.log("saveProduct",saveProduct);
             if (saveProduct) {
                 res.redirect("/admin/listproduct");
+                console.log("saveProdrtttyuct",saveProduct);
             } else {
                 const categorydata = await Category.find({});
                 res.render('addproduct', { category: categorydata, message: "Something went wrong." });
@@ -215,9 +219,10 @@ console.log("discount",discountedPrice);
             });
 
             const saveProduct = await product.save();
-
+            console.log("saveProduct",saveProduct);
             if (saveProduct) {
                 res.redirect("/admin/listproduct");
+                console.log("saveProduct",saveProduct);
             } else {
                 const categorydata = await Category.find({});
                 res.render('addproduct', { category: categorydata, message: "Something went wrong." });
@@ -260,7 +265,7 @@ const postEditProduct = async (req, res) => {
         // }
 
 
-        const newprice = Number(req.body.price)
+        const price = req.body.price
         const Data = await Product.findById(req.params.id);
         const offer = req.body.offer
 
@@ -279,24 +284,11 @@ const postEditProduct = async (req, res) => {
             material: Joi.string().min(3).required(),
 
         });
+        
 
 
 
-
-        const validationResult = schema.validate({
-            productName: req.body.productName,
-            price: newprice,
-            category: req.body.category,
-            stockquantity: req.body.stockquantity,
-            description: req.body.description,
-            material: req.body.material,
-
-        },);
-
-
-        if (validationResult.error) {
-            throw new Error(validationResult.error.details[0].message);
-        }
+      
 
         // if (offer) {
         //     const offers = await Offer.findById(offer)
@@ -317,22 +309,83 @@ const postEditProduct = async (req, res) => {
         //     Data.offer = offer
 
         // } else {
-        Data.productname = req.body.productName
+           
+        if (offer) {
+            const selectedOffer = await Offer.findById(offer);
+            if (!selectedOffer) {
+                const categorydata = await Category.find({});
+                return res.render('addproduct', { category: categorydata, message: "Selected offer not found." });
+            }
+            const newprice = Number(price);
+            const discountedPrice = newprice * (1 - selectedOffer.discount / 100);
+           
+            Data.productname = req.body.productName
 
-        Data.price = newprice
+            Data.price = discountedPrice
 
-        Data.category = req.body.category
-        Data.stockquantity = req.body.stockquantity
+            Data.category = req.body.category
+            Data.stockquantity = req.body.stockquantity
+            Data.mrp = newprice
 
 
-        Data.description = req.body.description
-        Data.material = req.body.material
-        Data.offer = null;
+            Data.description = req.body.description
+            Data.material = req.body.material
+            Data.offer = offer;
+            // }
+            
+            const saved = await Data.save()
+            const validationResult = schema.validate({
+                productName: req.body.productName,
+                price: discountedPrice,
+                category: req.body.category,
+                stockquantity: req.body.stockquantity,
+                description: req.body.description,
+                material: req.body.material,
+    
+            },);
+    
+    
+            if (validationResult.error) {
+                throw new Error(validationResult.error.details[0].message);
+            }
+            
+            res.redirect('/admin/product');
+        }else{
+            const newprice = Number(price); 
+            Data.productname = req.body.productName
+
+            Data.price = newprice
+    
+            Data.category = req.body.category
+            Data.stockquantity = req.body.stockquantity
+    
+    
+            Data.description = req.body.description
+            Data.material = req.body.material
+            Data.offer = null;
+           
+            const saved = await Data.save()
+            const validationResult = schema.validate({
+                productName: req.body.productName,
+                price: newprice,
+                category: req.body.category,
+                stockquantity: req.body.stockquantity,
+                description: req.body.description,
+                material: req.body.material,
+    
+            },);
+    
+    
+            if (validationResult.error) {
+                throw new Error(validationResult.error.details[0].message);
+            }
+         
+            res.redirect('/admin/product');
+        }
+      
+       
         // }
-        console.log("Data.image", Data.image);
-        const saved = await Data.save()
-        console.log("saved", saved);
-        res.redirect('/admin/product');
+      
 
     } catch (error) {
         console.log(error.message)
@@ -341,10 +394,83 @@ const postEditProduct = async (req, res) => {
 }
 
 const loadAddproduct = async (req, res) => {
-    try {
+    try {  
+         const productdata = await Product.aggregate([
+        {
+          $lookup: {
+            from: 'categories', // Assuming your category model is named 'category'
+            localField: 'category',
+            foreignField: '_id',
+            as: 'categoryInfo',
+          },
+        },
+        {
+          $unwind: '$categoryInfo',
+        },
+        {
+          $lookup: {
+            from: 'offers', // Assuming your offer model is named 'offer'
+            localField: 'categoryInfo.offer',
+            foreignField: '_id',
+            as: 'categoryInfo.offerInfo',
+          },
+        },
+        {
+          $unwind: { path: '$categoryInfo.offerInfo', preserveNullAndEmptyArrays: true },
+        },
+        {
+          $lookup: {
+            from: 'offers', // Assuming your offer model is named 'offer'
+            localField: 'offer',
+            foreignField: '_id',
+            as: 'productOfferInfo',
+          },
+        },
+        {
+          $unwind: { path: '$productOfferInfo', preserveNullAndEmptyArrays: true },
+        },
+        {
+          $project: {
+            _id: 1,
+            productname: 1,
+            stockquantity: 1,
+            price: 1,
+            mrp: 1,
+            category: {
+              _id: '$categoryInfo._id',
+              categoryName: '$categoryInfo.categoryName',
+              status: '$categoryInfo.status',
+              offer: {
+                _id: '$categoryInfo.offerInfo._id',
+                name: '$categoryInfo.offerInfo.name',
+                discount: '$categoryInfo.offerInfo.discount',
+                startingDate: '$categoryInfo.offerInfo.startingDate',
+                expiryDate: '$categoryInfo.offerInfo.expiryDate',
+                status: '$categoryInfo.offerInfo.status',
+                is_deleted: '$categoryInfo.offerInfo.is_deleted',
+              },
+            },
+            description: 1,
+            image: 1,
+            status: 1,
+            material: 1,
+            productOffer: {
+              _id: '$productOfferInfo._id',
+              name: '$productOfferInfo.name',
+              discount: '$productOfferInfo.discount',
+              startingDate: '$productOfferInfo.startingDate',
+              expiryDate: '$productOfferInfo.expiryDate',
+              status: '$productOfferInfo.status',
+              is_deleted: '$productOfferInfo.is_deleted',
+            },
+            createdAt: 1,
+            updatedAt: 1,
+          },
+        },
+      ]);
         const categorydata = await Category.find({});
         const offerdata = await Offer.find({});
-        res.render('addproduct', { category: categorydata, offers: offerdata })
+        res.render('addproduct', { category: categorydata,product:productdata, offers: offerdata })
 
     } catch (error) {
         console.log(error.message);
@@ -357,9 +483,9 @@ const Editproduct = async (req, res) => {
         const categorydata = await Category.find({});
         let id = req.params.id
         const productdata = await productmodel.findById(id)
-        console.log(productdata)
+        
         if (productdata) {
-            res.render('Editproduct', { category: categorydata, product: productdata, offer: offerdata })
+            res.render('Editproduct', { category: categorydata, product: productdata, offers: offerdata })
         }
 
     } catch (error) {
@@ -369,17 +495,152 @@ const Editproduct = async (req, res) => {
 
 const loadproduct = async (req, res) => {
     try {
-        const productdata = await Product.find({}).populate("offer");
-        console.log("productdata",productdata);
+    //     const productdata = await Product.aggregate([
+    //         {
+    //           $lookup: {
+    //             from: 'categories', // Assuming your category model is named 'category'
+    //             localField: 'category',
+    //             foreignField: '_id',
+    //             as: 'categoryInfo',
+    //           },
+    //         },
+    //         {
+    //           $unwind: '$categoryInfo',
+    //         },
+    //         {
+    //           $lookup: {
+    //             from: 'offers', // Assuming your offer model is named 'offer'
+    //             localField: 'categoryInfo.offer',
+    //             foreignField: '_id',
+    //             as: 'categoryInfo.offerInfo',
+    //           },
+              
+    //         },
+    //         {
+    //           $unwind: { path: '$categoryInfo.offerInfo', preserveNullAndEmptyArrays: true },
+    //         },
+    //         {
+    //           $project: {
+    //             _id: 1,
+    //             productname: 1,
+    //             stockquantity: 1,
+    //             price: 1,
+    //             mrp: 1,
+    //             category: {
+    //               _id: '$categoryInfo._id',
+    //               categoryName: '$categoryInfo.categoryName',
+    //               status: '$categoryInfo.status',
+    //               offer: {
+    //                 _id: '$categoryInfo.offerInfo._id',
+    //                 name: '$categoryInfo.offerInfo.name',
+    //                 discount: '$categoryInfo.offerInfo.discount',
+    //                 startingDate: '$categoryInfo.offerInfo.startingDate',
+    //                 expiryDate: '$categoryInfo.offerInfo.expiryDate',
+    //                 status: '$categoryInfo.offerInfo.status',
+    //                 is_deleted: '$categoryInfo.offerInfo.is_deleted',
+    //               },
+    //             },
+    //             description: 1,
+    //             image: 1,
+    //             status: 1,
+    //             material: 1,
+    //             offer: 1,
+    //             createdAt: 1,
+    //             updatedAt: 1,
+    //           },
+    //         },
+    //       ]);
+    //    console.log("productdata",productdata);
+      
+    const productdata = await Product.aggregate([
+        {
+          $lookup: {
+            from: 'categories', // Assuming your category model is named 'category'
+            localField: 'category',
+            foreignField: '_id',
+            as: 'categoryInfo',
+          },
+        },
+        {
+          $unwind: '$categoryInfo',
+        },
+        {
+          $lookup: {
+            from: 'offers', // Assuming your offer model is named 'offer'
+            localField: 'categoryInfo.offer',
+            foreignField: '_id',
+            as: 'categoryInfo.offerInfo',
+          },
+        },
+        {
+          $unwind: { path: '$categoryInfo.offerInfo', preserveNullAndEmptyArrays: true },
+        },
+        {
+          $lookup: {
+            from: 'offers', // Assuming your offer model is named 'offer'
+            localField: 'offer',
+            foreignField: '_id',
+            as: 'productOfferInfo',
+          },
+        },
+        {
+          $unwind: { path: '$productOfferInfo', preserveNullAndEmptyArrays: true },
+        },
+        {
+          $project: {
+            _id: 1,
+            productname: 1,
+            stockquantity: 1,
+            price: 1,
+            mrp: 1,
+            category: {
+              _id: '$categoryInfo._id',
+              categoryName: '$categoryInfo.categoryName',
+              status: '$categoryInfo.status',
+              offer: {
+                _id: '$categoryInfo.offerInfo._id',
+                name: '$categoryInfo.offerInfo.name',
+                discount: '$categoryInfo.offerInfo.discount',
+                startingDate: '$categoryInfo.offerInfo.startingDate',
+                expiryDate: '$categoryInfo.offerInfo.expiryDate',
+                status: '$categoryInfo.offerInfo.status',
+                is_deleted: '$categoryInfo.offerInfo.is_deleted',
+              },
+            },
+            description: 1,
+            image: 1,
+            status: 1,
+            material: 1,
+            productOffer: {
+              _id: '$productOfferInfo._id',
+              name: '$productOfferInfo.name',
+              discount: '$productOfferInfo.discount',
+              startingDate: '$productOfferInfo.startingDate',
+              expiryDate: '$productOfferInfo.expiryDate',
+              status: '$productOfferInfo.status',
+              is_deleted: '$productOfferInfo.is_deleted',
+            },
+            createdAt: 1,
+            updatedAt: 1,
+          },
+        },
+      ]);
+      
+      console.log(productdata);
+       
+       
         productdata.forEach(product => {
-            if (product.offer && product.offer.status === true) {
-               const discount = product.offer.discount;
-               console.log('Offer discount for product:', product.productname, 'is:', discount);
+            if (product.category.offer && product.category.offer.status === true) {
+                const discount = product.category.offer.discount;
+                console.log("sdfdfds",product.category.offer);
+                console.log("frtgtr",product.category?.offer);
+                console.log("errrrdcarw",product.category?.offer?.discount);
+                console.log('Offer discount for category:', discount);
             }
-           });
+        });
 
 
-        res.render('product', { product: productdata });
+        res.render('product', { product: productdata ,});
     } catch (error) {
         console.log(error.message);
     }
@@ -426,7 +687,7 @@ const addImage = async (req, res, next) => {
     const { id } = req.params;
     const images = req.files;
 
-    console.log("req.images", images);
+  
 
     let imagesWithPath;
     if (images && images.length) {
@@ -461,8 +722,7 @@ const addImage = async (req, res, next) => {
 
     const validImages = imagesWithPath.filter((image) => image !== null);
     const imagesWith = validImages.join('\n');
-    console.log("imagesWithPath", imagesWith);
-
+   
     try {
         await Product.findByIdAndUpdate(id, { $push: { image: imagesWith } }, { new: true });
         res.redirect(`/admin/Editproduct/${id}`);

@@ -74,13 +74,8 @@
                           </td>
                         </tr>
                         <% } else { %>
-                            <% if (salesReport.length) { %>
-                                <div class="col-md-3 col-12 p-4">
-                                  <a href="/admin/download-report?salesReport=<%= JSON.stringify(salesReport) %>" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-download"></i>
-                                  </a>
-                                </div>
-                              <% } %>
+                          <a  href="/admin/export-users-pdf"><i style="color: black; ;" class="bi bi-download"></i></a>
+                          <br>
                         
                         <% salesReport.forEach((report) => { %>
                             <% report.products.forEach((product)=> { %> 

@@ -1,6 +1,6 @@
 const Category = require('../models/category');
-
-
+const Offer = require("../models/offermodel")
+const Product = require('../models/productmodel')
 const listCategory = async(req,res) => {
     try {
         const categorydata = await Category.find({});
@@ -13,18 +13,38 @@ const listCategory = async(req,res) => {
 const postAddCategory = async (req,res) => {
     try {
         const category = req.body.category;
+        const offer = req.body.offer;
         const upperCat = category.toUpperCase();
        
         const categorydata = await Category.findOne({categoryName:upperCat});
-        if(categorydata){                                                                                               
-            res.render('addCatagory',{message:"This category is already added"})
+
+        if (offer) {
+            const selectedOffer = await Offer.findById(offer);
+            if(categorydata){                                                                                               
+                res.render('addCatagory',{message:"This category is already added"})
+            }else{
+                const category = new Category({
+                    categoryName:upperCat,
+                    offer: selectedOffer
+                })
+                const saveCat = await category.save();
+                console.log("saveCat",saveCat);
+                res.redirect("/admin/listCategory");
+                
+            }
         }else{
-            const category = new Category({
-                categoryName:upperCat
-            })
-            const saveCat = await category.save();
-            res.redirect("/admin/listCategory");
+            if(categorydata){                                                                                               
+                res.render('addCatagory',{message:"This category is already added"})
+            }else{
+                const category = new Category({
+                    categoryName:upperCat
+                })
+                const saveCat = await category.save();
+                res.redirect("/admin/listCategory");
+            }
         }
+
+       
     } catch (error) {
         console.log(error.message);
     }
@@ -34,8 +54,9 @@ const postAddCategory = async (req,res) => {
 
 
 const loadcatagory = async (req, res) => {
-    try {
-        res.render('addcatagory');
+    try {  const offerdata = await Offer.find({});
+    console.log("addcatagory=offerdata",offerdata);
+        res.render('addcatagory',{offers: offerdata});
     } catch (error) {
         console.log(error.message);
     }
@@ -58,7 +79,8 @@ const listcategorybutton = async (req,res) => {
         const id = req.query.id;
         const updatepro = await Category.updateOne({_id:id},{$set:{status:true}});
         const pro = await Category.find({})
-        res.render('catagory',{category:pro})
+        const offerdata = await Offer.find({});
+        res.render('catagory',{category:pro,offers: offerdata})
     } catch (error) {
         console.log(error.message);
     }
@@ -70,7 +92,8 @@ const Editcategory = async (req, res) => {
         let id=req.query.id
         const upperCat = id.toUpperCase();
         const categorydata = await Category.findOne({_id:upperCat});
-        res.render('Editcategory',{category:categorydata,messages: req.flash()})
+        const offerdata = await Offer.find({});
+        res.render('Editcategory',{category:categorydata,offers: offerdata,messages: req.flash()})
 
     } catch (error) {
         console.log(error.message);

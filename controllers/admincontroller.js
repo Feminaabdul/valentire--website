@@ -3,17 +3,21 @@ const User = require('../models/user')
 const bcrypt = require("bcrypt")
 const Order = require("../models/order")
 const fs = require('fs');
+const ejs = require("ejs");
+const pdf = require("html-pdf");
+const path = require("path");
+
 const csv = require('csv-parser');
 const PDFDocument = require('pdfkit')
 const loaddashboard = async (req, res) => {
     try {
-        const odd = await Order.find({}) 
-        .populate([
-            { path: 'user', model: 'User' },
-            { path: 'Address', model: 'Address' },
-            { path: 'products.productId', model: 'product' }
-        ])
-        
+        const odd = await Order.find({})
+            .populate([
+                { path: 'user', model: 'User' },
+                { path: 'Address', model: 'Address' },
+                { path: 'products.productId', model: 'product' }
+            ])
+
         res.render('dashboard')
 
     } catch (error) {
@@ -132,17 +136,8 @@ const getSalesReport = async (req, res, next) => {
             ]).skip(skip)
             .limit(pageSize);
 
-            const totalOrderPrice = filteredOrders.reduce((total, order) => {
-                const orderTotal = order.products.productId.reduce((orderTotal, product) => {
-                    // Handle undefined or missing totalPrice
-                    const productTotalPrice = product.totalPrice || 0;
-                    return orderTotal + productTotalPrice;
-                }, 0);
-            
-                return total + orderTotal;
-            }, 0);
-            
-            console.log('Total Price of All Orders:', totalOrderPrice);
+
+
         res.render('sales', {
             salesReport: filteredOrders,
             activePage: 'SalesReport',
@@ -153,68 +148,70 @@ const getSalesReport = async (req, res, next) => {
             },
             currentPage: page || 1,
             totalPages: totalPages || 1,
-            totalOrderPrice
+
         })
 
     } catch (error) {
         next(error);
     }
 };
-const downloadSalesReport = (req, res, next) => {
-    try {
-        console.log("Sales Report String:", req.query.salesReport);
-        const salesReportString = req.query.salesReport || '';
-        const decodedSalesReportString = decodeURIComponent(salesReportString);
-        console.log("Decoded Sales Report String:", decodedSalesReportString);
+// const downloadSalesReport =async(req, res, next) => {
+//     try {
+//          const salesReportString = req.query.salesReport || '';
+//         console.log("Sales Report String:", req.query.salesReport);
 
-        // Attempt to parse the string
-        const salesReport = JSON.parse(decodedSalesReportString);
 
-        // Create a new PDF document
-        salesReport.forEach((report) => {
-            const doc = new PDFDocument();
 
-            // Set the PDF response headers
-            res.setHeader('Content-Type', 'application/pdf');
-            res.setHeader('Content-Disposition', `attachment; filename=sales-report-${report.user.email}.pdf`);
+//         // Attempt to parse the string
+//         const salesReport =   JSON.parse(salesReportString);
 
-            // Pipe the PDF document to the response
-            doc.pipe(res);
+//         console.log("Parsed Sales Report:", salesReport);
 
-            // Add content to the PDF
-            doc.fontSize(16).text('Sales Report', { align: 'center' });
-            doc.moveDown();
-            doc.fontSize(12);
+//         // Create a new PDF document
+//         salesReport.forEach((report) => {
+//             const doc = new PDFDocument();
 
-            // Iterate over the salesReport data and add it to the PDF
-            doc.text(`User: ${report.user.name}`);
-            doc.text(`Email: ${report.user.email}`);
-            doc.text(`Phone: ${report.user.mobile}`);
-            doc.moveDown();
+//             // Set the PDF response headers
+//             res.setHeader('Content-Type', 'application/pdf');
+//             res.setHeader('Content-Disposition', `attachment; filename=sales-report-${report.user.email}.pdf`);
 
-            // Iterate over the products for each report
-            report.products.forEach((product) => {
-                doc.text(`Product Name: ${product.productId.productname}`);
-                doc.text(`Price: ${product.price}`);
-                doc.text(`Quantity: ${product.quantity}`);
-                doc.moveDown();
-            });
+//             // Pipe the PDF document to the response
+//             doc.pipe(res);
 
-            // Add total statistics
-            doc.text(`Total orders done: ${salesReport.length}`);
-            doc.text(`Total products sold: ${req.query.productsCount}`);
-            doc.text(`Total Revenue: ₹${req.query.revenue}`);
-            doc.moveDown();
+//             // Add content to the PDF
+//             doc.fontSize(16).text('Sales Report', { align: 'center' });
+//             doc.moveDown();
+//             doc.fontSize(12);
 
-            // Finalize and end the PDF document
-            doc.end();
-        });
-    } catch (error) {
-        console.error("Error parsing salesReport JSON:", error);
-        console.error("Error position:", error.at); 
-        next(error);
-    }
-};
+//             // Iterate over the salesReport data and add it to the PDF
+//             doc.text(`User: ${report.user.name}`);
+//             doc.text(`Email: ${report.user.email}`);
+//             doc.text(`Phone: ${report.user.mobile}`);
+//             doc.moveDown();
+
+//             // Iterate over the products for each report
+//             report.products.forEach((product) => {
+//                 doc.text(`Product Name: ${product.productId.productname}`);
+//                 doc.text(`Price: ${product.price}`);
+//                 doc.text(`Quantity: ${product.quantity}`);
+//                 doc.moveDown();
+//             });
+
+//             // Add total statistics
+//             doc.text(`Total orders done: ${salesReport.length}`);
+//             doc.text(`Total products sold: ${req.query.productsCount}`);
+//             doc.text(`Total Revenue: ₹${req.query.revenue}`);
+//             doc.moveDown();
+
+//             // Finalize and end the PDF document
+//             doc.end();
+//         });
+//     } catch (error) {
+//         console.error("Error parsing salesReport JSON:", error);
+//         console.error("Error position:", error.at); 
+//         next(error);
+//     }
+// };
 // const loadsales = async (req, res) => {
 //     try {
 //         const userdata = await User.find({ is_admin: 0 })
@@ -292,7 +289,42 @@ const update = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+const exportUsersPdf = async (req, res) => {
+    try {
+        const salesOrders = await Order.find({}).sort({ createdAt: -1 }).populate([
+            { path: 'user', model: 'User' },
+            { path: 'Address', model: 'Address' },
+            { path: 'products.productId', model: 'product' }
+        ])
+        const data = {
+            salesReport: salesOrders
+        }
+        const filePathName = path.resolve(__dirname, '../views/admin/htmltopdf.ejs');
+        const htmlString = fs.readFileSync(filePathName).toString();
+        let option = {
+            format: 'A3'
+        }
+        const ejsData = ejs.render(htmlString, data)
+        pdf.create(ejsData, option).toFile('users.pdf', (err, response) => {
+            if (err) console.log(err);
+            const filePath=path.resolve(__dirname,'../users.pdf')
+            fs.readFile(filePath,(err,file)=>{
+                if (err){
+                    console.log(err)
+                    return res.status(500).send('no dowlnoad')
+                }
+                res.setHeader('Content-Type','application/pdf')
+                res.setHeader('Content-Disposition','attachment;filename="users.pdf"');
+                res.send(file)
+            })
+           console.log('file generated');
 
+        });
+
+    } catch (error) {
+        console.log(error.message);
+    }
+}
 
 module.exports = {
     loaddashboard,
@@ -305,5 +337,5 @@ module.exports = {
     loadorder,
     update
     , getSalesReport,
-    downloadSalesReport
+    exportUsersPdf
 }
